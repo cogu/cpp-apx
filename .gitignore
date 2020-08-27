@@ -1,11 +1,12 @@
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
+#build files
+**/Debug/
+**/Release
+**/UnitTest
+**/VisualStudio
+**/build/
+**.vs/
+*.VC.db
+*.VC.opendb
+projects/visual_studio/cpp_apx_test/packages/
+projects/visual_studio/dtl_test/packages/
+projects/visual_studio/bstr_test/packages/

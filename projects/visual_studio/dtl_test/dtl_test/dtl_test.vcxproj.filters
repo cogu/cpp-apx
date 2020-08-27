@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\..\..\..\dtl\test\cpp\test_dtl_sv.cpp">
+      <Filter>dtl\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dtl\test\cpp\test_dtl_av.cpp">
+      <Filter>dtl\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dtl\test\cpp\test_dtl_hv.cpp">
+      <Filter>dtl\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dtl\src\cpp\dtl.cpp">
+      <Filter>dtl\source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp">
+      <Filter>dtl\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="dtl">
+      <UniqueIdentifier>{6a191927-6f0e-4650-af96-e8df9518060c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dtl\include">
+      <UniqueIdentifier>{bedc1f7c-1869-4c13-8c5c-3f0186fe2285}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dtl\source">
+      <UniqueIdentifier>{10202c36-b013-45aa-ba81-db2dd656a1a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dtl\test">
+      <UniqueIdentifier>{f22c9a4b-1daf-4755-aa86-12abc914429d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

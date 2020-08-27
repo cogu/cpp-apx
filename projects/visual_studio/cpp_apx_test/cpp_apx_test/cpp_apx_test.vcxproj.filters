@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\apx\src\parser.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\data_element.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\data_type.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="test_main.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\attribute_parser.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_attribute_parser.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_data_element.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_parser.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\port_attribute.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\node.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_node.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\signature_parser.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_signature_parser.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dtl\src\cpp\dtl.cpp">
+      <Filter>dtl\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_port_instance.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\types.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\parser.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_element.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_signature.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_type.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\attribute_parser.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\bstr\include\bstr.hpp">
+      <Filter>bstr\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\error.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\signature_parser.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp">
+      <Filter>dtl\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="apx">
+      <UniqueIdentifier>{7cfd6e50-d328-413d-8a6b-d70933c6afdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="apx\test">
+      <UniqueIdentifier>{ca9843e2-3add-4dc1-98ee-ed7355eba56e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="apx\include">
+      <UniqueIdentifier>{bdf53eda-c1d8-44ba-982b-e5051c9f2cee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dtl">
+      <UniqueIdentifier>{39571ce9-9dab-4c26-be1f-27a68b1541eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dtl\include">
+      <UniqueIdentifier>{1c1a116e-a583-482f-8859-9e3d4d8bd47b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dtl\src">
+      <UniqueIdentifier>{49a289ca-b42a-4c25-b103-09ab2a9cd729}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="apx\src">
+      <UniqueIdentifier>{1b410ce7-77f9-4fd0-a46f-40dcde0c7306}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bstr">
+      <UniqueIdentifier>{84830a85-ec4a-495b-a97e-c5c1d055fa59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bstr\include">
+      <UniqueIdentifier>{5ba5283d-4244-4344-a67a-44d3bec7f133}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

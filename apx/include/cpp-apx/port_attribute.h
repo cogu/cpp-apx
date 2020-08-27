@@ -1,0 +1,24 @@
+#pragma once
+
+#include <memory>
+#include <cstdint>
+#include "dtl.hpp"
+
+namespace apx
+{
+   enum class PortAttributeType {
+      None,
+      InitValue,
+      Parameter,
+      QueueLength
+   };
+   struct PortAttributes
+   {
+      bool has_init_value() { return init_value.get() != nullptr; }
+      dtl::Value* get_init_value() { return init_value.get(); }
+      dtl::DynamicValue init_value{ nullptr };
+      bool is_parameter = false;
+      uint32_t dynamic_length = 0u;
+      uint32_t queue_length = 0u;
+   };
+}
