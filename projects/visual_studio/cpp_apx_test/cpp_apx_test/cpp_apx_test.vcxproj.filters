@@ -45,6 +45,7 @@
     <ClCompile Include="..\..\..\..\apx\test\test_port_instance.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\include\cpp-apx\port.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

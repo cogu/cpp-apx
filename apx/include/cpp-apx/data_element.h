@@ -11,6 +11,7 @@
 
 namespace apx
 {
+   struct DataType;
    class DataElement
    {
    public:
@@ -35,13 +36,13 @@ namespace apx
       void append(std::unique_ptr<DataElement> child_element);
       std::size_t get_num_child_elements() { return m_elements->size(); }
       DataElement* get_child_at(unsigned int i) const { return m_elements->at(i).get(); }
-      void set_typeref(uint32_t type_id) { m_type_ref = type_id; }
-      void set_typeref(char const* name) { m_type_ref = name; }
-      void set_typeref(DataElement* element) { m_type_ref = element; }
+      void set_typeref(uint32_t type_id) { m_type_ref = type_id; m_type_code = apx::TypeCode::TypeRefId; }
+      void set_typeref(char const* name) { m_type_ref = name; m_type_code = apx::TypeCode::TypeRefName; }
+      void set_typeref(DataType* element) { m_type_ref = element; m_type_code = apx::TypeCode::TypeRefPtr; }
       std::size_t get_typeref_index() const { return m_type_ref.index(); }
-      uint32_t get_typeref_by_id() const { return std::get<uint32_t>(m_type_ref); };
-      std::string const& get_typeref_by_name() const { return std::get<std::string>(m_type_ref); };
-      DataElement* get_typeref_by_ptr() const { return std::get<DataElement*>(m_type_ref); };
+      uint32_t get_typeref_id() const { return std::get<uint32_t>(m_type_ref); };
+      std::string const& get_typeref_name() const { return std::get<std::string>(m_type_ref); };
+      DataType* get_typeref_ptr() const { return std::get<DataType*>(m_type_ref); };
       void set_name(std::string const&& name) { m_name = name; }
       std::string const& get_name() const { return m_name; }
       void set_dynamic_array() { m_dynamic_array = true; }
@@ -53,7 +54,7 @@ namespace apx
       apx::TypeCode m_type_code = apx::TypeCode::None;
       uint32_t m_array_len = 0u;
       bool m_dynamic_array = false;
-      std::variant<uint32_t, std::string, DataElement*> m_type_ref; // uint32_t when m_type_code equals TypeRefId,
+      std::variant<uint32_t, std::string, DataType*> m_type_ref;    // uint32_t when m_type_code equals TypeRefId,
                                                                     // String when m_type_code equals TypeRefName,
                                                                     // Pointer when m_type_code equals TypeRefPtr
       std::unique_ptr<std::vector<std::unique_ptr<DataElement>>> m_elements = nullptr;

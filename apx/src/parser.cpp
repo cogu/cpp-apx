@@ -128,7 +128,7 @@ namespace apx
       if (result)
       {
          std::string name{ name_bstr->first, name_bstr->second };
-         auto data_type = new apx::DataType(std::move(name));
+         auto data_type = new apx::DataType(std::move(name), m_state.lineno);
          data_type->dsg.element = std::move(m_state.data_element);
          if (has_attr)
          {
@@ -178,7 +178,7 @@ namespace apx
       if (result)
       {
          std::string name{ name_bstr->first, name_bstr->second };
-         auto port = new apx::Port(port_type, std::move(name));
+         auto port = new apx::Port(port_type, std::move(name), m_state.lineno);
          port->dsg.element = std::move(m_state.data_element);
          if (has_attr)
          {

@@ -27,12 +27,16 @@ namespace apx
       apx::DataType* get_last_data_type();      
       apx::Port* get_last_require_port();
       apx::Port* get_last_provide_port();
+      apx::error_t finalize();
+      int get_last_error_line() const { return m_last_error_line; }
    protected:
+      apx::error_t derive_types_on_ports(std::vector< std::unique_ptr<apx::Port>>& ports);
       std::string m_name;
       std::vector<std::unique_ptr<apx::DataType>> m_data_types;
       std::vector<std::unique_ptr<apx::Port>> m_require_ports;
       std::vector<std::unique_ptr<apx::Port>> m_provide_ports;
       std::map<std::string, apx::DataType*> m_type_map;
       std::map<std::string, apx::Port*> m_port_map;
+      int m_last_error_line{ -1 };
    };
 }

@@ -22,6 +22,6 @@ namespace apx
       std::vector<uint8_t> pack_program;
       std::vector<uint8_t> unpack_program;
       std::unique_ptr<apx::DataElement> data_element;
-
+      std::string data_signature;
    };
 }

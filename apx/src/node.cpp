@@ -105,3 +105,34 @@ apx::Port* apx::Node::get_last_provide_port()
    return nullptr;
 }
 
+apx::error_t apx::Node::finalize()
+{
+    m_last_error_line = -1;
+    apx::error_t result = derive_types_on_ports(m_provide_ports);
+    if (result != APX_NO_ERROR)
+    {
+       return result;
+    }
+    result = derive_types_on_ports(m_require_ports);
+    if (result != APX_NO_ERROR)
+    {
+       return result;
+    }
+    return APX_NO_ERROR;
+}
+
+apx::error_t apx::Node::derive_types_on_ports(std::vector<std::unique_ptr<apx::Port>>& ports)
+{
+   for (auto it = ports.begin(); it != ports.end(); it++)
+   {
+      auto* port = it->get();
+      apx::error_t result = port->derive_types(m_data_types, m_type_map);
+      if (result != APX_NO_ERROR)
+      {         
+         m_last_error_line = port->line_number;
+         return result;
+      }
+   }
+   return APX_NO_ERROR;
+}
+
