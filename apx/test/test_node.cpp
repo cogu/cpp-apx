@@ -117,4 +117,40 @@ namespace apx_test
        ASSERT_NE(data_element, nullptr);
        ASSERT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefPtr);
    }
+   
+   
+   TEST(Node, FollowRecursiveTypeRefById)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "T\"UserName_T\"a[20]\n"
+         "T\"UserId_T\"L\n"
+         "R\"UserInfo\"{\"UserName\"T[0]\"UserId\"T[1]}\n";
+
+      apx::Parser parser;
+      std::stringstream ss;
+      ss.str(apx_text);
+      EXPECT_TRUE(parser.parse(ss));
+      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      EXPECT_EQ(node->finalize(), APX_NO_ERROR);
+
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      ASSERT_EQ(port->line_number, 5);
+      auto data_element = port->get_data_element();
+      ASSERT_NE(data_element, nullptr);
+      ASSERT_EQ(data_element->get_type_code(), apx::TypeCode::Record);
+      ASSERT_EQ(data_element->get_num_child_elements(), 2u);
+      auto child_element = data_element->get_child_at(0);
+      ASSERT_NE(child_element, nullptr);
+      ASSERT_EQ(child_element->get_name(), "UserName");
+      ASSERT_EQ(child_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+      child_element = data_element->get_child_at(1);
+      ASSERT_NE(child_element, nullptr);
+      ASSERT_EQ(child_element->get_name(), "UserId");
+      ASSERT_EQ(child_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+
+   }
+   
 }

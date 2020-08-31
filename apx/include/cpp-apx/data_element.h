@@ -5,9 +5,11 @@
 #include <variant>
 #include <optional>
 #include <memory>
+#include <map>
 #include <utility>
 #include <string>
 #include "cpp-apx/types.h"
+#include "cpp-apx/error.h"
 
 namespace apx
 {
@@ -35,7 +37,7 @@ namespace apx
       std::pair<uint32_t, uint32_t> get_limits_unsigned();
       void append(std::unique_ptr<DataElement> child_element);
       std::size_t get_num_child_elements() { return m_elements->size(); }
-      DataElement* get_child_at(unsigned int i) const { return m_elements->at(i).get(); }
+      DataElement* get_child_at(std::size_t i) const { return m_elements->at(i).get(); }
       void set_typeref(uint32_t type_id) { m_type_ref = type_id; m_type_code = apx::TypeCode::TypeRefId; }
       void set_typeref(char const* name) { m_type_ref = name; m_type_code = apx::TypeCode::TypeRefName; }
       void set_typeref(DataType* element) { m_type_ref = element; m_type_code = apx::TypeCode::TypeRefPtr; }
@@ -47,6 +49,7 @@ namespace apx
       std::string const& get_name() const { return m_name; }
       void set_dynamic_array() { m_dynamic_array = true; }
       bool is_dynamic_array() const { return m_dynamic_array; }
+      apx::error_t derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
 
    protected:
       void init_element_vector();

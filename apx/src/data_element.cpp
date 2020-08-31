@@ -1,3 +1,4 @@
+#include <cassert>
 #include "cpp-apx/data_element.h"
 //DEBUG ONLY
 #include <iostream>
@@ -91,5 +92,49 @@ namespace apx
       {
          m_elements = std::make_unique<std::vector<std::unique_ptr<DataElement>>>();
       }
+   }
+
+   apx::error_t apx::DataElement::derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map)
+   {
+      const auto type_code = m_type_code;
+      if (type_code == apx::TypeCode::Record)
+      {
+         std::size_t num_elements = get_num_child_elements();
+         for (std::size_t i = 0u; i < num_elements; i++)
+         {
+            auto child_element = get_child_at(i);
+            assert(child_element != nullptr);
+            std::cout << child_element->get_name() << std::endl;
+            auto result = child_element->derive_types_on_element(type_list, type_map);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+         }
+      }
+      else if (type_code == apx::TypeCode::TypeRefId)
+      {
+         uint32_t type_index = get_typeref_id();
+         uint32_t num_types = (uint32_t)type_list.size();
+         if (type_index >= num_types)
+         {
+            return APX_INVALID_TYPE_REF_ERROR;
+         }
+         apx::DataType* data_type = type_list[type_index].get();
+         if (data_type == nullptr)
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         set_typeref(data_type);
+      }
+      else if (type_code == apx::TypeCode::TypeRefName)
+      {
+         return APX_NOT_IMPLEMENTED_ERROR;
+      }
+      else
+      {
+         //All other types are already derived
+      }
+      return APX_NO_ERROR;
    }
 }

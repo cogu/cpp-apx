@@ -218,6 +218,18 @@ TEST(ApxParser, Record_Notification_T)
    auto port = node->get_data_type(0u);
    ASSERT_NE(port, nullptr);
    ASSERT_EQ(port->name, "Notification_T"s);
+   auto data_element = port->get_data_element();
+   ASSERT_NE(data_element, nullptr);
+   ASSERT_EQ(data_element->get_num_child_elements(), 3);
+   auto child_element = data_element->get_child_at(0u);
+   ASSERT_NE(child_element, nullptr);
+   ASSERT_EQ(child_element->get_name(), "ID"s);
+   child_element = data_element->get_child_at(1u);
+   ASSERT_NE(child_element, nullptr);
+   ASSERT_EQ(child_element->get_name(), "Stat"s);
+   child_element = data_element->get_child_at(2);
+   ASSERT_NE(child_element, nullptr);
+   ASSERT_EQ(child_element->get_name(), "Type"s);
 }
 
 TEST(ApxParser, ParseErrorInRecord)
