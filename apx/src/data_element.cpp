@@ -103,8 +103,10 @@ namespace apx
          for (std::size_t i = 0u; i < num_elements; i++)
          {
             auto child_element = get_child_at(i);
-            assert(child_element != nullptr);
-            std::cout << child_element->get_name() << std::endl;
+            if (child_element == nullptr)
+            {
+               return APX_NULL_PTR_ERROR;
+            }
             auto result = child_element->derive_types_on_element(type_list, type_map);
             if (result != APX_NO_ERROR)
             {
@@ -129,7 +131,16 @@ namespace apx
       }
       else if (type_code == apx::TypeCode::TypeRefName)
       {
-         return APX_NOT_IMPLEMENTED_ERROR;
+         auto type_name = get_typeref_name();
+         auto it = type_map.find(type_name);
+         if (it != type_map.end())
+         {
+            set_typeref(it->second);
+         }
+         else
+         {
+            return APX_INVALID_TYPE_REF_ERROR;
+         }
       }
       else
       {

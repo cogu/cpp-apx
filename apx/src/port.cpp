@@ -8,7 +8,7 @@ apx::error_t apx::Port::derive_types(const std::vector<std::unique_ptr<apx::Data
    if (data_element == nullptr)
    {
       return APX_NULL_PTR_ERROR;
-   }   
+   }
    return data_element->derive_types_on_element(type_list, type_map);
 }
 

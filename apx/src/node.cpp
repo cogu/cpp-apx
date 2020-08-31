@@ -79,7 +79,7 @@ apx::Port* apx::Node::get_provide_port(apx::port_id_t id)
 }
 
 apx::DataType* apx::Node::get_last_data_type()
-{   
+{
    if (m_data_types.size() > 0)
    {
       return m_data_types[m_data_types.size()-1].get();
@@ -128,7 +128,7 @@ apx::error_t apx::Node::derive_types_on_ports(std::vector<std::unique_ptr<apx::P
       auto* port = it->get();
       apx::error_t result = port->derive_types(m_data_types, m_type_map);
       if (result != APX_NO_ERROR)
-      {         
+      {
          m_last_error_line = port->line_number;
          return result;
       }
