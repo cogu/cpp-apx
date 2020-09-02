@@ -45,6 +45,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_type.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\error.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\pack.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h" />
@@ -52,6 +53,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\types.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\parser.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vmdefs.h" />
     <ClInclude Include="..\..\..\..\bstr\include\bstr.hpp" />
     <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp" />
     <ClInclude Include="pch.h" />
@@ -89,6 +91,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\test\test_data_element.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_pack.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_parser.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_attribute_parser.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_node.cpp" />
