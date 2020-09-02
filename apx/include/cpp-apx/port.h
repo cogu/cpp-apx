@@ -20,7 +20,7 @@ namespace apx
       apx::DataElement* get_data_element() { return dsg.element.get(); }
       apx::PortAttributes* get_attributes() { return attr.get(); }
       apx::error_t derive_types(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
-      apx::error_t derive_types_on_element(apx::DataElement *data_element, const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
+      apx::error_t derive_proper_init_value();
 
       apx::PortType port_type;
       std::string name;

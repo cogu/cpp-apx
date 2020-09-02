@@ -1,5 +1,6 @@
 #include <cassert>
 #include "cpp-apx/data_element.h"
+#include "cpp-apx/data_type.h"
 //DEBUG ONLY
 #include <iostream>
 
@@ -148,4 +149,97 @@ namespace apx
       }
       return APX_NO_ERROR;
    }
+
+   /*
+   * Note: Calling this function before finalizing the node is not allowed
+   */
+   apx::TypeCode DataElement::resolve_type_code()
+   {
+      if ((m_type_code == apx::TypeCode::TypeRefId) || (m_type_code == apx::TypeCode::TypeRefName))
+      {
+         return apx::TypeCode::None;
+      }
+      else if (m_type_code == apx::TypeCode::TypeRefPtr)
+      {
+         apx::DataType* data_type = get_typeref_ptr();
+         assert(data_type != nullptr);
+         return data_type->resolve_type_code();
+      }
+      return m_type_code;
+   }
+
+
+   apx::error_t DataElement::derive_proper_init_value(dtl::DynamicValue& parsed_init_value, dtl::DynamicValue& derived_value)
+   {
+      apx::TypeCode type_code = resolve_type_code();
+      assert(  (type_code != apx::TypeCode::None) &&
+               (type_code != apx::TypeCode::TypeRefId) &&
+               (type_code != apx::TypeCode::TypeRefName) &&
+               (type_code != apx::TypeCode::TypeRefPtr)
+            );
+      if (type_code == apx::TypeCode::Record)
+      {
+         return APX_NOT_IMPLEMENTED_ERROR;
+      }
+      else if (is_array())
+      {
+         if (parsed_init_value->dv_type() == dtl::ValueType::Array)
+         {
+            auto parsed_av = dynamic_cast<dtl::Array*>(parsed_init_value.get());
+            assert(parsed_av != nullptr);
+            if (is_dynamic_array())
+            {
+               return APX_NOT_IMPLEMENTED_ERROR;
+            }
+            else
+            {
+               if (m_array_len == parsed_av->length())
+               {
+                  auto derived_av = new dtl::Array();
+                  for (uint32_t i = 0; i < m_array_len; i++)
+                  {
+                     auto child_dv = parsed_av->at(i);
+                     if (child_dv->dv_type() == dtl::ValueType::Scalar)
+                     {
+                        derived_av->push(child_dv);
+                     }
+                     else
+                     {
+                        delete derived_av;
+                        return APX_DV_TYPE_ERROR;
+                     }
+                  }
+                  derived_value.reset(derived_av);
+               }
+               else
+               {
+                  return APX_LENGTH_ERROR;
+               }
+            }
+         }
+         else
+         {
+            return APX_DV_TYPE_ERROR;
+         }
+      }
+      else
+      {
+         if (parsed_init_value->dv_type() == dtl::ValueType::Scalar)
+         {
+            derived_value = parsed_init_value;
+         }
+         else
+         {
+            return APX_DV_TYPE_ERROR;
+         }
+      }
+      return APX_NO_ERROR;
+   }
+
+   apx::error_t DataElement::create_default_init_value(dtl::DynamicValue& derived_value)
+   {
+      return APX_NO_ERROR;
+   }
+
+
 }

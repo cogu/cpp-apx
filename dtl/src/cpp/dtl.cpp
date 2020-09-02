@@ -17,15 +17,6 @@ namespace dtl
    constexpr int I64_ID = 2;
    constexpr int U64_ID = 3;
    constexpr int STR_ID = 4;
-   Scalar::Scalar() : Value{ dtl::ValueType::Scalar }
-   {
-
-   }
-
-   Scalar::~Scalar()
-   {
-      
-   }
 
    ScalarType Scalar::sv_type()
    {
@@ -137,7 +128,7 @@ namespace dtl
          switch (m_sv_data.value().index())
          {
          case I32_ID:
-            retval = static_cast<uint32_t>(std::get<uint32_t>(m_sv_data.value()));
+            retval = static_cast<uint32_t>(std::get<int32_t>(m_sv_data.value()));
             ok = true;
             break;
          case U32_ID:

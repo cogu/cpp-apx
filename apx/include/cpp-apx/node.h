@@ -20,17 +20,19 @@ namespace apx
       std::string& get_name() { return m_name; }
       std::size_t get_num_data_types() { return m_data_types.size(); }
       std::size_t get_num_require_ports() { return m_require_ports.size(); }
-      std::size_t get_num_provide_ports() { return m_provide_ports.size(); }      
+      std::size_t get_num_provide_ports() { return m_provide_ports.size(); }
       apx::DataType* get_data_type(apx::type_id_t id);
       apx::Port* get_require_port(apx::port_id_t id);
       apx::Port* get_provide_port(apx::port_id_t id);
-      apx::DataType* get_last_data_type();      
+      apx::DataType* get_last_data_type();
       apx::Port* get_last_require_port();
       apx::Port* get_last_provide_port();
       apx::error_t finalize();
       int get_last_error_line() const { return m_last_error_line; }
    protected:
       apx::error_t derive_types_on_ports(std::vector< std::unique_ptr<apx::Port>>& ports);
+      apx::error_t derive_proper_init_values_on_ports(std::vector< std::unique_ptr<apx::Port>>& ports);
+
       std::string m_name;
       std::vector<std::unique_ptr<apx::DataType>> m_data_types;
       std::vector<std::unique_ptr<apx::Port>> m_require_ports;

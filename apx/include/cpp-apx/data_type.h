@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "cpp-apx/types.h"
 #include "cpp-apx/data_signature.h"
 #include "cpp-apx/type_attribute.h"
 
@@ -12,6 +13,7 @@ namespace apx
       DataType(std::string const& type_name, int32_t lineno) : name{ type_name }, line_number{ lineno }{}
       apx::DataElement* get_data_element() { return dsg.element.get(); }
       apx::TypeAttributes* get_attributes() { return attr.get(); }
+      apx::TypeCode resolve_type_code();
 
       std::string name;
       apx::DataSignature dsg;

@@ -16,9 +16,10 @@ namespace apx
    {
       bool has_init_value() { return init_value.get() != nullptr; }
       dtl::Value* get_init_value() { return init_value.get(); }
+      dtl::DynamicValue get_shared_init_value() { return init_value; }
 
       dtl::DynamicValue init_value{ nullptr };
-      bool is_parameter = false;      
+      bool is_parameter = false;
       uint32_t queue_length = 0u;
    };
 }

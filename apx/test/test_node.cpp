@@ -206,4 +206,30 @@ namespace apx_test
       ASSERT_EQ(child_element->get_name(), "UserId");
       ASSERT_EQ(child_element->get_type_code(), apx::TypeCode::TypeRefPtr);
    }
+
+   TEST(Node, DeriveProperInitValueU8)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "R\"U8Signal\"C:=255\n";
+
+      apx::Parser parser;
+      std::stringstream ss;
+      ss.str(apx_text);
+      EXPECT_TRUE(parser.parse(ss));
+      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      EXPECT_EQ(node->finalize(), APX_NO_ERROR);
+
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      ASSERT_NE(port->proper_init_value, nullptr);
+      auto init_value = port->proper_init_value;
+      ASSERT_EQ(init_value->dv_type(), dtl::ValueType::Scalar);
+      auto sv = dynamic_cast<dtl::Scalar*>(init_value.get());
+      bool ok;
+      ASSERT_EQ(sv->to_u32(ok), 255u);
+      ASSERT_TRUE(ok);
+   }
+
 }

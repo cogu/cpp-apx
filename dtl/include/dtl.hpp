@@ -63,8 +63,16 @@ namespace dtl
          int64_t,             //index 2
          uint64_t,            //index 3
          std::string> >;      //index 4
-      Scalar();
-      ~Scalar();
+      Scalar() : Value{ dtl::ValueType::Scalar } {}
+      Scalar(int32_t value) : Value{ dtl::ValueType::Scalar } { set(value);  }
+      Scalar(uint32_t value) : Value{ dtl::ValueType::Scalar } { set(value); }
+      Scalar(int64_t value) : Value{ dtl::ValueType::Scalar } { set(value); }
+      Scalar(uint64_t value) : Value{ dtl::ValueType::Scalar } { set(value); }
+      Scalar(const std::string& value) : Value{ dtl::ValueType::Scalar } { set(value); }
+      Scalar(const char* value) : Value{ dtl::ValueType::Scalar } { set(value); }
+      Scalar(const char* begin, const char* end) : Value{ dtl::ValueType::Scalar } { set(begin, end); }
+
+      ~Scalar() {}
       ScalarType sv_type();
       bool has_value() { return m_sv_data.has_value(); }
       void reset();

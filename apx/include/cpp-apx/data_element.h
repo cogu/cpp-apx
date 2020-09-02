@@ -10,6 +10,7 @@
 #include <string>
 #include "cpp-apx/types.h"
 #include "cpp-apx/error.h"
+#include "dtl.hpp"
 
 namespace apx
 {
@@ -50,6 +51,10 @@ namespace apx
       void set_dynamic_array() { m_dynamic_array = true; }
       bool is_dynamic_array() const { return m_dynamic_array; }
       apx::error_t derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
+      apx::TypeCode resolve_type_code();
+      apx::error_t derive_proper_init_value(dtl::DynamicValue &parsed_init_value, dtl::DynamicValue& derived_value);
+      apx::error_t create_default_init_value(dtl::DynamicValue& derived_value);
+
 
    protected:
       void init_element_vector();
