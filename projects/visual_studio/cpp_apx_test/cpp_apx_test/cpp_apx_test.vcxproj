@@ -49,10 +49,12 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\program.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\signature_parser.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\types.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\parser.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vm.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vmdefs.h" />
     <ClInclude Include="..\..\..\..\bstr\include\bstr.hpp" />
     <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp" />
@@ -86,6 +88,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\program.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\signature_parser.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -96,6 +102,7 @@
     <ClCompile Include="..\..\..\..\apx\test\test_attribute_parser.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_node.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_port_instance.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_program.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_signature_parser.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>

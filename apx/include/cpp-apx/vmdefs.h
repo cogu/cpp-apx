@@ -24,7 +24,6 @@
 #pragma once
 
 #include "cpp-apx/types.h"
-#include <vector>
 
 namespace apx
 {
@@ -36,7 +35,8 @@ namespace apx
    * Byte 4: VM_MINOR_VERSION
    * Byte 5: (high nibble): program flags
    * Byte 6: (Low nibble) program type
-   * Bytes 7-10: Maximum used data size of this program (encoded as uint32_le)
+   * Bytes 7-10: Maximum used data size required by this program (encoded as uint32_le)
+   *             If no program flags are active this is the exact data size required by the program.
    */
    constexpr std::uint32_t VM_HEADER_SIZE = 8u;
    constexpr std::uint8_t APX_VM_MAGIC_NUMBER_0 = ((uint8_t)'A');
@@ -47,7 +47,8 @@ namespace apx
    constexpr std::uint32_t VM_HEADER_DATA_SIZE_OFFSET = 7;
    constexpr std::uint8_t VM_HEADER_PROG_TYPE_UNPACK = 0x00;
    constexpr std::uint8_t VM_HEADER_PROG_TYPE_PACK = 0x01;
-   constexpr std::uint8_t VM_HEADER_FLAG_DYNAMIC_DATA = 0x10;
+   constexpr std::uint8_t VM_HEADER_FLAG_DYNAMIC_DATA = 0x10; //This is just an indicator if any dynamic arrays are present inside the data.
+   constexpr std::uint8_t VM_HEADER_FLAG_QUEUED_DATA = 0x20; //When this is active, the very next instruction must be OPCODE_DATA_SIZE.
    constexpr std::uint32_t VM_INSTRUCTION_SIZE = sizeof(std::uint8_t);
 
    /* APX INSTRUCTION
@@ -90,11 +91,11 @@ namespace apx
       11: BYTES (immutable bytes object)
       12: STRING
 
-   2: ARRAY_SIZE     : 3 variants
+   2: DATA_SIZE     : 3 variants
       FLAG: is_dynamic_array(true, false)
-      0: U8
-      1: U16
-      2: U32
+      0: U8_SIZE
+      1: U16_SIZE
+      2: U32_SIZE
    3: DATA_CTRL  : 1 variant
       0: RECORD_SELECT
          FLAG: When 1 it means this is the last record field.
@@ -123,20 +124,23 @@ namespace apx
    constexpr std::uint8_t VARIANT_ARRAY = 8; //This obviously must have instruction flag bit set
    constexpr std::uint8_t VARIANT_RECORD = 9;
 
-
+   constexpr std::uint8_t OPCODE_NONE = 0; //This is true directly after program header
    constexpr std::uint8_t OPCODE_PACK = 1;
       //same variants as OPCODE_UNPACK
-   constexpr std::uint8_t OPCODE_ARRAY_SIZE = 2;
+   constexpr std::uint8_t OPCODE_DATA_SIZE = 2;
+      // This instruction is context-dependent:
+      // * When found directly after PACK/UNPACK instruction it's an array size (previous instruction must have ARRAY_FLAG active)
+      // * When found directly after program header it's an element size (header must have VM_HEADER_FLAG_QUEUED_DATA set)
       // uses VARIANT_U8, VARIANT_U16 and VARIANT_U32 depending on array size
       // Maximum array size is always encoded into program.
-      //If flag bit is active the current array size is serialized into data buffer (as next byte(s)). This is used for dynamic arrays.
+      // If flag bit is set then the current array size is serialized into data buffer (as next byte(s)). This is used for dynamic arrays.
    constexpr std::uint8_t OPCODE_DATA_CTRL = 3;
 
-   constexpr std::uint8_t VARIANT_RECORD_SELECT = 0;
-   constexpr std::uint8_t VARIANT_U8_LIMIT_CHECK = 1;
+   constexpr std::uint8_t VARIANT_RECORD_SELECT   = 0;
+   constexpr std::uint8_t VARIANT_U8_LIMIT_CHECK  = 1;
    constexpr std::uint8_t VARIANT_U16_LIMIT_CHECK = 2;
    constexpr std::uint8_t VARIANT_U32_LIMIT_CHECK = 3;
-   constexpr std::uint8_t VARIANT_S8_LIMIT_CHECK = 4;
+   constexpr std::uint8_t VARIANT_S8_LIMIT_CHECK  = 4;
    constexpr std::uint8_t VARIANT_S16_LIMIT_CHECK = 5;
    constexpr std::uint8_t VARIANT_S32_LIMIT_CHECK = 6;
 
@@ -152,7 +156,7 @@ namespace apx
    constexpr std::uint8_t DYN_ARRAY_FLAG = INST_FLAG;
    constexpr std::uint8_t LAST_FIELD_FLAG = INST_FLAG;
 
-   using Program = std::vector<std::uint8_t>;
+
 }
 
 
