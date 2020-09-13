@@ -49,6 +49,24 @@ apx::error_t apx::Port::derive_proper_init_value()
    return APX_NO_ERROR;
 }
 
+bool apx::Port::is_queued()
+{
+   if (auto attributes = get_attributes(); attributes != nullptr)
+   {
+      return attributes->queue_length > 0u;
+   }
+   return false;
+}
+
+bool apx::Port::is_parameter()
+{
+   if (auto attributes = get_attributes(); attributes != nullptr)
+   {
+      return attributes->is_parameter;
+   }
+   return false;
+}
+
 
 
 

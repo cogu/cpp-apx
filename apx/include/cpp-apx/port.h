@@ -17,10 +17,14 @@ namespace apx
       Port() = delete;
       Port(apx::PortType type, std::string const& type_name, int32_t lineno) : port_type{ type }, name{ type_name }, line_number{ lineno } {}
 
-      apx::DataElement* get_data_element() { return dsg.element.get(); }
-      apx::PortAttributes* get_attributes() { return attr.get(); }
+      apx::DataElement* get_data_element() const { return dsg.element.get(); }
+      apx::DataElement const *get_const_data_element() const { return dsg.element.get(); }
+
+      apx::PortAttributes* get_attributes() const { return attr.get(); }
       apx::error_t derive_types(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
       apx::error_t derive_proper_init_value();
+      bool is_queued();
+      bool is_parameter();
 
       apx::PortType port_type;
       std::string name;

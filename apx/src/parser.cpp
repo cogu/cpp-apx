@@ -38,7 +38,19 @@ namespace apx
             return false;
          }
       }
-      return (m_state.lineno > 0);
+      if (auto node = m_state.node.get(); node != nullptr)
+      {
+         auto error_code = node->finalize();
+         if (error_code != APX_NO_ERROR)
+         {
+            set_error(error_code);
+         }
+         else
+         {
+            return true;
+         }
+      }
+      return false;
    }
 
    void Parser::reset()

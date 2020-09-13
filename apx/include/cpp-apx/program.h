@@ -24,26 +24,31 @@
 #pragma once
 
 #include <vector>
-#include "vmdefs.h"
+#include "cpp-apx/vmdefs.h"
 #include "cpp-apx/error.h"
 
 namespace apx
 {
-
-   using Program = std::vector<std::uint8_t>;
-
-   struct ProgramHeader
+   namespace vm
    {
-      std::uint8_t major_version;
-      std::uint8_t minor_version;
-      std::uint8_t prog_type;
-      std::uint8_t prog_flags;
-      std::uint32_t data_size;
-   };
+      using Program = std::vector<std::uint8_t>;
 
-   apx::error_t encode_program_header(apx::Program &program, ProgramHeader const& header);
-   apx::error_t encode_program_header(std::uint8_t* program, ProgramHeader const& header);
-   apx::error_t decode_program_header(std::uint8_t const* program, ProgramHeader& header);
+      struct ProgramHeader
+      {
+         std::uint8_t major_version{ apx::vm::MAJOR_VERSION };
+         std::uint8_t minor_version{ apx::vm::MINOR_VERSION };
+         std::uint8_t prog_type{ HEADER_PROG_TYPE_UNKNOWN };
+         std::uint8_t prog_flags{ 0u };
+         std::uint32_t data_size{ 0u };
+      };
+
+      apx::error_t init_program_header(apx::vm::Program& program, std::uint8_t prog_type);
+      apx::error_t decode_program_header(std::uint8_t const* program, ProgramHeader& header);
+      void reserve_elem_size_instruction(apx::vm::Program& program, apx::SizeType elem_size);
+      std::uint8_t encode_instruction(std::uint8_t opcode, std::uint8_t variant, bool flag);
+      apx::error_t decode_instruction(std::uint8_t instruction, std::uint8_t &opcode, std::uint8_t &variant, bool &flag);
+
+   }
 }
 
 
