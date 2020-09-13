@@ -193,15 +193,15 @@ TEST(ApxParser, ParseRequirePortDeclaration_U8Ref_NoInit) {
    ASSERT_EQ(port->name, "FuelLevel1"s);
    auto data_element = port->get_data_element();
    EXPECT_NE(data_element, nullptr);
-   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefId);
-   EXPECT_EQ(data_element->get_typeref_id(), (uint32_t)0u);
+   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+   EXPECT_NE(data_element->get_typeref_ptr(), nullptr);
    port = node->get_require_port(1u);
    ASSERT_NE(port, nullptr);
    ASSERT_EQ(port->name, "FuelLevel2"s);
    data_element = port->get_data_element();
    EXPECT_NE(data_element, nullptr);
-   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefId);
-   EXPECT_EQ(data_element->get_typeref_id(), (uint32_t)0u);
+   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+   EXPECT_NE(data_element->get_typeref_ptr(), nullptr);
 }
 
 TEST(ApxParser, Record_Notification_T)

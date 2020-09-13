@@ -107,28 +107,33 @@ apx::Port* apx::Node::get_last_provide_port()
 
 apx::error_t apx::Node::finalize()
 {
-    m_last_error_line = -1;
-    apx::error_t result = derive_types_on_ports(m_provide_ports);
-    if (result != APX_NO_ERROR)
-    {
-       return result;
-    }
-    result = derive_types_on_ports(m_require_ports);
-    if (result != APX_NO_ERROR)
-    {
-       return result;
-    }
-    result = derive_proper_init_values_on_ports(m_provide_ports);
-    if (result != APX_NO_ERROR)
-    {
-       return result;
-    }
-    result = derive_proper_init_values_on_ports(m_require_ports);
-    if (result != APX_NO_ERROR)
-    {
-       return result;
-    }
-    return APX_NO_ERROR;
+   if (m_is_finalized)
+   {
+      return APX_NO_ERROR;
+   }
+   m_last_error_line = -1;
+   apx::error_t result = derive_types_on_ports(m_provide_ports);
+   if (result != APX_NO_ERROR)
+   {
+      return result;
+   }
+   result = derive_types_on_ports(m_require_ports);
+   if (result != APX_NO_ERROR)
+   {
+      return result;
+   }
+   result = derive_proper_init_values_on_ports(m_provide_ports);
+   if (result != APX_NO_ERROR)
+   {
+      return result;
+   }
+   result = derive_proper_init_values_on_ports(m_require_ports);
+   if (result != APX_NO_ERROR)
+   {
+      return result;
+   }
+   m_is_finalized = true;
+   return APX_NO_ERROR;
 }
 
 apx::error_t apx::Node::derive_types_on_ports(std::vector<std::unique_ptr<apx::Port>>& ports)

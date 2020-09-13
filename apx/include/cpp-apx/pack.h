@@ -37,7 +37,7 @@ namespace apx
 {
    template<typename T> void packBE(std::uint8_t* p, T value)
    {
-      static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Value type must be unsigned integer");
+      static_assert(std::is_integral<T>::value, "Value type must be integer");
 
 #ifdef __cpp_lib_endian
       if constexpr(std::endian::native == std::endian::big)
@@ -52,21 +52,21 @@ namespace apx
          p += (size - 1);
          while (size > 0)
          {
-            *(p--) = (std::uint8_t) value;
+            *(p--) = static_cast<std::uint8_t>(value);
             value >>= 8;
             size--;
          }
       }
    }
 
-   template<> void packBE(std::uint8_t* p, std::uint8_t value)
+   template<> inline void packBE(std::uint8_t* p, std::uint8_t value)
    {
       *p = value;
    }
 
    template<typename T> T unpackBE(const std::uint8_t* p)
    {
-      static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Value type must be unsigned integer");
+      static_assert(std::is_integral<T>::value, "Value type must be integer");
       T value = 0u;
 #ifdef __cpp_lib_endian
       if constexpr (std::endian::native == std::endian::big)
@@ -87,14 +87,14 @@ namespace apx
       return value;
    }
 
-   template<> std::uint8_t unpackBE(const std::uint8_t* p)
+   template<> inline std::uint8_t unpackBE(const std::uint8_t* p)
    {
       return *p;
    }
 
    template<typename T> void packLE(std::uint8_t* p, T value)
    {
-      static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Value type must be unsigned integer");
+      static_assert(std::is_integral<T>::value, "Value type must be integer");
 #ifdef __cpp_lib_endian
       if constexpr (std::endian::native == std::endian::little)
       {
@@ -107,21 +107,21 @@ namespace apx
          std::size_t size = sizeof(T);
          while (size > 0)
          {
-            *(p++) = (std::uint8_t) value;
+            *(p++) = static_cast<std::uint8_t>(value);
             value >>= 8;
             size--;
          }
       }
    }
 
-   template<> void packLE(std::uint8_t* p, std::uint8_t value)
+   template<> inline void packLE(std::uint8_t* p, std::uint8_t value)
    {
       *p = value;
    }
 
    template<typename T> T unpackLE(const std::uint8_t* p)
    {
-      static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Value type must be unsigned integer");
+      static_assert(std::is_integral<T>::value, "Value type must be integer");
       T value = 0u;
 #ifdef __cpp_lib_endian
       if constexpr (std::endian::native == std::endian::little)
@@ -143,7 +143,7 @@ namespace apx
       return value;
    }
 
-   template<> std::uint8_t unpackLE(const std::uint8_t* p)
+   template<> inline std::uint8_t unpackLE(const std::uint8_t* p)
    {
       return *p;
    }

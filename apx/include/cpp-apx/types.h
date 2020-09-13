@@ -30,6 +30,15 @@ namespace apx
       GroupDeclaration,    //APX IDL v1.4
       FunctionDeclaration  //APX IDL v1.4
    };
+
+   enum class SizeType : unsigned char {
+      None,
+      UInt8,
+      UInt16,
+      UInt32,
+   };
+
+   enum class ProgramType : unsigned char { Unpack, Pack };
    enum class PortType : unsigned char { RequirePort, ProvidePort };
    enum class ArrayType: unsigned char { None, UInt8, UInt16, UInt32};
 

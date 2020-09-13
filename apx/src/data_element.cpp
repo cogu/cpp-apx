@@ -72,12 +72,12 @@ namespace apx
       return false;
    }
 
-   std::pair<int32_t, int32_t>  DataElement::get_limits_signed()
+   std::pair<int32_t, int32_t>  DataElement::get_limits_signed() const
    {
       return std::make_pair(std::get<int32_t>(m_lower_limit.value()), std::get<int32_t>(m_upper_limit.value()));
    }
 
-   std::pair<uint32_t, uint32_t>  DataElement::get_limits_unsigned()
+   std::pair<uint32_t, uint32_t>  DataElement::get_limits_unsigned() const
    {
       return std::make_pair(std::get<uint32_t>(m_lower_limit.value()), std::get<uint32_t>(m_upper_limit.value()));
    }
