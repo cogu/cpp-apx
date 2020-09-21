@@ -13,6 +13,7 @@ namespace apx
 
    std::unique_ptr<vm::Program> Compiler::compile_port(apx::Port const *port, apx::ProgramType program_type, apx::error_t& error_code)
    {
+      reset_internal_state();
       m_program = std::make_unique<vm::Program>();
       if (m_program.get() == nullptr)
       {
@@ -21,7 +22,6 @@ namespace apx
       }
       else
       {
-         m_last_error = init_program_header(port, program_type);
          if (m_last_error == APX_NO_ERROR)
          {
             auto data_element = port->get_const_data_element();
@@ -40,54 +40,23 @@ namespace apx
       {
          return std::unique_ptr<vm::Program>();
       }
-      m_last_error = program_finalize();
+      std::uint32_t const queue_length = port->get_queue_length();
+      std::uint32_t const element_size = m_data_offset;
+      apx::vm::Program header;
+      m_last_error = apx::vm::create_program_header(header, program_type, element_size, queue_length, m_is_dynamic);
       if (m_last_error != APX_NO_ERROR)
       {
          return std::unique_ptr<vm::Program>();
       }
+      m_program->insert(m_program->cbegin(), header.cbegin(), header.cend());
       return std::move(m_program);
    }
 
-   void Compiler::reset()
+   void Compiler::reset_internal_state()
    {
       m_last_error = APX_NO_ERROR;
-      m_queue_length = 0u;
-      m_queue_size_type = apx::SizeType::None;
       m_is_dynamic = false;
       m_data_offset = 0u;
-   }
-
-   apx::error_t Compiler::init_program_header(apx::Port const *port, apx::ProgramType program_type)
-   {
-      const std::uint8_t program_byte{ program_type == apx::ProgramType::Pack ? vm::HEADER_PROG_TYPE_PACK : vm::HEADER_PROG_TYPE_UNPACK };
-      auto result = vm::init_program_header(*m_program, program_byte);
-      if (result == APX_NO_ERROR)
-      {
-         if (auto port_attributes = port->get_attributes(); port_attributes != nullptr)
-         {
-            if (port_attributes->queue_length > 0u)
-            {
-               m_queue_length = port_attributes->queue_length;
-            }
-         }
-      }
-      if (m_queue_length > 0u)
-      {
-         if (m_queue_length > UINT16_MAX)
-         {
-            m_queue_size_type = apx::SizeType::UInt32;
-         }
-         else if (m_queue_length > UINT8_MAX)
-         {
-            m_queue_size_type = apx::SizeType::UInt16;
-         }
-         else
-         {
-            m_queue_size_type = apx::SizeType::UInt8;
-         }
-         vm::reserve_elem_size_instruction(*m_program, m_queue_size_type);
-      }
-      return result;
    }
 
    apx::error_t Compiler::compile_data_element(apx::DataElement const* data_element, apx::ProgramType program_type)
@@ -296,17 +265,5 @@ namespace apx
    }
 
 
-   apx::error_t Compiler::program_finalize()
-   {
-      uint8_t* raw_program = m_program->data();
-      if (raw_program != nullptr)
-      {
-         apx::packLE<std::uint32_t>(&raw_program[vm::HEADER_SIZE_OFFSET], m_data_offset);
-      }
-      else
-      {
-         return APX_NULL_PTR_ERROR;
-      }
-      return APX_NO_ERROR;
-   }
+
 }

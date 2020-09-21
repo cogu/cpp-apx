@@ -15,8 +15,8 @@ namespace apx
       Compiler() {}
       std::unique_ptr<apx::vm::Program> compile_port(apx::Port const *port, apx::ProgramType program_type, apx::error_t& error_code);
    protected:
-      void reset();
-      apx::error_t Compiler::init_program_header(apx::Port const *port, apx::ProgramType program_type);
+      void reset_internal_state();
+
 
       void set_error(apx::error_t error) { m_last_error = error; }
       void set_error(apx::error_t& storage, apx::error_t error) { storage = error; }
@@ -25,14 +25,11 @@ namespace apx
       apx::error_t compile_limit_values(std::uint8_t limit_variant, std::int32_t lower_limit, std::int32_t upper_limit);
       apx::error_t compile_limit_values(std::uint8_t limit_variant, std::uint32_t lower_limit, std::uint32_t upper_limit);
       apx::error_t compile_array_size_instruction(std::uint32_t array_size, bool is_dynamic_array);
-      apx::error_t program_finalize();
 
       std::stack<std::uint32_t> m_offset_stack;
-      std::uint32_t m_queue_length = 0u;
-      apx::SizeType m_queue_size_type;
       std::unique_ptr<apx::vm::Program> m_program;
       std::uint32_t m_data_offset{ 0u };
       apx::error_t m_last_error{ APX_NO_ERROR };
-      bool m_is_dynamic;
+      bool m_is_dynamic = false;
    };
 }

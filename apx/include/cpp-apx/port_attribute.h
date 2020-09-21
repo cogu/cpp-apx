@@ -20,6 +20,6 @@ namespace apx
 
       dtl::DynamicValue init_value{ nullptr };
       bool is_parameter = false;
-      uint32_t queue_length = 0u;
+      std::uint32_t queue_length = 0u;
    };
 }

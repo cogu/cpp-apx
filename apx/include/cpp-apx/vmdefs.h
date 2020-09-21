@@ -31,14 +31,30 @@ namespace apx
    namespace vm
    {
       /*
-      * APX PROGRAM HEADER
+      * APX PROGRAM HEADER (Varies between 7 and 14 bytes)
       * bytes 0-2: Magic numbers 'A','P','X'
       * Byte 3: VM_MAJOR_VERSION
       * Byte 4: VM_MINOR_VERSION
-      * Byte 5: (high nibble): program flags
-      * Byte 5: (Low nibble) program type
-      * Bytes 6-9: Maximum used data size required by this program (encoded as uint32_le)
-      *             If no program flags are active this is the exact data size required by the program.
+      * Byte 5 (bits 4-7): program flags
+      * Byte 5 (bit 3): pack or unpack program (0-1)
+      * Byte 5 (bits 0-2): data size variant (VARIANT_U8, VARIANT_U16, VARIANT_U32)
+      * Bytes 6-9: DataSize (Maximum data size required by this program) (variable-size encoded integer)
+      *            - If Byte 5 (bits 0-2) has value VARIANT_U8 this is encoded as uint8.
+      *            - If Byte 5 (bits 0-2) has value VARIANT_U16 this is encoded as uint16le (little endian).
+      *            - If Byte 5 (bits 0-2) has value VARIANT_U32 this is encoded as uint32le.
+      * After the the previous integer is encoded the header usually ends. However, if HEADER_FLAG_QUEUED_DATA was set among program flags (Byte 5)
+      * The header continues with an encoded DATA_SIZE instruction where variant must be value 2 or above.
+      * Since length of previous header field varies we call the first byte after the encoded integer "Byte N".
+      * Byte N: DATA_SIZE instruction header
+      * Bytes (N+1)-(N+4): ElementSize (variable-size encoded integer)
+      *
+      * When HEADER_FLAG_QUEUED_DATA is set the queue size can be calculated from using the DataSize and ElementSize numbers.
+      * The DataSize value has been previously incremented by the value 1, 2 or 4. Which of these it is can be determined from variant in the DATA_SIZE instruction.
+      * The queue length can be calculated by using this formula:
+      *
+      * Number of queued elements = (DataSize-QueueStorageSize)/ElementSize
+      *
+      * where QueueStorageSize is either 1, 2, or 4 (which can be determined from the variant on the DATA_SIZE instruction).
       */
       constexpr std::uint32_t HEADER_SIZE = 10u;
       constexpr std::uint8_t HEADER_MAGIC_NUMBER_0 = ((uint8_t)'A');
@@ -49,9 +65,10 @@ namespace apx
       constexpr std::uint8_t MINOR_VERSION = 0u;
       constexpr std::uint32_t VERSION_SIZE = 2u;
       constexpr std::uint32_t HEADER_SIZE_OFFSET = 6;
-      constexpr std::uint8_t HEADER_PROG_TYPE_UNPACK = 0x01;
-      constexpr std::uint8_t HEADER_PROG_TYPE_PACK = 0x02;
-      constexpr std::uint8_t HEADER_PROG_TYPE_UNKNOWN = 0x0F;
+      constexpr std::uint8_t HEADER_PROG_TYPE_UNPACK = 0x00;
+      constexpr std::uint8_t HEADER_PROG_TYPE_PACK = 0x08;
+      constexpr std::uint8_t HEADER_DATA_SIZE_MASK = 0x07;
+
       constexpr std::uint8_t HEADER_FLAG_DYNAMIC_DATA = 0x10; //This is just an indicator if any dynamic arrays are present inside the data.
       constexpr std::uint8_t HEADER_FLAG_QUEUED_DATA = 0x20; //When this is active, the very next instruction must be OPCODE_DATA_SIZE.
 
@@ -101,9 +118,15 @@ namespace apx
          0: ARRAY_SIZE_U8
          1: ARRAY_SIZE_U16
          2: ARRAY_SIZE_U32
-         3: ELEMENT_SIZE_U8
-         4: ELEMENT_SIZE_U16
-         5: ELEMENT_SIZE_U32
+         4: ELEMENT_SIZE_U8_QUEUE_SIZE_U8
+         5: ELEMENT_SIZE_U8_QUEUE_SIZE_U16
+         6: ELEMENT_SIZE_U8_QUEUE_SIZE_U32
+         7: ELEMENT_SIZE_U16_QUEUE_SIZE_U8
+         8: ELEMENT_SIZE_U16_QUEUE_SIZE_U16
+         9: ELEMENT_SIZE_U16_QUEUE_SIZE_U32
+         10: ELEMENT_SIZE_U32_QUEUE_SIZE_U8
+         11: ELEMENT_SIZE_U32_QUEUE_SIZE_U16
+         12: ELEMENT_SIZE_U32_QUEUE_SIZE_U32
 
       3: DATA_CTRL  : 9 variants
          0: RECORD_SELECT
@@ -145,9 +168,18 @@ namespace apx
       constexpr std::uint8_t VARIANT_ARRAY_SIZE_U8 = 0;
       constexpr std::uint8_t VARIANT_ARRAY_SIZE_U16 = 1;
       constexpr std::uint8_t VARIANT_ARRAY_SIZE_U32 = 2;
-      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U8 = 4;
-      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U16 = 5;
-      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U32 = 6;
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U8_BASE = 3;
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U8 = VARIANT_ELEMENT_SIZE_U8_BASE + VARIANT_U8;    // 3
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U16 = VARIANT_ELEMENT_SIZE_U8_BASE + VARIANT_U16;  // 4
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U32 = VARIANT_ELEMENT_SIZE_U8_BASE + VARIANT_U32;  // 5
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U16_BASE = 6;
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U16_QUEUE_SIZE_U8 = VARIANT_ELEMENT_SIZE_U16_BASE + VARIANT_U8;    // 6
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U16_QUEUE_SIZE_U16 = VARIANT_ELEMENT_SIZE_U16_BASE + VARIANT_U16;  // 7
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U16_QUEUE_SIZE_U32 = VARIANT_ELEMENT_SIZE_U16_BASE + VARIANT_U32;  // 8
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U32_BASE = 9;
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U32_QUEUE_SIZE_U8 = VARIANT_ELEMENT_SIZE_U32_BASE + VARIANT_U8;    // 9
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U32_QUEUE_SIZE_U16 = VARIANT_ELEMENT_SIZE_U32_BASE + VARIANT_U16;  // 10
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U32_QUEUE_SIZE_U32 = VARIANT_ELEMENT_SIZE_U32_BASE + VARIANT_U32;  // 11
       // For variants 0..2: Maximum array size is always encoded into program.
       // If flag bit is set then the current array size is serialized into data buffer (as next byte(s)). This is used for dynamic arrays.
 

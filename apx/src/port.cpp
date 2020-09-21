@@ -49,7 +49,7 @@ apx::error_t apx::Port::derive_proper_init_value()
    return APX_NO_ERROR;
 }
 
-bool apx::Port::is_queued()
+bool apx::Port::is_queued() const
 {
    if (auto attributes = get_attributes(); attributes != nullptr)
    {
@@ -58,13 +58,22 @@ bool apx::Port::is_queued()
    return false;
 }
 
-bool apx::Port::is_parameter()
+bool apx::Port::is_parameter() const
 {
    if (auto attributes = get_attributes(); attributes != nullptr)
    {
       return attributes->is_parameter;
    }
    return false;
+}
+
+std::uint32_t apx::Port::get_queue_length() const
+{
+   if (auto attributes = get_attributes(); attributes != nullptr)
+   {
+      return attributes->queue_length;
+   }
+   return 0u;
 }
 
 

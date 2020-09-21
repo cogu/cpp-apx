@@ -232,4 +232,23 @@ namespace apx_test
       ASSERT_TRUE(ok);
    }
 
+   TEST(Node, QueuedProvidePort)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "P\"U8QueuedSignal\"C(0,15):Q[10]\n";
+
+      apx::Parser parser;
+      std::stringstream ss;
+      ss.str(apx_text);
+      EXPECT_TRUE(parser.parse(ss));
+      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+
+      auto port = node->get_provide_port(0u);
+      ASSERT_NE(port, nullptr);
+      ASSERT_TRUE(port->is_queued());
+      ASSERT_EQ(port->get_queue_length(), 10u);
+   }
+
 }
