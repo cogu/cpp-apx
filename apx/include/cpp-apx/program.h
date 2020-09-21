@@ -37,14 +37,13 @@ namespace apx
       {
          std::uint8_t major_version{ apx::vm::MAJOR_VERSION };
          std::uint8_t minor_version{ apx::vm::MINOR_VERSION };
-         std::uint8_t prog_type{ HEADER_PROG_TYPE_UNKNOWN };
+         apx::ProgramType prog_type{ apx::ProgramType::Unpack };
          std::uint8_t prog_flags{ 0u };
          std::uint32_t data_size{ 0u };
       };
 
-      apx::error_t init_program_header(apx::vm::Program& program, std::uint8_t prog_type);
+      apx::error_t create_program_header(apx::vm::Program& header, apx::ProgramType program_type, std::uint32_t element_size, std::uint32_t queue_size, bool is_dynamic);
       apx::error_t decode_program_header(std::uint8_t const* program, ProgramHeader& header);
-      void reserve_elem_size_instruction(apx::vm::Program& program, apx::SizeType elem_size);
       std::uint8_t encode_instruction(std::uint8_t opcode, std::uint8_t variant, bool flag);
       apx::error_t decode_instruction(std::uint8_t instruction, std::uint8_t &opcode, std::uint8_t &variant, bool &flag);
 
