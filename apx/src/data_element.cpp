@@ -169,7 +169,7 @@ namespace apx
    }
 
 
-   apx::error_t DataElement::derive_proper_init_value(dtl::DynamicValue& parsed_init_value, dtl::DynamicValue& derived_value)
+   apx::error_t DataElement::derive_proper_init_value(dtl::DynamicValue const & parsed_init_value, dtl::DynamicValue& derived_value)
    {
       apx::TypeCode type_code = resolve_type_code();
       assert(  (type_code != apx::TypeCode::None) &&
@@ -179,7 +179,26 @@ namespace apx
             );
       if (type_code == apx::TypeCode::Record)
       {
-         return APX_NOT_IMPLEMENTED_ERROR;
+         if (is_array())
+         {
+            return APX_NOT_IMPLEMENTED_ERROR; //Array of records
+         }
+         if (parsed_init_value->dv_type() == dtl::ValueType::Array)
+         {
+            auto parsed_av = dynamic_cast<dtl::Array*>(parsed_init_value.get());
+            assert(parsed_av != nullptr);
+            dtl::Hash* derived_hv = nullptr;
+            apx::error_t result = derive_hash_init_value(parsed_av, derived_hv);
+            if (result == APX_NO_ERROR)
+            {
+               assert(derived_hv != nullptr);
+               derived_value.reset(derived_hv);
+            }
+            else
+            {
+               assert(derived_hv == nullptr);
+            }
+         }
       }
       else if (is_array())
       {
@@ -238,6 +257,30 @@ namespace apx
 
    apx::error_t DataElement::create_default_init_value(dtl::DynamicValue& derived_value)
    {
+      return APX_NO_ERROR;
+   }
+
+   apx::error_t DataElement::derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv)
+   {
+      unique_ptr<dtl::Hash> hv = std::make_unique<dtl::Hash>();
+      std::size_t num_children = get_num_child_elements();
+      if (num_children != parsed_av->length())
+      {
+         return APX_LENGTH_ERROR;
+      }
+      for (std::size_t i = 0u; i < num_children; i++)
+      {
+         DataElement* child_element = get_child_at(i);
+         dtl::DynamicValue const parsed_dv = parsed_av->at(i);
+         dtl::DynamicValue derived_dv;
+         apx::error_t result = child_element->derive_proper_init_value(parsed_dv, derived_dv);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         hv->insert(std::make_pair(child_element->get_name(), derived_dv));
+      }
+      derived_hv = hv.release();
       return APX_NO_ERROR;
    }
 

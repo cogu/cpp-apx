@@ -15,6 +15,7 @@ namespace apx
    {
       reset_internal_state();
       m_program = std::make_unique<vm::Program>();
+      std::uint32_t element_size = 0u;
       if (m_program.get() == nullptr)
       {
          set_error(error_code, APX_NULL_PTR_ERROR);
@@ -27,7 +28,7 @@ namespace apx
             auto data_element = port->get_const_data_element();
             if (data_element != nullptr)
             {
-               m_last_error = compile_data_element(data_element, program_type);
+               m_last_error = compile_data_element(data_element, program_type, element_size);
             }
             else
             {
@@ -41,7 +42,6 @@ namespace apx
          return std::unique_ptr<vm::Program>();
       }
       std::uint32_t const queue_length = port->get_queue_length();
-      std::uint32_t const element_size = m_data_offset;
       apx::vm::Program header;
       m_last_error = apx::vm::create_program_header(header, program_type, element_size, queue_length, m_is_dynamic);
       if (m_last_error != APX_NO_ERROR)
@@ -56,14 +56,12 @@ namespace apx
    {
       m_last_error = APX_NO_ERROR;
       m_is_dynamic = false;
-      m_data_offset = 0u;
    }
 
-   apx::error_t Compiler::compile_data_element(apx::DataElement const* data_element, apx::ProgramType program_type)
+   apx::error_t Compiler::compile_data_element(apx::DataElement const* data_element, apx::ProgramType program_type, std::uint32_t& elem_size)
    {
       assert(data_element != nullptr);
       apx::error_t retval = APX_NO_ERROR;
-      std::uint32_t elem_size = 0u;
       std::uint8_t data_variant = 0u;
       std::uint32_t array_length = data_element->get_array_length();
       std::uint8_t limit_check_variant = vm::VARIANT_LIMIT_CHECK_NONE;
@@ -72,6 +70,7 @@ namespace apx
       bool const has_limits = data_element->has_limits();
       bool const is_pack_prog = program_type == apx::ProgramType::Pack ? true : false;
       bool is_signed_type = false;
+      bool is_record = false;
       std::uint8_t const opcode = is_pack_prog ? vm::OPCODE_PACK : vm::OPCODE_UNPACK;
       apx::TypeCode const type_code = data_element->get_type_code();
       switch (type_code)
@@ -81,11 +80,46 @@ namespace apx
          limit_check_variant = vm::VARIANT_LIMIT_CHECK_U8;
          elem_size = vm::UINT8_SIZE;
          break;
+      case apx::TypeCode::UInt16:
+         data_variant = vm::VARIANT_U16;
+         limit_check_variant = vm::VARIANT_LIMIT_CHECK_U16;
+         elem_size = vm::UINT16_SIZE;
+         break;
+      case apx::TypeCode::UInt32:
+         data_variant = vm::VARIANT_U32;
+         limit_check_variant = vm::VARIANT_LIMIT_CHECK_U32;
+         elem_size = vm::UINT32_SIZE;
+         break;
       case apx::TypeCode::Int8:
          data_variant = vm::VARIANT_S8;
          limit_check_variant = vm::VARIANT_LIMIT_CHECK_S8;
          elem_size = vm::INT8_SIZE;
          is_signed_type = true;
+         break;
+      case apx::TypeCode::Int16:
+         data_variant = vm::VARIANT_S16;
+         limit_check_variant = vm::VARIANT_LIMIT_CHECK_S16;
+         elem_size = vm::INT16_SIZE;
+         is_signed_type = true;
+         break;
+      case apx::TypeCode::Int32:
+         data_variant = vm::VARIANT_S32;
+         limit_check_variant = vm::VARIANT_LIMIT_CHECK_S32;
+         elem_size = vm::INT32_SIZE;
+         is_signed_type = true;
+         break;
+      case apx::TypeCode::Byte:
+         data_variant = vm::VARIANT_BYTE;
+         limit_check_variant = vm::VARIANT_LIMIT_CHECK_U8;
+         elem_size = vm::UINT8_SIZE;
+         break;
+      case apx::TypeCode::Char:
+         data_variant = vm::VARIANT_CHAR;
+         elem_size = vm::UINT8_SIZE;
+         break;
+      case apx::TypeCode::Record:
+         data_variant = vm::VARIANT_RECORD;
+         is_record = true;
          break;
       default:
          retval = APX_ELEMENT_TYPE_ERROR;
@@ -110,14 +144,24 @@ namespace apx
             {
                return retval;
             }
-            elem_size *= array_length;
+            if (is_dynamic_array)
+            {
+               m_is_dynamic = true;
+            }
+         }
+         if (is_record)
+         {
+            retval = compile_record_fields(data_element, program_type, elem_size);
          }
       }
       if (retval == APX_NO_ERROR)
       {
          if (elem_size > 0u)
          {
-            m_data_offset += elem_size;
+            if (is_array)
+            {
+               elem_size *= array_length;
+            }
          }
          else
          {
@@ -264,6 +308,54 @@ namespace apx
       return APX_NO_ERROR;
    }
 
+   apx::error_t Compiler::compile_record_fields(apx::DataElement const* data_element, apx::ProgramType program_type, std::uint32_t& record_size)
+   {
+      assert(m_program.get() != nullptr);
+      if (data_element->get_type_code() != apx::TypeCode::Record)
+      {
+         return APX_ELEMENT_TYPE_ERROR;
+      }
+      std::size_t num_children = data_element->get_num_child_elements();
+      if (num_children == 0)
+      {
+         return APX_EMPTY_RECORD_ERROR;
+      }
+      for (std::size_t i = 0u; i < num_children; i++)
+      {
+         std::uint32_t child_size = 0u;
+         apx::DataElement const* child_element = data_element->get_child_at(i);
+         apx::error_t result  = compile_record_select_instruction(child_element, (i == (num_children-1))? true : false );
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         result = compile_data_element(child_element, program_type, child_size);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         if (child_size == 0u)
+         {
+            return APX_LENGTH_ERROR;
+         }
+         record_size += child_size;
+      }
+      return APX_NO_ERROR;
+   }
 
+   apx::error_t Compiler::compile_record_select_instruction(apx::DataElement const* data_element, bool is_last_field)
+   {
+      assert(m_program.get() != nullptr);
+      std::string const& name = data_element->get_name();
+      if (name.size() == 0)
+      {
+         return APX_NAME_MISSING_ERROR;
+      }
+      std::uint8_t const instruction = vm::encode_instruction(vm::OPCODE_DATA_CTRL, vm::VARIANT_RECORD_SELECT, is_last_field);
+      m_program->push_back(instruction);
+      m_program->insert(m_program->end(), name.begin(), name.end());
+      m_program->push_back(0u); //null-terminator;
+      return APX_NO_ERROR;
+   }
 
 }
