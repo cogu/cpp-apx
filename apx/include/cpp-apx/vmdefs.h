@@ -93,8 +93,8 @@ namespace apx
          8: ARRAY
          9: RECORD
          10: BOOL
-         11: BYTES (immutable bytes object)
-         12: STRING
+         11: BYTE (immutable bytes object)
+         12: CHAR
 
 
       1: PACK  13 variants
@@ -110,8 +110,8 @@ namespace apx
          8: ARRAY
          9: RECORD
          10: BOOL
-         11: BYTES (immutable bytes object)
-         12: STRING
+         11: BYTE (immutable bytes object)
+         12: CHAR
 
       2: DATA_SIZE     : 6 variants
          FLAG: is_dynamic_array(true, false)
@@ -160,6 +160,9 @@ namespace apx
       constexpr std::uint8_t VARIANT_S64 = 7;
       constexpr std::uint8_t VARIANT_ARRAY = 8; //RESERVED FOR FUTURE USE (e.g. array of arrays)
       constexpr std::uint8_t VARIANT_RECORD = 9;
+      constexpr std::uint8_t VARIANT_BOOL = 10;
+      constexpr std::uint8_t VARIANT_BYTE = 11;
+      constexpr std::uint8_t VARIANT_CHAR = 12;
 
       constexpr std::uint8_t OPCODE_PACK = 1;
       //same variants as OPCODE_UNPACK
@@ -208,6 +211,7 @@ namespace apx
       constexpr std::uint8_t LAST_FIELD_FLAG = INST_FLAG;
 
       constexpr std::uint32_t UINT8_SIZE = sizeof(std::uint8_t);
+      constexpr std::uint32_t BYTE_SIZE = sizeof(std::uint8_t); //TODO: Change to std::byte when C++20 has better support?
       constexpr std::uint32_t UINT16_SIZE = sizeof(std::uint16_t);
       constexpr std::uint32_t UINT32_SIZE = sizeof(std::uint32_t);
       constexpr std::uint32_t INT8_SIZE = sizeof(std::int8_t);

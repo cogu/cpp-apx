@@ -107,9 +107,10 @@ namespace dtl
    {
    public:
       Array(std::size_t initial_length = 0u);
-      std::size_t length() { return m_av_data.size(); }
+      std::size_t length() const { return m_av_data.size(); }
       void push(std::shared_ptr<dtl::Value> dv) { m_av_data.push_back(dv); }
       std::shared_ptr<dtl::Value>& at(std::size_t pos) { return m_av_data.at(pos); }
+      const std::shared_ptr<dtl::Value>& at(std::size_t pos) const { return m_av_data.at(pos); }
    protected:
       std::vector<std::shared_ptr<dtl::Value>> m_av_data;
    };

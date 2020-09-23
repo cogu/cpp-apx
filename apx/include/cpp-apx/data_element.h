@@ -37,7 +37,7 @@ namespace apx
       std::pair<std::int32_t, std::int32_t> get_limits_signed() const;
       std::pair<std::uint32_t, std::uint32_t> get_limits_unsigned() const;
       void append(std::unique_ptr<DataElement> child_element);
-      std::size_t get_num_child_elements() { return m_elements->size(); }
+      std::size_t get_num_child_elements() const { return m_elements->size(); }
       DataElement* get_child_at(std::size_t i) const { return m_elements->at(i).get(); }
       void set_typeref(std::uint32_t type_id) { m_type_ref = type_id; m_type_code = apx::TypeCode::TypeRefId; }
       void set_typeref(char const* name) { m_type_ref = name; m_type_code = apx::TypeCode::TypeRefName; }
@@ -52,8 +52,9 @@ namespace apx
       bool is_dynamic_array() const { return m_dynamic_array; }
       apx::error_t derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
       apx::TypeCode resolve_type_code();
-      apx::error_t derive_proper_init_value(dtl::DynamicValue &parsed_init_value, dtl::DynamicValue& derived_value);
+      apx::error_t derive_proper_init_value(dtl::DynamicValue const &parsed_init_value, dtl::DynamicValue& derived_value);
       apx::error_t create_default_init_value(dtl::DynamicValue& derived_value);
+      apx::error_t derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv);
 
 
    protected:

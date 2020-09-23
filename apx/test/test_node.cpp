@@ -251,4 +251,18 @@ namespace apx_test
       ASSERT_EQ(port->get_queue_length(), 10u);
    }
 
+   TEST(Node, DeriveProperInitValueRecord_UInt8_Uint16)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "R\"RecordPort\"{\"First\"C\"Second\"S}:={255, 65535}\n";
+
+      apx::Parser parser;
+      std::stringstream ss;
+      ss.str(apx_text);
+      EXPECT_TRUE(parser.parse(ss));
+   }
+
+
 }

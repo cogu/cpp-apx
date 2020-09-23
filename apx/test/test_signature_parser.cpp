@@ -70,7 +70,107 @@ TEST(SignatureParser, U8LimitArray)
    EXPECT_EQ(lower_limit, 0u);
    EXPECT_EQ(upper_limit, 7u);
    EXPECT_EQ(data_element->get_array_length(), 8u);
+}
 
+TEST(SignatureParser, ByteObject)
+{
+   const char* begin = "B";
+   const char* end = begin + strlen(begin);
+   apx::SignatureParser parser;
+   auto result = parser.parse_data_signature(begin, end);
+   EXPECT_EQ(result, end);
+   std::unique_ptr<apx::DataElement> data_element{ parser.take_data_element() };
+   EXPECT_NE(data_element.get(), nullptr);
+   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Byte);
+   EXPECT_FALSE(data_element->has_limits());
+   EXPECT_FALSE(data_element->is_array());
+}
+
+TEST(SignatureParser, ByteObjectWithLimits)
+{
+   const char* begin = "B(0,3)";
+   const char* end = begin + strlen(begin);
+   apx::SignatureParser parser;
+   auto result = parser.parse_data_signature(begin, end);
+   EXPECT_EQ(result, end);
+   std::unique_ptr<apx::DataElement> data_element{ parser.take_data_element() };
+   EXPECT_NE(data_element.get(), nullptr);
+   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Byte);
+   EXPECT_TRUE(data_element->has_limits());
+   EXPECT_FALSE(data_element->is_array());
+   auto [lower_limit, upper_limit] = data_element->get_limits_unsigned();
+   EXPECT_EQ(lower_limit, 0u);
+   EXPECT_EQ(upper_limit, 3u);
+}
+
+TEST(SignatureParser, ByteArray)
+{
+   const char* begin = "B[8]";
+   const char* end = begin + strlen(begin);
+   apx::SignatureParser parser;
+   auto result = parser.parse_data_signature(begin, end);
+   EXPECT_EQ(result, end);
+   std::unique_ptr<apx::DataElement> data_element{ parser.take_data_element() };
+   EXPECT_NE(data_element.get(), nullptr);
+   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Byte);
+   EXPECT_FALSE(data_element->has_limits());
+   EXPECT_TRUE(data_element->is_array());
+   EXPECT_FALSE(data_element->is_dynamic_array());
+   EXPECT_EQ(data_element->get_array_length(), 8u);
+}
+
+TEST(SignatureParser, ByteArrayWithLimit)
+{
+   const char* begin = "B(0, 7)[ 8 ]";
+   const char* end = begin + strlen(begin);
+   apx::SignatureParser parser;
+   auto result = parser.parse_data_signature(begin, end);
+   EXPECT_EQ(result, end);
+   std::unique_ptr<apx::DataElement> data_element{ parser.take_data_element() };
+   EXPECT_NE(data_element.get(), nullptr);
+   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Byte);
+   EXPECT_TRUE(data_element->has_limits());
+   EXPECT_TRUE(data_element->is_array());
+   EXPECT_FALSE(data_element->is_dynamic_array());
+   auto [lower_limit, upper_limit] = data_element->get_limits_unsigned();
+   EXPECT_EQ(lower_limit, 0u);
+   EXPECT_EQ(upper_limit, 7u);
+   EXPECT_EQ(data_element->get_array_length(), 8u);
+}
+
+TEST(SignatureParser, DynamicByteArray)
+{
+   const char* begin = "B[8*]";
+   const char* end = begin + strlen(begin);
+   apx::SignatureParser parser;
+   auto result = parser.parse_data_signature(begin, end);
+   EXPECT_EQ(result, end);
+   std::unique_ptr<apx::DataElement> data_element{ parser.take_data_element() };
+   EXPECT_NE(data_element.get(), nullptr);
+   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Byte);
+   EXPECT_FALSE(data_element->has_limits());
+   EXPECT_TRUE(data_element->is_array());
+   EXPECT_TRUE(data_element->is_dynamic_array());
+   EXPECT_EQ(data_element->get_array_length(), 8u);
+}
+
+TEST(SignatureParser, DynamicByteArrayWithLimit)
+{
+   const char* begin = "B(0,7)[8*]";
+   const char* end = begin + strlen(begin);
+   apx::SignatureParser parser;
+   auto result = parser.parse_data_signature(begin, end);
+   EXPECT_EQ(result, end);
+   std::unique_ptr<apx::DataElement> data_element{ parser.take_data_element() };
+   EXPECT_NE(data_element.get(), nullptr);
+   EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Byte);
+   EXPECT_TRUE(data_element->has_limits());
+   EXPECT_TRUE(data_element->is_array());
+   EXPECT_TRUE(data_element->is_dynamic_array());
+   auto [lower_limit, upper_limit] = data_element->get_limits_unsigned();
+   EXPECT_EQ(lower_limit, 0u);
+   EXPECT_EQ(upper_limit, 7u);
+   EXPECT_EQ(data_element->get_array_length(), 8u);
 }
 
 TEST(SignatureParser, Record_U8_U8_U8)
@@ -124,7 +224,6 @@ TEST(SignatureParser, Record_U8U8_U8U8)
    EXPECT_NE(grand_child, nullptr);
    EXPECT_EQ(grand_child->get_name(), "Stat2");
    EXPECT_EQ(grand_child->get_type_code(), apx::TypeCode::UInt8);
-
 }
 
 TEST(SignatureParser, Record_String_U16)
