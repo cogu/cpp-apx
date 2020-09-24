@@ -253,6 +253,7 @@ namespace apx_test
 
    TEST(Node, DeriveProperInitValueRecord_UInt8_Uint16)
    {
+      bool ok;
       const char* apx_text =
          "APX/1.3\n"
          "N\"TestNode\"\n"
@@ -262,6 +263,69 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
+      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      ASSERT_NE(port->proper_init_value, nullptr);
+      auto init_value = port->proper_init_value;
+      ASSERT_EQ(init_value->dv_type(), dtl::ValueType::Hash);
+      auto derived_hv = dynamic_cast<dtl::Hash*>(init_value.get());
+      auto const* first = derived_hv->get("First");
+      ASSERT_NE(first, nullptr);
+      EXPECT_EQ(first->dv_type(), dtl::ValueType::Scalar);
+      auto const* sv = dynamic_cast<const dtl::Scalar*>(first);
+      EXPECT_EQ(sv->to_u32(ok), 255);
+      EXPECT_TRUE(ok);
+      auto const* second = derived_hv->get("Second");
+      ASSERT_NE(second, nullptr);
+      EXPECT_EQ(second->dv_type(), dtl::ValueType::Scalar);
+      sv = dynamic_cast<const dtl::Scalar*>(second);
+      EXPECT_EQ(sv->to_u32(ok), 65535);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Node, DeriveProperInitValueRecord_U8U8_U16)
+   {
+      bool ok;
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "R\"RecordPort\"{\"Outer1\"{\"Inner1\"C(0,7)\"Inner2\"C(0,3)}\"Outer2\"L}:={ {7,3}, 65535}\n";
+
+      apx::Parser parser;
+      std::stringstream ss;
+      ss.str(apx_text);
+      EXPECT_TRUE(parser.parse(ss));
+      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      auto init_value = port->proper_init_value;
+      ASSERT_NE(init_value.get(), nullptr);
+      ASSERT_EQ(init_value->dv_type(), dtl::ValueType::Hash);
+      auto derived_hv = dynamic_cast<dtl::Hash*>(init_value.get());
+      auto const* inner_dv = derived_hv->get("Outer1");
+      ASSERT_EQ(inner_dv->dv_type(), dtl::ValueType::Hash);
+      auto inner_hv = dynamic_cast<const dtl::Hash*>(inner_dv);
+      auto const* inner1 = inner_hv->get("Inner1");
+      ASSERT_NE(inner1, nullptr);
+      EXPECT_EQ(inner1->dv_type(), dtl::ValueType::Scalar);
+      auto const* sv = dynamic_cast<const dtl::Scalar*>(inner1);
+      ASSERT_NE(sv, nullptr);
+      EXPECT_EQ(sv->to_u32(ok), 7);
+      EXPECT_TRUE(ok);
+      auto const* inner2 = inner_hv->get("Inner2");
+      ASSERT_NE(inner2, nullptr);
+      EXPECT_EQ(inner2->dv_type(), dtl::ValueType::Scalar);
+      sv = dynamic_cast<const dtl::Scalar*>(inner2);
+      ASSERT_NE(sv, nullptr);
+      EXPECT_EQ(sv->to_u32(ok), 3);
+      EXPECT_TRUE(ok);
+      auto const* outer2_dv = derived_hv->get("Outer2");
+      ASSERT_EQ(outer2_dv->dv_type(), dtl::ValueType::Scalar);
+      sv = dynamic_cast<const dtl::Scalar*>(outer2_dv);
+      ASSERT_NE(sv, nullptr);
+      EXPECT_EQ(sv->to_u32(ok), 65535);
+      EXPECT_TRUE(ok);
    }
 
 

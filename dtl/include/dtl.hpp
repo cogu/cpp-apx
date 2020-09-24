@@ -29,7 +29,7 @@ namespace dtl
    {
    public:
       virtual ~Value() {}
-      dtl::ValueType dv_type();
+      dtl::ValueType dv_type() const { return m_dv_type; }
    protected:
       Value(ValueType dv_type) : m_dv_type{ dv_type } {}
       ValueType m_dv_type;
@@ -83,11 +83,11 @@ namespace dtl
       void set(const std::string& value);
       void set(const char* value);
       void set(const char* begin, const char* end);
-      int32_t to_i32(bool& ok);
-      uint32_t to_u32(bool& ok);
-      int64_t to_i64(bool& ok);
-      uint64_t to_u64(bool& ok);
-      std::string to_string();
+      int32_t to_i32(bool& ok) const;
+      uint32_t to_u32(bool& ok) const;
+      int64_t to_i64(bool& ok) const;
+      uint64_t to_u64(bool& ok) const;
+      std::string to_string() const;
    protected:
       ScalarData m_sv_data;
    };
@@ -129,6 +129,9 @@ namespace dtl
       void insert(value_type& v);
       void insert(value_type&& v);
       std::shared_ptr<dtl::Value>& at(std::string const& key) { return m_hv_data.at(key); }
+      std::shared_ptr<dtl::Value>& at(char const* key) { return m_hv_data.at(key); }
+      dtl::Value const* get(std::string const& key) const { auto &tmp = m_hv_data.at(key); return tmp.get(); }
+      dtl::Value const* get(char const* key) const { auto &tmp = m_hv_data.at(key); return tmp.get(); }
    protected:
       std::unordered_map<std::string, std::shared_ptr<dtl::Value>> m_hv_data;
    };
