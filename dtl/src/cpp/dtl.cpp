@@ -7,11 +7,6 @@ template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
 
 namespace dtl
 {
-   ValueType Value::dv_type()
-   {
-      return m_dv_type;
-   }
-
    constexpr int I32_ID = 0;
    constexpr int U32_ID = 1;
    constexpr int I64_ID = 2;
@@ -75,7 +70,7 @@ namespace dtl
       m_sv_data = std::string{ begin, count };
    }
 
-   int32_t Scalar::to_i32(bool& ok)
+   int32_t Scalar::to_i32(bool& ok) const
    {
       ok = false;
       int32_t retval = 0;
@@ -119,7 +114,7 @@ namespace dtl
       return retval;
    }
 
-   uint32_t Scalar::to_u32(bool& ok)
+   uint32_t Scalar::to_u32(bool& ok) const
    {
       ok = false;
       uint32_t retval = 0;
@@ -163,7 +158,7 @@ namespace dtl
       return retval;
    }
 
-   int64_t Scalar::to_i64(bool& ok)
+   int64_t Scalar::to_i64(bool& ok) const
    {
       ok = false;
       int64_t retval = 0;
@@ -207,7 +202,7 @@ namespace dtl
       return retval;
    }
 
-   uint64_t Scalar::to_u64(bool& ok)
+   uint64_t Scalar::to_u64(bool& ok) const
    {
       ok = false;
       uint64_t retval = 0;
@@ -251,7 +246,7 @@ namespace dtl
       return retval;
    }
 
-   std::string Scalar::to_string()
+   std::string Scalar::to_string() const
    {
       std::string retval;
       if (m_sv_data.has_value())
