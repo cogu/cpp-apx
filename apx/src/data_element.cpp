@@ -208,7 +208,14 @@ namespace apx
             assert(parsed_av != nullptr);
             if (is_dynamic_array())
             {
-               return APX_NOT_IMPLEMENTED_ERROR;
+               if (parsed_av->length() == 0u)
+               {
+                  derived_value = make_unique<dtl::Array>();
+               }
+               else
+               {
+                  return APX_INVALID_ATTRIBUTE_ERROR; //dynamic array only supports empty initializer list
+               }
             }
             else
             {

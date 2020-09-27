@@ -5,18 +5,18 @@
 namespace apx_test
 {
    TEST(AttributeParser, ParseInitValue_Zero)
-   {  
+   {
       const char* begin = "0";
       const char* end = begin + strlen(begin);
       apx::AttributeParser parser;
       dtl::DynamicValue dv = nullptr;
       bool ok = false;
-      
+
       const char *result = parser.parse_initializer(begin, end, dv);
       ASSERT_EQ(result, end);
       ASSERT_EQ(dv.use_count(), 1);
       dtl::Scalar* sv = dynamic_cast<dtl::Scalar*>(dv.get());
-      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::Int32);      
+      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::Int32);
       ASSERT_EQ(sv->to_i32(ok), (int32_t)0);
       ASSERT_TRUE(ok);
       dtl::ScalarValue sv2 = std::dynamic_pointer_cast<dtl::Scalar>(dv);
@@ -41,7 +41,7 @@ namespace apx_test
       result = parser.parse_initializer(begin2, end2, dv);
       ASSERT_EQ(result, end2);
       dtl::Scalar* sv = dynamic_cast<dtl::Scalar*>(dv.get());
-      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::Int32);      
+      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::Int32);
       ASSERT_EQ(sv->to_i32(ok), -1);
       ASSERT_TRUE(ok);
    }
@@ -92,7 +92,7 @@ namespace apx_test
       const char* result = parser.parse_initializer(begin, end, dv);
       ASSERT_EQ(result, end);
       dtl::Scalar* sv = dynamic_cast<dtl::Scalar*>(dv.get());
-      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::Int32);      
+      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::Int32);
       ASSERT_EQ(sv->to_i32(ok), INT32_MIN);
       ASSERT_TRUE(ok);
    }
@@ -137,7 +137,7 @@ namespace apx_test
       ASSERT_EQ(inner_av->length(), 2);
       auto sv = dynamic_cast<dtl::Scalar*>(inner_av->at(0).get()); //[0,0]
       ASSERT_EQ(sv->to_i32(ok), 1);
-      ASSERT_TRUE(ok);      
+      ASSERT_TRUE(ok);
       sv = dynamic_cast<dtl::Scalar*>(inner_av->at(1).get()); //[0,1]
       ASSERT_EQ(sv->to_i32(ok), 2);
       ASSERT_TRUE(ok);
@@ -157,7 +157,7 @@ namespace apx_test
    {
       const char* begin = "\"\"";
       const char* end = begin + strlen(begin);
-      apx::AttributeParser parser; 
+      apx::AttributeParser parser;
       dtl::DynamicValue dv = nullptr;
       const char* result = parser.parse_initializer(begin, end, dv);
       ASSERT_EQ(result, end);
@@ -205,11 +205,11 @@ namespace apx_test
       ASSERT_TRUE(ok);
       sv = dynamic_cast<dtl::Scalar*>(av->at(1).get());
       ASSERT_NE(sv, nullptr);
-      ASSERT_EQ(sv->to_string(), "None");      
+      ASSERT_EQ(sv->to_string(), "None");
    }
 }
 
-TEST(AttributeParser, PortAttributes)
+TEST(AttributeParser, ParsePortInitValues)
 {
    const char* begin1 = "=3";
    const char* end1 = begin1 + strlen(begin1);
@@ -399,3 +399,45 @@ TEST(AttributeParser, QueueLength)
    ASSERT_EQ(result, end);
    ASSERT_EQ(attr.queue_length, 10u);
 }
+
+TEST(AttributeParser, EmptyInitializerList)
+{
+   const char* begin = "={}";
+   const char* end = begin + strlen(begin);
+   apx::AttributeParser parser;
+   apx::PortAttributes attr;
+   const char* result = parser.parse_port_attributes(begin, end, attr);
+   ASSERT_EQ(result, end);
+   ASSERT_TRUE(attr.has_init_value());
+   ASSERT_FALSE(attr.is_parameter);
+   dtl::Value* dv = attr.init_value.get();
+   ASSERT_EQ(dv->dv_type(), dtl::ValueType::Array);
+   dtl::Array* av = dynamic_cast<dtl::Array*>(dv);
+   ASSERT_EQ(av->length(), 0);
+}
+
+TEST(AttributeParser, EmptyInitializerListInRecord)
+{
+   const char* begin = "={3, {}}";
+   const char* end = begin + strlen(begin);
+   apx::AttributeParser parser;
+   apx::PortAttributes attr;
+   const char* result = parser.parse_port_attributes(begin, end, attr);
+   ASSERT_EQ(result, end);
+   ASSERT_TRUE(attr.has_init_value());
+   ASSERT_FALSE(attr.is_parameter);
+   ASSERT_EQ(attr.init_value->dv_type(), dtl::ValueType::Array);
+   dtl::Array* outer_av = dynamic_cast<dtl::Array*>(attr.init_value.get());
+   ASSERT_EQ(outer_av->length(), 2);
+   auto dv = outer_av->at(0);
+   ASSERT_EQ(dv->dv_type(), dtl::ValueType::Scalar);
+   auto sv = dynamic_cast<dtl::Scalar*>(dv.get());
+   bool ok;
+   ASSERT_EQ(sv->to_u32(ok), 3u);
+   ASSERT_TRUE(ok);
+   dv = outer_av->at(1);
+   ASSERT_EQ(dv->dv_type(), dtl::ValueType::Array);
+   auto inner_av = dynamic_cast<dtl::Array*>(dv.get());
+   ASSERT_EQ(inner_av->length(), 0);
+}
+

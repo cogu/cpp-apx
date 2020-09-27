@@ -21,6 +21,7 @@ namespace apx
          State* parent = nullptr;
          dtl::ScalarValue sv;
          dtl::ArrayValue initializer_list;
+         bool has_value() const { return (sv.use_count() > 0) || (initializer_list.use_count() > 0); }
       };
 
       struct ComputationState
