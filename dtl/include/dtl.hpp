@@ -102,6 +102,7 @@ namespace dtl
    ScalarValue make_sv_string(const std::string& value);
    ScalarValue make_sv_string(const char* value);
    ScalarValue make_sv_string(const char* begin, const char* end);
+
    /* Array */
    class Array : public dtl::Value
    {
@@ -110,7 +111,8 @@ namespace dtl
       std::size_t length() const { return m_av_data.size(); }
       void push(std::shared_ptr<dtl::Value> dv) { m_av_data.push_back(dv); }
       std::shared_ptr<dtl::Value>& at(std::size_t pos) { return m_av_data.at(pos); }
-      const std::shared_ptr<dtl::Value>& at(std::size_t pos) const { return m_av_data.at(pos); }
+      std::shared_ptr<dtl::Value>const & at(std::size_t pos) const { return m_av_data.at(pos); }
+      bool is_empty() const { return m_av_data.empty(); }
    protected:
       std::vector<std::shared_ptr<dtl::Value>> m_av_data;
    };
@@ -132,6 +134,7 @@ namespace dtl
       std::shared_ptr<dtl::Value>& at(char const* key) { return m_hv_data.at(key); }
       dtl::Value const* get(std::string const& key) const { auto &tmp = m_hv_data.at(key); return tmp.get(); }
       dtl::Value const* get(char const* key) const { auto &tmp = m_hv_data.at(key); return tmp.get(); }
+      bool is_empty() const { return m_hv_data.empty(); }
    protected:
       std::unordered_map<std::string, std::shared_ptr<dtl::Value>> m_hv_data;
    };

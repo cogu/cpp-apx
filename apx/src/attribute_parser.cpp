@@ -263,28 +263,26 @@ namespace apx
             {
                return result;
             }
-            assert(prev != next); //Parse did not progress
          }
 POST_VALUE_HANDLER:
          if (is_list_initializer())
          {
             next = bstr::lstrip(next, end);
             c = *next;
-            if (c == ',')
+            if (m_state->has_value())
             {
-               next++;
                if (!push_value_to_parent())
                {
                   return nullptr;
                }
             }
+            if (bool is_empty = m_state->parent->initializer_list->is_empty(); !is_empty && (c == ','))
+            {
+               next++;
+            }
             else if (c == '}')
             {
                next++;
-               if (!push_value_to_parent())
-               {
-                  return nullptr;
-               }
                if (m_stack.size() > 0)
                {
                   delete m_state;
@@ -867,4 +865,5 @@ POST_VALUE_HANDLER:
       }
       return rs.release();
    }
+
 }

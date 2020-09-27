@@ -328,5 +328,24 @@ namespace apx_test
       EXPECT_TRUE(ok);
    }
 
+   TEST(Node, DeriveProperInitValue_DynamicArray)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "R\"DynamicPort\"b[4095*]:={}\n";
 
+      apx::Parser parser;
+      std::stringstream ss;
+      ss.str(apx_text);
+      EXPECT_TRUE(parser.parse(ss));
+      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      auto init_value = port->proper_init_value;
+      ASSERT_NE(init_value.get(), nullptr);
+      ASSERT_EQ(init_value->dv_type(), dtl::ValueType::Array);
+      auto av = dynamic_cast<dtl::Array*>(init_value.get());
+      ASSERT_TRUE(av->is_empty());
+   }
 }
