@@ -11,7 +11,7 @@ namespace apx
       static std::uint8_t encode_program_byte(apx::ProgramType program_type, bool is_dynamic, bool is_queued, std::uint8_t data_size_variant)
       {
          std::uint8_t retval = (program_type == apx::ProgramType::Pack)? HEADER_PROG_TYPE_PACK : HEADER_PROG_TYPE_UNPACK;
-         retval |= (data_size_variant & HEADER_DATA_SIZE_MASK);
+         retval |= (data_size_variant & HEADER_DATA_VARIANT_MASK);
          if (is_dynamic)
          {
             retval |= HEADER_FLAG_DYNAMIC_DATA;
@@ -28,6 +28,31 @@ namespace apx
          std::uint8_t retval = (element_variant == VARIANT_U8) ? VARIANT_ELEMENT_SIZE_U8_BASE : (element_variant == VARIANT_U16) ? VARIANT_ELEMENT_SIZE_U16_BASE : VARIANT_ELEMENT_SIZE_U32_BASE;
          retval += queue_variant;
          return retval;
+      }
+
+      static std::uint8_t const* parse_number_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::uint32_t& number)
+      {
+         std::uint8_t const* next = begin;
+         std::size_t const unpack_size = variant_to_size_u32(variant);
+         if ( (unpack_size == 0) || (next + unpack_size) > end)
+         {
+            return nullptr;
+         }
+         switch (variant)
+         {
+         case VARIANT_U8:
+            number = static_cast<std::uint32_t>(unpackLE<std::uint8_t>(next));
+            break;
+         case VARIANT_U16:
+            number = static_cast<std::uint32_t>(unpackLE<std::uint16_t>(next));
+            break;
+         case VARIANT_U32:
+            number = static_cast<std::uint32_t>(unpackLE<std::uint32_t>(next));
+            break;
+         default:
+            assert(0);
+         }
+         return next + unpack_size;
       }
 
       apx::error_t create_program_header(apx::vm::Program& header, apx::ProgramType program_type, std::uint32_t element_size, std::uint32_t queue_size, bool is_dynamic)
@@ -112,9 +137,108 @@ namespace apx
          return APX_NO_ERROR;
       }
 
-      apx::error_t decode_program_header(std::uint8_t const* program, ProgramHeader& header)
+      apx::error_t decode_program_header(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t const*& next, ProgramHeader& header)
       {
-         return APX_NOT_IMPLEMENTED_ERROR;
+         if ((begin != nullptr && end != nullptr) && (begin < end))
+         {
+            header.element_size = 0u;
+            header.is_dynamic_data = false;
+            header.queue_length = 0u;
+            std::size_t size = (end - begin);
+            if (size < FIXED_HEADER_SIZE)
+            {
+               return APX_LENGTH_ERROR;
+            }
+            if ((begin[0] != HEADER_MAGIC_NUMBER_0) ||
+               (begin[1] != HEADER_MAGIC_NUMBER_1) ||
+               (begin[2] != HEADER_MAGIC_NUMBER_2))
+            {
+               return APX_INVALID_HEADER_ERROR;
+            }
+            header.major_version = begin[3];
+            header.minor_version = begin[4];
+            if (header.major_version != MAJOR_VERSION || header.minor_version != MINOR_VERSION)
+            {
+               return APX_NOT_IMPLEMENTED_ERROR;
+            }
+            std::uint8_t const data_variant = begin[5] & HEADER_DATA_VARIANT_MASK;
+            header.prog_type = ((begin[5] & HEADER_PROG_TYPE_PACK) == HEADER_PROG_TYPE_PACK) ? ProgramType::Pack : ProgramType::Unpack;
+            bool const is_queued_data = ((begin[5] & HEADER_FLAG_QUEUED_DATA) == HEADER_FLAG_QUEUED_DATA);
+            header.is_dynamic_data = ((begin[5] & HEADER_FLAG_DYNAMIC_DATA) == HEADER_FLAG_DYNAMIC_DATA);
+            next = begin + FIXED_HEADER_SIZE;
+            if (auto result = parse_number_by_variant(next, end, data_variant, header.data_size); (result > next) && (result <= end) )
+            {
+               next = result;
+            }
+            else
+            {
+               return APX_PARSE_ERROR;
+            }
+
+            if (is_queued_data)
+            {
+               if (next >= end)
+               {
+                  return APX_PARSE_ERROR;
+               }
+               std::uint8_t opcode;
+               std::uint8_t variant;
+               bool flag;
+               std::uint8_t element_variant;
+               std::uint8_t queued_variant;
+
+               if (apx::error_t const result = decode_instruction(*next, opcode, variant, flag); result != APX_NO_ERROR)
+               {
+                  return result;
+               }
+               if ((opcode != OPCODE_DATA_SIZE) || (variant < VARIANT_ELEMENT_SIZE_U8_BASE) || (variant > VARIANT_ELEMENT_SIZE_LAST))
+               {
+                  return APX_PARSE_ERROR;
+               }
+               next++;
+               if (variant < VARIANT_ELEMENT_SIZE_U16_BASE) //variant is between 3..5
+               {
+                  element_variant = VARIANT_U8;
+                  queued_variant = variant - VARIANT_ELEMENT_SIZE_U8_BASE;
+               }
+               else if (variant < VARIANT_ELEMENT_SIZE_U32_BASE) //variant is between 6..8
+               {
+                  element_variant = VARIANT_U16;
+                  queued_variant = variant - VARIANT_ELEMENT_SIZE_U16_BASE;
+               }
+               else //variant is between 9..11
+               {
+                  element_variant = VARIANT_U32;
+                  queued_variant = variant - VARIANT_ELEMENT_SIZE_U32_BASE;
+               }
+               auto const queued_elem_size = variant_to_size_u32(queued_variant);
+               if ((queued_elem_size == 0u) || (queued_elem_size > header.data_size))
+               {
+                  return APX_PARSE_ERROR;
+               }
+               if (auto result = parse_number_by_variant(next, end, element_variant, header.element_size); (result > next) && (result <= end))
+               {
+                  next = result;
+               }
+               else
+               {
+                  return APX_PARSE_ERROR;
+               }
+               //Calculate element size by subtracting queued_elem_size from header.data_size then dividing by header.element_size
+               if (header.element_size == 0)
+               {
+                  return APX_PARSE_ERROR;
+               }
+               std::uint32_t const tmp = header.data_size - static_cast<std::uint32_t>(queued_elem_size);
+               if (tmp % header.element_size != 0)
+               {
+                  return APX_INVALID_HEADER_ERROR;
+               }
+               header.queue_length = tmp / header.element_size;
+            }
+            return APX_NO_ERROR;
+         }
+         return APX_INVALID_ARGUMENT_ERROR;
       }
 
       std::uint8_t encode_instruction(std::uint8_t opcode, std::uint8_t variant, bool flag)
@@ -134,6 +258,59 @@ namespace apx
          flag = (instruction & INST_FLAG) == INST_FLAG? true : false;
          return APX_NO_ERROR;
       }
-   }
 
+      std::size_t variant_to_size_full(std::uint8_t variant)
+      {
+         std::size_t retval{ 0 };
+         switch (variant)
+         {
+         case VARIANT_U8:
+         case VARIANT_BOOL:
+         case VARIANT_BYTE:
+         case VARIANT_CHAR:
+            retval = UINT8_SIZE;
+            break;
+         case VARIANT_U16:
+            retval = UINT16_SIZE;
+            break;
+         case VARIANT_U32:
+            retval = UINT32_SIZE;
+            break;
+         case VARIANT_U64:
+            retval = UINT64_SIZE;
+            break;
+         case VARIANT_S8:
+            retval = UINT8_SIZE;
+            break;
+         case VARIANT_S16:
+            retval = UINT16_SIZE;
+            break;
+         case VARIANT_S32:
+            retval = UINT32_SIZE;
+            break;
+         case VARIANT_S64:
+            retval = UINT64_SIZE;
+            break;
+         }
+         return retval;
+      }
+
+      std::size_t variant_to_size_u32(std::uint8_t variant)
+      {
+         std::size_t retval{ 0 };
+         switch (variant)
+         {
+         case VARIANT_U8:
+            retval = UINT8_SIZE;
+            break;
+         case VARIANT_U16:
+            retval = UINT16_SIZE;
+            break;
+         case VARIANT_U32:
+            retval = UINT32_SIZE;
+            break;
+         }
+         return retval;
+      }
+   }
 }

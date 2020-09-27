@@ -44,6 +44,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_element.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_signature.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_type.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\deserializer.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\error.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\pack.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\program.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\serializer.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\signature_parser.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\types.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\parser.h" />
@@ -100,6 +102,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\vm.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\test\test_compiler.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_data_element.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_pack.cpp" />
@@ -111,6 +116,7 @@
     <ClCompile Include="..\..\..\..\apx\test\test_signature_parser.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_vm.cpp" />
     <ClCompile Include="..\..\..\..\dtl\src\cpp\dtl.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
