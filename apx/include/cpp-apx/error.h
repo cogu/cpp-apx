@@ -79,3 +79,4 @@ namespace apx
 #define APX_INVALID_PORT_HANDLE_ERROR   62
 #define APX_STRAY_CHARACTERS_AFTER_PARSE_ERROR 63
 #define APX_EMPTY_RECORD_ERROR                 64
+#define APX_INVALID_HEADER_ERROR               65

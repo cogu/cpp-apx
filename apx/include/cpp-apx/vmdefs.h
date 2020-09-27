@@ -56,7 +56,7 @@ namespace apx
       *
       * where QueueStorageSize is either 1, 2, or 4 (which can be determined from the variant on the DATA_SIZE instruction).
       */
-      constexpr std::uint32_t HEADER_SIZE = 10u;
+
       constexpr std::uint8_t HEADER_MAGIC_NUMBER_0 = ((uint8_t)'A');
       constexpr std::uint8_t HEADER_MAGIC_NUMBER_1 = ((uint8_t)'P');
       constexpr std::uint8_t HEADER_MAGIC_NUMBER_2 = ((uint8_t)'X');
@@ -64,10 +64,10 @@ namespace apx
       constexpr std::uint8_t MAJOR_VERSION = 2u;
       constexpr std::uint8_t MINOR_VERSION = 0u;
       constexpr std::uint32_t VERSION_SIZE = 2u;
-      constexpr std::uint32_t HEADER_SIZE_OFFSET = 6;
+      constexpr std::uint32_t FIXED_HEADER_SIZE = 6;
       constexpr std::uint8_t HEADER_PROG_TYPE_UNPACK = 0x00;
       constexpr std::uint8_t HEADER_PROG_TYPE_PACK = 0x08;
-      constexpr std::uint8_t HEADER_DATA_SIZE_MASK = 0x07;
+      constexpr std::uint8_t HEADER_DATA_VARIANT_MASK = 0x07;
 
       constexpr std::uint8_t HEADER_FLAG_DYNAMIC_DATA = 0x10; //This is just an indicator if any dynamic arrays are present inside the data.
       constexpr std::uint8_t HEADER_FLAG_QUEUED_DATA = 0x20; //When this is active, the very next instruction must be OPCODE_DATA_SIZE.
@@ -183,8 +183,10 @@ namespace apx
       constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U32_QUEUE_SIZE_U8 = VARIANT_ELEMENT_SIZE_U32_BASE + VARIANT_U8;    // 9
       constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U32_QUEUE_SIZE_U16 = VARIANT_ELEMENT_SIZE_U32_BASE + VARIANT_U16;  // 10
       constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U32_QUEUE_SIZE_U32 = VARIANT_ELEMENT_SIZE_U32_BASE + VARIANT_U32;  // 11
+      constexpr std::uint8_t VARIANT_ELEMENT_SIZE_LAST = VARIANT_ELEMENT_SIZE_U32_QUEUE_SIZE_U32;
       // For variants 0..2: Maximum array size is always encoded into program.
       // If flag bit is set then the current array size is serialized into data buffer (as next byte(s)). This is used for dynamic arrays.
+      // Flag bit is not used for variants 3..11
 
       constexpr std::uint8_t OPCODE_DATA_CTRL = 3;
       constexpr std::uint8_t VARIANT_RECORD_SELECT = 0;
@@ -214,10 +216,11 @@ namespace apx
       constexpr std::uint32_t BYTE_SIZE = sizeof(std::uint8_t); //TODO: Change to std::byte when C++20 has better support?
       constexpr std::uint32_t UINT16_SIZE = sizeof(std::uint16_t);
       constexpr std::uint32_t UINT32_SIZE = sizeof(std::uint32_t);
+      constexpr std::uint32_t UINT64_SIZE = sizeof(std::uint64_t);
       constexpr std::uint32_t INT8_SIZE = sizeof(std::int8_t);
       constexpr std::uint32_t INT16_SIZE = sizeof(std::int16_t);
       constexpr std::uint32_t INT32_SIZE = sizeof(std::int32_t);
-
+      constexpr std::uint32_t INT64_SIZE = sizeof(std::int64_t);
    }
 
 }

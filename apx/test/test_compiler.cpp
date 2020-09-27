@@ -563,7 +563,7 @@ namespace apx_test
       const char* apx_text =
          "APX/1.3\n"
          "N\"TestNode\"\n"
-         "R\"BytePort\"a[256*]\n";
+         "R\"BytePort\"a[256*]:={}\n";
       apx::Parser parser;
       std::stringstream ss;
       ss.str(apx_text);

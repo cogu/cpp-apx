@@ -63,6 +63,12 @@
     <ClCompile Include="..\..\..\..\apx\test\test_compiler.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_vm.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\vm.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -124,6 +130,12 @@
       <Filter>apx\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\compiler.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\deserializer.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\serializer.h">
       <Filter>apx\include</Filter>
     </ClInclude>
   </ItemGroup>
