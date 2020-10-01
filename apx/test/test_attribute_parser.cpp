@@ -326,15 +326,15 @@ TEST(AttributeParser, ValueTableRanges)
    ASSERT_EQ(attr.computations.size(), 2);
    auto vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(0).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.u32, 251);
-   ASSERT_EQ(vt->upper_range.u32, 254);
+   ASSERT_EQ(vt->lower_range.u32, 251u);
+   ASSERT_EQ(vt->upper_range.u32, 254u);
    ASSERT_EQ(vt->values.size(), 1);
    ASSERT_EQ(vt->values.at(0), "Error");
 
    vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(1).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.u32, 255);
-   ASSERT_EQ(vt->upper_range.u32, 255);
+   ASSERT_EQ(vt->lower_range.u32, 255u);
+   ASSERT_EQ(vt->upper_range.u32, 255u);
    ASSERT_EQ(vt->values.size(), 1);
    ASSERT_EQ(vt->values.at(0), "NotAvailable");
 }

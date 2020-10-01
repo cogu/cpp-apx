@@ -30,10 +30,10 @@ namespace apx
          return retval;
       }
 
-      std::uint8_t const* parse_number_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::uint32_t& number)
+      std::uint8_t const* parse_uint32_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::uint32_t& number)
       {
          std::uint8_t const* next = begin;
-         std::size_t const unpack_size = variant_to_size_u32(variant);
+         std::size_t const unpack_size = variant_to_size_integer(variant);
          if ( (unpack_size == 0) || (next + unpack_size) > end)
          {
             return nullptr;
@@ -50,10 +50,92 @@ namespace apx
             number = static_cast<std::uint32_t>(unpackLE<std::uint32_t>(next));
             break;
          default:
-            assert(0);
+            return nullptr; //VARIANT ERROR
          }
          return next + unpack_size;
       }
+
+      std::uint8_t const* parse_uint64_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::uint64_t& number)
+      {
+         std::uint8_t const* next = begin;
+         std::size_t const unpack_size = variant_to_size_integer(variant);
+         if ((unpack_size == 0) || (next + unpack_size) > end)
+         {
+            return nullptr;
+         }
+         switch (variant)
+         {
+         case VARIANT_U8:
+            number = static_cast<std::uint64_t>(unpackLE<std::uint8_t>(next));
+            break;
+         case VARIANT_U16:
+            number = static_cast<std::uint64_t>(unpackLE<std::uint16_t>(next));
+            break;
+         case VARIANT_U32:
+            number = static_cast<std::uint64_t>(unpackLE<std::uint32_t>(next));
+            break;
+         case VARIANT_U64:
+            number = static_cast<std::uint64_t>(unpackLE<std::uint64_t>(next));
+            break;
+         default:
+            return nullptr; //VARIANT ERROR
+         }
+         return next + unpack_size;
+      }
+
+      std::uint8_t const* parse_int32_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::int32_t& number)
+      {
+         std::uint8_t const* next = begin;
+         std::size_t const unpack_size = variant_to_size_integer(variant);
+         if ((unpack_size == 0) || (next + unpack_size) > end)
+         {
+            return nullptr;
+         }
+         switch (variant)
+         {
+         case VARIANT_S8:
+            number = static_cast<std::int32_t>(unpackLE<std::int8_t>(next));
+            break;
+         case VARIANT_S16:
+            number = static_cast<std::int32_t>(unpackLE<std::int16_t>(next));
+            break;
+         case VARIANT_S32:
+            number = static_cast<std::int32_t>(unpackLE<std::int32_t>(next));
+            break;
+         default:
+            return nullptr; //VARIANT ERROR
+         }
+         return next + unpack_size;
+      }
+
+      std::uint8_t const* parse_int64_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::int64_t& number)
+      {
+         std::uint8_t const* next = begin;
+         std::size_t const unpack_size = variant_to_size_integer(variant);
+         if ((unpack_size == 0) || (next + unpack_size) > end)
+         {
+            return nullptr;
+         }
+         switch (variant)
+         {
+         case VARIANT_S8:
+            number = static_cast<std::int64_t>(unpackLE<std::int8_t>(next));
+            break;
+         case VARIANT_S16:
+            number = static_cast<std::int64_t>(unpackLE<std::int16_t>(next));
+            break;
+         case VARIANT_S32:
+            number = static_cast<std::int64_t>(unpackLE<std::int32_t>(next));
+            break;
+         case VARIANT_S64:
+            number = static_cast<std::int64_t>(unpackLE<std::int32_t>(next));
+            break;
+         default:
+            return nullptr; //VARIANT ERROR
+         }
+         return next + unpack_size;
+      }
+
 
       apx::error_t create_program_header(apx::vm::Program& header, apx::ProgramType program_type, std::uint32_t element_size, std::uint32_t queue_size, bool is_dynamic)
       {
@@ -112,7 +194,7 @@ namespace apx
             std::uint8_t const variant = calc_data_size_variant(element_variant, queue_variant);
             std::uint8_t const instruction = encode_instruction(opcode, variant, false);
             header.push_back(instruction);
-            std::uint8_t* p = encoded_size.data();
+            p = encoded_size.data();
             switch (element_variant)
             {
             case VARIANT_U8:
@@ -166,7 +248,7 @@ namespace apx
             bool const is_queued_data = ((begin[5] & HEADER_FLAG_QUEUED_DATA) == HEADER_FLAG_QUEUED_DATA);
             header.is_dynamic_data = ((begin[5] & HEADER_FLAG_DYNAMIC_DATA) == HEADER_FLAG_DYNAMIC_DATA);
             next = begin + FIXED_HEADER_SIZE;
-            if (auto result = parse_number_by_variant(next, end, data_variant, header.data_size); (result > next) && (result <= end) )
+            if (auto result = parse_uint32_by_variant(next, end, data_variant, header.data_size); (result > next) && (result <= end) )
             {
                next = result;
             }
@@ -207,12 +289,12 @@ namespace apx
                   element_variant = VARIANT_U32;
                   queued_variant = variant - VARIANT_ELEMENT_SIZE_U32_BASE;
                }
-               auto const queued_elem_size = variant_to_size_u32(queued_variant);
+               auto const queued_elem_size = variant_to_size_integer(queued_variant);
                if ((queued_elem_size == 0u) || (queued_elem_size > header.data_size))
                {
                   return APX_PARSE_ERROR;
                }
-               if (auto result = parse_number_by_variant(next, end, element_variant, header.element_size); (result > next) && (result <= end))
+               if (auto result = parse_uint32_by_variant(next, end, element_variant, header.element_size); (result > next) && (result <= end))
                {
                   next = result;
                }
@@ -293,7 +375,7 @@ namespace apx
          return retval;
       }
 
-      std::size_t variant_to_size_u32(std::uint8_t variant)
+      std::size_t variant_to_size_integer(std::uint8_t variant)
       {
          std::size_t retval{ 0 };
          switch (variant)
@@ -306,6 +388,21 @@ namespace apx
             break;
          case VARIANT_U32:
             retval = UINT32_SIZE;
+            break;
+         case VARIANT_U64:
+            retval = UINT64_SIZE;
+            break;
+         case VARIANT_S8:
+            retval = INT8_SIZE;
+            break;
+         case VARIANT_S16:
+            retval = INT16_SIZE;
+            break;
+         case VARIANT_S32:
+            retval = UINT32_SIZE;
+            break;
+         case VARIANT_S64:
+            retval = INT64_SIZE;
             break;
          }
          return retval;

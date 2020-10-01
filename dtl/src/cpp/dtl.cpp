@@ -19,11 +19,11 @@ namespace dtl
       if (m_sv_data.has_value())
       {
          std::visit(overloaded{
-            [&retval](int32_t v) { retval = dtl::ScalarType::Int32; },
-            [&retval](uint32_t v) { retval = dtl::ScalarType::UInt32; },
-            [&retval](int64_t v) { retval = dtl::ScalarType::Int64; },
-            [&retval](uint64_t v) { retval = dtl::ScalarType::UInt64; },
-            [&retval](std::string& v) { retval = dtl::ScalarType::String; }
+            [&retval](int32_t v) { (void)v; retval = dtl::ScalarType::Int32; },
+            [&retval](uint32_t v) { (void)v; retval = dtl::ScalarType::UInt32; },
+            [&retval](int64_t v) { (void)v; retval = dtl::ScalarType::Int64; },
+            [&retval](uint64_t v) { (void)v; retval = dtl::ScalarType::UInt64; },
+            [&retval](std::string& v) { (void)v; retval = dtl::ScalarType::String; }
             }, m_sv_data.value());
       }
       return retval;

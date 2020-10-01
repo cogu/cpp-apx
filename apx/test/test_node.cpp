@@ -274,13 +274,13 @@ namespace apx_test
       ASSERT_NE(first, nullptr);
       EXPECT_EQ(first->dv_type(), dtl::ValueType::Scalar);
       auto const* sv = dynamic_cast<const dtl::Scalar*>(first);
-      EXPECT_EQ(sv->to_u32(ok), 255);
+      EXPECT_EQ(sv->to_u32(ok), 255u);
       EXPECT_TRUE(ok);
       auto const* second = derived_hv->get("Second");
       ASSERT_NE(second, nullptr);
       EXPECT_EQ(second->dv_type(), dtl::ValueType::Scalar);
       sv = dynamic_cast<const dtl::Scalar*>(second);
-      EXPECT_EQ(sv->to_u32(ok), 65535);
+      EXPECT_EQ(sv->to_u32(ok), 65535u);
       EXPECT_TRUE(ok);
    }
 
@@ -311,20 +311,20 @@ namespace apx_test
       EXPECT_EQ(inner1->dv_type(), dtl::ValueType::Scalar);
       auto const* sv = dynamic_cast<const dtl::Scalar*>(inner1);
       ASSERT_NE(sv, nullptr);
-      EXPECT_EQ(sv->to_u32(ok), 7);
+      EXPECT_EQ(sv->to_u32(ok), 7u);
       EXPECT_TRUE(ok);
       auto const* inner2 = inner_hv->get("Inner2");
       ASSERT_NE(inner2, nullptr);
       EXPECT_EQ(inner2->dv_type(), dtl::ValueType::Scalar);
       sv = dynamic_cast<const dtl::Scalar*>(inner2);
       ASSERT_NE(sv, nullptr);
-      EXPECT_EQ(sv->to_u32(ok), 3);
+      EXPECT_EQ(sv->to_u32(ok), 3u);
       EXPECT_TRUE(ok);
       auto const* outer2_dv = derived_hv->get("Outer2");
       ASSERT_EQ(outer2_dv->dv_type(), dtl::ValueType::Scalar);
       sv = dynamic_cast<const dtl::Scalar*>(outer2_dv);
       ASSERT_NE(sv, nullptr);
-      EXPECT_EQ(sv->to_u32(ok), 65535);
+      EXPECT_EQ(sv->to_u32(ok), 65535u);
       EXPECT_TRUE(ok);
    }
 

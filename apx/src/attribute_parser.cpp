@@ -36,7 +36,7 @@ namespace apx
    const char* AttributeParser::parse_port_attributes(const char* begin, const char* end, apx::PortAttributes& attr)
    {
       const char* next = begin;
-      if ( (end < begin) || (begin == nullptr) || (end == nullptr))
+      if ((end < begin) || (begin == nullptr) || (end == nullptr))
       {
          set_error(APX_INVALID_ARGUMENT_ERROR);
          return nullptr;
@@ -239,7 +239,6 @@ namespace apx
       while (next < end)
       {
          next = bstr::lstrip(next, end);
-         const char* prev = next;
          char c = *next;
 
          if (c == '{')
@@ -264,7 +263,7 @@ namespace apx
                return result;
             }
          }
-POST_VALUE_HANDLER:
+      POST_VALUE_HANDLER:
          if (is_list_initializer())
          {
             next = bstr::lstrip(next, end);
@@ -342,7 +341,6 @@ POST_VALUE_HANDLER:
    const char* AttributeParser::parse_scalar(const char* begin, const char* end)
    {
       auto next = begin;
-      auto prev = next;
       char c = *next;
       if (c > 0)
       {
@@ -506,7 +504,7 @@ POST_VALUE_HANDLER:
             {
                //that was the last argument
                vt = create_value_table_from_state(state);
-               return next+1;
+               return next + 1;
             }
          }
       }
@@ -638,7 +636,6 @@ POST_VALUE_HANDLER:
          bool unary_minus = false;
          double d = 0.0;
          int32_t i32 = 0;
-         uint32_t u32 = 0u;
          std::string unit;
          switch (rss.arg_index)
          {
@@ -701,7 +698,7 @@ POST_VALUE_HANDLER:
       const char* next = begin;
       char* end_ptr;
       uint32_t tmp = (uint32_t)std::strtoul(next, &end_ptr, 0);
-      if (end_ptr > next)
+      if ((end_ptr > next) && (end_ptr <= end))
       {
          next = end_ptr;
          if (unary_minus)
@@ -730,7 +727,7 @@ POST_VALUE_HANDLER:
       const char* next = begin;
       char* end_ptr;
       uint32_t tmp = (uint32_t)std::strtoul(next, &end_ptr, 0);
-      if (end_ptr > next)
+      if ((end_ptr > next) && (end_ptr <= end))
       {
          next = end_ptr;
          if (unary_minus)
@@ -776,7 +773,7 @@ POST_VALUE_HANDLER:
    {
       const char* retval = nullptr;
       char* end_ptr;
-      v = (int32_t) std::strtol(begin, &end_ptr, 0);
+      v = (int32_t)std::strtol(begin, &end_ptr, 0);
       if ((end_ptr > begin) && (end_ptr < end))
       {
          retval = end_ptr;
@@ -817,11 +814,11 @@ POST_VALUE_HANDLER:
          }
          if (vts.is_signed_range)
          {
-            vt->set_range(vts.i32_range.first, auto_upper_range? vts.i32_range.first : vts.i32_range.second);
+            vt->set_range(vts.i32_range.first, auto_upper_range ? vts.i32_range.first : vts.i32_range.second);
          }
          else
          {
-            vt->set_range(vts.u32_range.first, auto_upper_range? vts.u32_range.first : vts.u32_range.second);
+            vt->set_range(vts.u32_range.first, auto_upper_range ? vts.u32_range.first : vts.u32_range.second);
          }
       }
       else
@@ -835,7 +832,7 @@ POST_VALUE_HANDLER:
          vt->values.push_back(*it);
          if (vt->is_signed_range)
          {
-            if (auto_upper_range &&  (vt->upper_range.i32 < i32_index) )
+            if (auto_upper_range && (vt->upper_range.i32 < i32_index))
             {
                vt->upper_range.i32 = i32_index;
             }
