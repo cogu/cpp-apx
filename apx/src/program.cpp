@@ -30,7 +30,7 @@ namespace apx
          return retval;
       }
 
-      static std::uint8_t const* parse_number_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::uint32_t& number)
+      std::uint8_t const* parse_number_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::uint32_t& number)
       {
          std::uint8_t const* next = begin;
          std::size_t const unpack_size = variant_to_size_u32(variant);
@@ -186,11 +186,7 @@ namespace apx
                bool flag;
                std::uint8_t element_variant;
                std::uint8_t queued_variant;
-
-               if (apx::error_t const result = decode_instruction(*next, opcode, variant, flag); result != APX_NO_ERROR)
-               {
-                  return result;
-               }
+               decode_instruction(*next, opcode, variant, flag);
                if ((opcode != OPCODE_DATA_SIZE) || (variant < VARIANT_ELEMENT_SIZE_U8_BASE) || (variant > VARIANT_ELEMENT_SIZE_LAST))
                {
                   return APX_PARSE_ERROR;
@@ -251,12 +247,11 @@ namespace apx
          return result;
       }
 
-      apx::error_t decode_instruction(std::uint8_t instruction, std::uint8_t& opcode, std::uint8_t& variant, bool& flag)
+      void decode_instruction(std::uint8_t instruction, std::uint8_t& opcode, std::uint8_t& variant, bool& flag)
       {
          opcode = instruction & INST_OPCODE_MASK;
          variant = (instruction >> INST_VARIANT_SHIFT) & INST_VARIANT_MASK;
          flag = (instruction & INST_FLAG) == INST_FLAG? true : false;
-         return APX_NO_ERROR;
       }
 
       std::size_t variant_to_size_full(std::uint8_t variant)
@@ -267,13 +262,16 @@ namespace apx
          case VARIANT_U8:
          case VARIANT_BOOL:
          case VARIANT_BYTE:
-         case VARIANT_CHAR:
+         case VARIANT_ASCII_CHAR:
+         case VARIANT_CHAR8:
             retval = UINT8_SIZE;
             break;
          case VARIANT_U16:
+         case VARIANT_CHAR16:
             retval = UINT16_SIZE;
             break;
          case VARIANT_U32:
+         case VARIANT_CHAR32:
             retval = UINT32_SIZE;
             break;
          case VARIANT_U64:
@@ -309,6 +307,62 @@ namespace apx
          case VARIANT_U32:
             retval = UINT32_SIZE;
             break;
+         }
+         return retval;
+      }
+
+      TypeCode variant_to_type_code(std::uint8_t variant)
+      {
+         TypeCode retval;
+         switch (variant)
+         {
+         case VARIANT_U8:
+            retval = TypeCode::UInt8;
+            break;
+         case VARIANT_U16:
+            retval = TypeCode::UInt16;
+            break;
+         case VARIANT_U32:
+            retval = TypeCode::UInt32;
+            break;
+         case VARIANT_U64:
+            retval = TypeCode::UInt64;
+            break;
+         case VARIANT_S8:
+            retval = TypeCode::Int8;
+            break;
+         case VARIANT_S16:
+            retval = TypeCode::Int16;
+            break;
+         case VARIANT_S32:
+            retval = TypeCode::Int32;
+            break;
+         case VARIANT_S64:
+            retval = TypeCode::Int64;
+            break;
+         case VARIANT_BOOL:
+            retval = TypeCode::Bool;
+            break;
+         case VARIANT_BYTE:
+            retval = TypeCode::Byte;
+            break;
+         case VARIANT_RECORD:
+            retval = TypeCode::Record;
+            break;
+         case VARIANT_ASCII_CHAR:
+            retval = TypeCode::Char;
+            break;
+         case VARIANT_CHAR8:
+            retval = TypeCode::Char8;
+            break;
+         case VARIANT_CHAR16:
+            retval = TypeCode::Char16;
+            break;
+         case VARIANT_CHAR32:
+            retval = TypeCode::Char32;
+            break;
+         default:
+            retval = TypeCode::None;
          }
          return retval;
       }

@@ -90,12 +90,14 @@ namespace apx
          5: S16
          6: S32
          7: S64
-         8: ARRAY
-         9: RECORD
-         10: BOOL
-         11: BYTE (immutable bytes object)
-         12: CHAR
-
+         8: BOOL
+         9: BYTE (immutable bytes object)
+         10: RECORD
+         11: ARRAY
+         12: ASCII_CHAR
+         13: CHAR8
+         14: CHAR16
+         15: CHAR32
 
       1: PACK  13 variants
          FLAG: is_array(true,false)
@@ -158,11 +160,17 @@ namespace apx
       constexpr std::uint8_t VARIANT_S16 = 5;
       constexpr std::uint8_t VARIANT_S32 = 6;
       constexpr std::uint8_t VARIANT_S64 = 7;
-      constexpr std::uint8_t VARIANT_ARRAY = 8; //RESERVED FOR FUTURE USE (e.g. array of arrays)
-      constexpr std::uint8_t VARIANT_RECORD = 9;
-      constexpr std::uint8_t VARIANT_BOOL = 10;
-      constexpr std::uint8_t VARIANT_BYTE = 11;
-      constexpr std::uint8_t VARIANT_CHAR = 12;
+      constexpr std::uint8_t VARIANT_BOOL = 8;
+      constexpr std::uint8_t VARIANT_BYTE = 9;
+      constexpr std::uint8_t VARIANT_RECORD = 10;
+      constexpr std::uint8_t VARIANT_ARRAY = 11; //RESERVED FOR FUTURE USE (e.g. array of arrays)
+      constexpr std::uint8_t VARIANT_ASCII_CHAR = 12;
+      constexpr std::uint8_t VARIANT_CHAR8 = 13;
+      constexpr std::uint8_t VARIANT_CHAR16 = 14;
+      constexpr std::uint8_t VARIANT_CHAR32 = 15;
+
+
+      constexpr std::uint8_t VARIANT_TYPE_CODE_LAST = VARIANT_CHAR32;
 
       constexpr std::uint8_t OPCODE_PACK = 1;
       //same variants as OPCODE_UNPACK
@@ -171,6 +179,7 @@ namespace apx
       constexpr std::uint8_t VARIANT_ARRAY_SIZE_U8 = 0;
       constexpr std::uint8_t VARIANT_ARRAY_SIZE_U16 = 1;
       constexpr std::uint8_t VARIANT_ARRAY_SIZE_U32 = 2;
+      constexpr std::uint8_t VARIANT_ARRAY_SIZE_LAST = VARIANT_ARRAY_SIZE_U32;
       constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U8_BASE = 3;
       constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U8 = VARIANT_ELEMENT_SIZE_U8_BASE + VARIANT_U8;    // 3
       constexpr std::uint8_t VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U16 = VARIANT_ELEMENT_SIZE_U8_BASE + VARIANT_U16;  // 4
@@ -199,9 +208,11 @@ namespace apx
       constexpr std::uint8_t VARIANT_LIMIT_CHECK_S16 = 6;
       constexpr std::uint8_t VARIANT_LIMIT_CHECK_S32 = 7;
       constexpr std::uint8_t VARIANT_LIMIT_CHECK_S64 = 8;
+      constexpr std::uint8_t VARIANT_LIMIT_CHECK_LAST = VARIANT_LIMIT_CHECK_S64;
 
       constexpr std::uint8_t OPCODE_FLOW_CTRL = 4;
       constexpr std::uint8_t VARIANT_ARRAY_NEXT = 0;
+      constexpr std::uint8_t VARIANT_FLOW_CTRL_LAST = VARIANT_ARRAY_NEXT;
 
       constexpr std::uint32_t INST_SIZE = sizeof(std::uint8_t);
       constexpr std::uint8_t INST_OPCODE_MASK = 7u;
@@ -221,6 +232,23 @@ namespace apx
       constexpr std::uint32_t INT16_SIZE = sizeof(std::int16_t);
       constexpr std::uint32_t INT32_SIZE = sizeof(std::int32_t);
       constexpr std::uint32_t INT64_SIZE = sizeof(std::int64_t);
+
+      enum class OperationType : unsigned char {
+         Unpack,
+         Pack,
+         LimitCheck,
+         RecordSelect,
+         ArrayNext,
+         ProgramEnd
+      };
+
+      struct PackUnpackOperation
+      {
+         apx::TypeCode type_code;
+         std::uint32_t array_size;
+         bool is_dynamic_array;
+      };
+
    }
 
 }

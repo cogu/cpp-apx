@@ -80,3 +80,4 @@ namespace apx
 #define APX_STRAY_CHARACTERS_AFTER_PARSE_ERROR 63
 #define APX_EMPTY_RECORD_ERROR                 64
 #define APX_INVALID_HEADER_ERROR               65
+#define APX_UNEXPECTED_END_ERROR               66

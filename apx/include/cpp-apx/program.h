@@ -44,12 +44,14 @@ namespace apx
          bool is_dynamic_data{ false };
       };
 
+      std::uint8_t const* parse_number_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::uint32_t& number);
       apx::error_t create_program_header(apx::vm::Program& header, apx::ProgramType program_type, std::uint32_t element_size, std::uint32_t queue_size, bool is_dynamic);
       apx::error_t decode_program_header(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t const*& next, ProgramHeader &header);
       std::uint8_t encode_instruction(std::uint8_t opcode, std::uint8_t variant, bool flag);
-      apx::error_t decode_instruction(std::uint8_t instruction, std::uint8_t &opcode, std::uint8_t &variant, bool &flag);
+      void decode_instruction(std::uint8_t instruction, std::uint8_t &opcode, std::uint8_t &variant, bool &flag);
       std::size_t variant_to_size_full(std::uint8_t variant);
       std::size_t variant_to_size_u32(std::uint8_t variant);
+      TypeCode variant_to_type_code(std::uint8_t variant);
    }
 }
 
