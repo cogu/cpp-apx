@@ -264,6 +264,7 @@ namespace apx
 
    apx::error_t DataElement::create_default_init_value(dtl::DynamicValue& derived_value)
    {
+      (void)derived_value;
       return APX_NO_ERROR;
    }
 

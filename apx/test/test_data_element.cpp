@@ -35,7 +35,7 @@ namespace apx_test
       EXPECT_EQ(elem.get_type_code(), apx::TypeCode::UInt8);
       EXPECT_FALSE(elem.has_limits());
       EXPECT_TRUE(elem.is_array());
-      EXPECT_EQ(elem.get_array_length(), 10);
+      EXPECT_EQ(elem.get_array_length(), 10u);
    }
 
    TEST(DataElement, CreateUInt8ArrayDataElementWithLimits)
@@ -47,7 +47,7 @@ namespace apx_test
       EXPECT_EQ(lower_limit, (uint32_t)0u);
       EXPECT_EQ(upper_limit, (uint32_t)7u);
       EXPECT_TRUE(elem.is_array());
-      EXPECT_EQ(elem.get_array_length(), 10);
+      EXPECT_EQ(elem.get_array_length(), 10u);
    }
 
 
@@ -90,7 +90,7 @@ namespace apx_test
       EXPECT_EQ(lower_limit, (int32_t)-100);
       EXPECT_EQ(upper_limit, (int32_t)100);
       EXPECT_TRUE(elem.is_array());
-      EXPECT_EQ(elem.get_array_length(), 20);
+      EXPECT_EQ(elem.get_array_length(), 20u);
    }
 
    TEST(DataElement, CreateRecord_UInt8_Uint16)

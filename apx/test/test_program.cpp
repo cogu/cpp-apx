@@ -76,7 +76,7 @@ namespace apx_test
       ASSERT_EQ(header.prog_type, apx::ProgramType::Pack);
       ASSERT_FALSE(header.is_dynamic_data);
       ASSERT_EQ(header.queue_length, 0u);
-      ASSERT_EQ(header.data_size, 255);
+      ASSERT_EQ(header.data_size, 255u);
    }
 
    TEST(Program, DecodeSimpleProgramHeader_U16)
@@ -93,7 +93,7 @@ namespace apx_test
       ASSERT_EQ(header.prog_type, apx::ProgramType::Pack);
       ASSERT_FALSE(header.is_dynamic_data);
       ASSERT_EQ(header.queue_length, 0u);
-      ASSERT_EQ(header.data_size, 65535);
+      ASSERT_EQ(header.data_size, 65535u);
    }
 
    TEST(Program, DecodeSimpleProgramHeader_U32)
@@ -128,8 +128,8 @@ namespace apx_test
       ASSERT_EQ(header.minor_version, MINOR_VERSION);
       ASSERT_EQ(header.prog_type, apx::ProgramType::Pack);
       ASSERT_FALSE(header.is_dynamic_data);
-      ASSERT_EQ(header.data_size, 9);
-      ASSERT_EQ(header.element_size, 2);
+      ASSERT_EQ(header.data_size, 9u);
+      ASSERT_EQ(header.element_size, 2u);
       ASSERT_EQ(header.queue_length, 4u);
    }
 

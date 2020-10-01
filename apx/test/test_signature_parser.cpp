@@ -184,7 +184,7 @@ TEST(SignatureParser, Record_U8_U8_U8)
    EXPECT_NE(data_element.get(), nullptr);
    EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Record);
    EXPECT_FALSE(data_element->is_array());
-   EXPECT_EQ(data_element->get_num_child_elements(), 3);
+   EXPECT_EQ(data_element->get_num_child_elements(), 3u);
 }
 
 TEST(SignatureParser, Record_U8U8_U8U8)
@@ -237,12 +237,12 @@ TEST(SignatureParser, Record_String_U16)
    EXPECT_NE(data_element.get(), nullptr);
    EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Record);
    EXPECT_FALSE(data_element->is_array());
-   EXPECT_EQ(data_element->get_num_child_elements(), 2);
+   EXPECT_EQ(data_element->get_num_child_elements(), 2u);
    auto child = data_element->get_child_at(0);
    EXPECT_NE(child, nullptr);
    EXPECT_EQ(child->get_name(), "Name");
    EXPECT_EQ(child->get_type_code(), apx::TypeCode::Char);
-   EXPECT_EQ(child->get_array_length(), 32);
+   EXPECT_EQ(child->get_array_length(), 32u);
    child = data_element->get_child_at(1);
    EXPECT_NE(child, nullptr);
    EXPECT_EQ(child->get_name(), "ID");
@@ -260,7 +260,7 @@ TEST(SignatureParser, DynString)
    std::unique_ptr<apx::DataElement> data_element{ parser.take_data_element() };
    EXPECT_NE(data_element.get(), nullptr);
    EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Char);
-   EXPECT_EQ(data_element->get_array_length(), 256);
+   EXPECT_EQ(data_element->get_array_length(), 256u);
    EXPECT_TRUE(data_element->is_dynamic_array());
 }
 

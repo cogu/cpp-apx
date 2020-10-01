@@ -200,6 +200,7 @@ namespace apx
       }
       return APX_INVALID_ARGUMENT_ERROR;
    }
+
    apx::error_t Compiler::compile_limit_values(std::uint8_t limit_variant, std::int32_t lower_limit, std::int32_t upper_limit)
    {
       apx::error_t retval = APX_NO_ERROR;
