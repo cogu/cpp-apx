@@ -236,19 +236,44 @@ namespace apx
       enum class OperationType : unsigned char {
          Unpack,
          Pack,
-         LimitCheck,
+         LimitCheckInt32,
+         LimitCheckUInt32,
+         LimitCheckInt64,
+         LimitCheckUInt64,
          RecordSelect,
          ArrayNext,
          ProgramEnd
       };
 
-      struct PackUnpackOperation
+      struct PackUnpackOperationInfo
       {
          apx::TypeCode type_code;
          std::uint32_t array_size;
          bool is_dynamic_array;
       };
 
+      struct LimitCheckUInt32OperationInfo
+      {
+         std::uint32_t lower_limit;
+         std::uint32_t upper_limit;
+      };
+
+      struct LimitCheckUInt64OperationInfo
+      {
+         std::uint64_t lower_limit;
+         std::uint64_t upper_limit;
+      };
+      struct LimitCheckInt32OperationInfo
+      {
+         std::int32_t lower_limit;
+         std::int32_t upper_limit;
+      };
+
+      struct LimitCheckInt64OperationInfo
+      {
+         std::int64_t lower_limit;
+         std::int64_t upper_limit;
+      };
    }
 
 }
