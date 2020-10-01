@@ -36,19 +36,30 @@ namespace apx
       public:
          apx::error_t select_program(std::uint8_t const* begin, std::uint8_t const* end);
          apx::error_t parse_next_operation(OperationType& operation_type);
-         PackUnpackOperation const& get_pack_unpack_info() { return m_pack_unpack_info; }
+         PackUnpackOperationInfo const& get_pack_unpack_info() { return m_pack_unpack_info; }
+         LimitCheckUInt32OperationInfo const& get_limit_check_uint32() { return m_limit_check_uint32_info; }
+         LimitCheckInt32OperationInfo const& get_limit_check_int32() { return m_limit_check_int32_info; }
+         LimitCheckUInt64OperationInfo const& get_limit_check_uint64() { return m_limit_check_uint64_info; }
+         LimitCheckInt64OperationInfo const& get_limit_check_int64() { return m_limit_check_int64_info; }
+
       protected:
          std::uint8_t const* m_program_next{ nullptr };
          std::uint8_t const* m_program_end{ nullptr };
-         PackUnpackOperation m_pack_unpack_info;
          OperationType m_operation_type{ OperationType::ProgramEnd };
-
+         PackUnpackOperationInfo m_pack_unpack_info;
+         LimitCheckUInt32OperationInfo m_limit_check_uint32_info{ 0u, 0u };
+         LimitCheckInt32OperationInfo m_limit_check_int32_info{ 0, 0 };
+         LimitCheckUInt64OperationInfo m_limit_check_uint64_info{ 0u, 0u };
+         LimitCheckInt64OperationInfo m_limit_check_int64_info{ 0, 0 };
 
 
          apx::error_t decode_next_instruction_internal();
          void Decoder::reset_pack_unpack_info(apx::TypeCode type_code);
          apx::error_t decode_array_size();
-
+         apx::error_t decode_limit_check_uint32(std::uint8_t variant);
+         apx::error_t decode_limit_check_uint64(std::uint8_t variant);
+         apx::error_t decode_limit_check_int32(std::uint8_t variant);
+         apx::error_t decode_limit_check_int64(std::uint8_t variant);
 
       };
    }
