@@ -11,14 +11,18 @@ namespace apx
       UInt8,       //'C'
       UInt16,      //'S'
       UInt32,      //'L'
-      UInt64,      //'U'
+      UInt64,      //'Q' From APX IDL v1.3
       Int8,        //'c'
       Int16,       //'s'
       Int32,       //'l'
-      Int64,       //'u'
-      Char,        //'a'
-      Bool,        //'b'
-      Byte,        //'B'
+      Int64,       //'q' From APX IDL v1.3
+      Char,        //'a' ASCII-encoded character (char type in C/C00). From APX IDL v1.3.
+                      // In APX IDL v1.2, the encoding of 'a' was unspecified and was implementation-defined (sometimes ASCII, sometimes UTF-8).
+      Char8,       //'A' UTF-8 character (char8_t in C++20, uint8_t otherwise). From APX IDL v1.3
+      Char16,      //'u' UTF-16 character (char16_t). Reserved for APX IDL v1.4
+      Char32,      //'U' UTF-32 character (char32_t). Reserved for APX IDL v1.4
+      Bool,        //'b' From APX IDL v1.3
+      Byte,        //'B' From APX IDL v1.3
       Record,      // {}
       TypeRefId,   // TYPE ID (integer)
       TypeRefName, // TYPE NAME (string)
@@ -27,8 +31,8 @@ namespace apx
    enum class TokenClass : unsigned char {
       None,
       DataElement,         //APX IDL v1.3
-      GroupDeclaration,    //APX IDL v1.4
-      FunctionDeclaration  //APX IDL v1.4
+      GroupDeclaration,    //APX IDL v1.4 (RESERVED)
+      FunctionDeclaration  //APX IDL v1.4 (RESERVED)
    };
 
    enum class SizeType : unsigned char {

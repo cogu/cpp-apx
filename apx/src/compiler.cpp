@@ -114,7 +114,7 @@ namespace apx
          elem_size = vm::UINT8_SIZE;
          break;
       case apx::TypeCode::Char:
-         data_variant = vm::VARIANT_CHAR;
+         data_variant = vm::VARIANT_ASCII_CHAR;
          elem_size = vm::UINT8_SIZE;
          break;
       case apx::TypeCode::Record:
