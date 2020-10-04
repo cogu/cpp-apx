@@ -81,3 +81,6 @@ namespace apx
 #define APX_EMPTY_RECORD_ERROR                 64
 #define APX_INVALID_HEADER_ERROR               65
 #define APX_UNEXPECTED_END_ERROR               66
+#define APX_VALUE_TYPE_ERROR                   67
+#define APX_VALUE_RANGE_ERROR                  68
+#define APX_VALUE_CONVERSION_ERROR             69

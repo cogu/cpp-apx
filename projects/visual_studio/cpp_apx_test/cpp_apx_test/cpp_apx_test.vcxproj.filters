@@ -39,9 +39,6 @@
     <ClCompile Include="..\..\..\..\apx\test\test_signature_parser.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\dtl\src\cpp\dtl.cpp">
-      <Filter>dtl\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\test\test_port_instance.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
@@ -74,6 +71,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\test\test_decoder.cpp">
       <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\serializer.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_serializer.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\dtl\src\cpp\dtl.cpp">
+      <Filter>dtl\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +126,6 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h">
       <Filter>apx\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp">
-      <Filter>dtl\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vmdefs.h">
       <Filter>apx\include</Filter>
     </ClInclude>
@@ -146,6 +149,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\decoder.h">
       <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp">
+      <Filter>dtl\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
