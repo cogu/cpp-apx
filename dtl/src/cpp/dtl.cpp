@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "dtl.hpp"
+#include "..\..\include\dtl.hpp"
 
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 
@@ -83,9 +84,15 @@ namespace dtl
             ok = true;
             break;
          case U32_ID:
-            retval = static_cast<int32_t>(std::get<uint32_t>(m_sv_data.value()));
-            ok = true;
-            break;
+         {
+            uint32_t value = std::get<uint32_t>(m_sv_data.value());
+            if (value <= UINT32_MAX)
+            {
+               retval = static_cast<int32_t>(value);
+               ok = true;
+            }
+         }
+         break;
          case I64_ID:
             retval = static_cast<int32_t>(std::get<int64_t>(m_sv_data.value()));
             ok = true;
@@ -123,9 +130,15 @@ namespace dtl
          switch (m_sv_data.value().index())
          {
          case I32_ID:
-            retval = static_cast<uint32_t>(std::get<int32_t>(m_sv_data.value()));
-            ok = true;
-            break;
+         {
+            int32_t value = std::get<int32_t>(m_sv_data.value());
+            if (value >= 0)
+            {
+               retval = static_cast<uint32_t>(value);
+               ok = true;
+            }
+         }
+         break;
          case U32_ID:
             retval = std::get<uint32_t>(m_sv_data.value());
             ok = true;
@@ -274,6 +287,11 @@ namespace dtl
    }
 
 
+   DynamicValue make_dv()
+   {
+      return std::make_shared<Value>(ValueType::NoneType);
+   }
+
    std::shared_ptr<Scalar> make_sv()
    {
       return std::make_shared<Scalar>();
@@ -349,6 +367,11 @@ namespace dtl
    void Hash::insert(value_type&& v)
    {
       m_hv_data.insert(v);
+   }
+
+   void Hash::set(std::string const& key, DynamicValue value)
+   {
+      insert(std::make_pair(key, value));
    }
 
    std::shared_ptr<Hash> make_hv()

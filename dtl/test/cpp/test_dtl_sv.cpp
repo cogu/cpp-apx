@@ -57,7 +57,7 @@ namespace dtl
       EXPECT_EQ(sv1->dv_type(), dtl::ValueType::Scalar);
       EXPECT_EQ(sv1->sv_type(), dtl::ScalarType::UInt32);
       EXPECT_EQ(sv1.use_count(), 1);
-      EXPECT_EQ(sv1->to_u32(ok), (uint32_t)0u);      
+      EXPECT_EQ(sv1->to_u32(ok), (uint32_t)0u);
       EXPECT_TRUE(ok);
       EXPECT_EQ(sv1->to_i32(ok), 0);
       EXPECT_TRUE(ok);
@@ -120,6 +120,7 @@ namespace dtl
       EXPECT_TRUE(ok);
    }
 
+
    TEST(ScalarTest, CreateNumericString)
    {
       auto sv = dtl::make_sv_string("255");
@@ -142,8 +143,12 @@ namespace dtl
       bool ok = false;
       auto sv = dtl::make_sv_string(begin, end);
       EXPECT_EQ(sv->to_string(), "first");
-      EXPECT_EQ(sv->to_i32(ok), 0);
-      EXPECT_FALSE(ok);
+   }
+
+   TEST(ValueTest, CreateNoneTypeValue)
+   {
+      auto dv = dtl::make_dv();
+      EXPECT_EQ(dv->dv_type(), dtl::ValueType::NoneType);
    }
 
 }

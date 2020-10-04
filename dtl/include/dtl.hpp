@@ -18,6 +18,7 @@ namespace dtl
 
    enum class ValueType : uint8_t
    {
+      NoneType,
       Scalar,
       Array,
       Hash
@@ -28,19 +29,20 @@ namespace dtl
    class Value
    {
    public:
+      Value(ValueType dv_type) : m_dv_type{ dv_type } {}
       virtual ~Value() {}
       dtl::ValueType dv_type() const { return m_dv_type; }
    protected:
-      Value(ValueType dv_type) : m_dv_type{ dv_type } {}
       ValueType m_dv_type;
    };
 
    using DynamicValue = std::shared_ptr<dtl::Value>;
 
+   DynamicValue make_dv();
+
    enum class ScalarType : uint8_t
    {
       None,
-      ValuePtr,
       Int32,
       UInt32,
       Int64,
@@ -53,6 +55,7 @@ namespace dtl
       ByteArray,
       Ptr
    };
+
    /* Scalar */
    class Scalar : public dtl::Value
    {
@@ -125,11 +128,12 @@ namespace dtl
    class Hash : public dtl::Value
    {
    public:
-      using value_type = std::pair<std::string, std::shared_ptr<dtl::Value>>;
+      using value_type = std::pair<std::string, DynamicValue>;
       Hash();
       std::size_t length() { return m_hv_data.size(); }
       void insert(value_type& v);
       void insert(value_type&& v);
+      void set(std::string const& key, DynamicValue value);
       std::shared_ptr<dtl::Value>& at(std::string const& key) { return m_hv_data.at(key); }
       std::shared_ptr<dtl::Value>& at(char const* key) { return m_hv_data.at(key); }
       dtl::Value const* get(std::string const& key) const { auto &tmp = m_hv_data.at(key); return tmp.get(); }
