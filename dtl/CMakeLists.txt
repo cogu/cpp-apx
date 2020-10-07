@@ -4,7 +4,7 @@ project(dtl LANGUAGES CXX VERSION 0.0.1)
 
 ### Library bstr
 set (DTL_HEADER_LIST
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/dtl.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/dtl/dtl.hpp
 )
 
 set (DTL_SOURCE_LIST
@@ -16,7 +16,8 @@ add_library(dtl ${DTL_HEADER_LIST} ${DTL_SOURCE_LIST})
 target_include_directories(dtl PUBLIC
 "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
-set_target_properties(dtl PROPERTIES CXX_STANDARD 17)
+
+set_target_properties(dtl PROPERTIES CXX_STANDARD 20)
 ###
 
 ### Executable bstr_unit
