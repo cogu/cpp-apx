@@ -105,9 +105,6 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\attribute_parser.h">
       <Filter>apx\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\bstr\include\bstr.hpp">
-      <Filter>bstr\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h">
       <Filter>apx\include</Filter>
     </ClInclude>
@@ -150,8 +147,11 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\decoder.h">
       <Filter>apx\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp">
+    <ClInclude Include="..\..\..\..\dtl\include\dtl\dtl.hpp">
       <Filter>dtl\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\bstr\include\bstr\bstr.hpp">
+      <Filter>bstr\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

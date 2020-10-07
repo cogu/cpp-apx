@@ -11,7 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="..\..\..\..\bstr\include\bstr.hpp">
+    <ClInclude Include="..\..\..\..\bstr\include\bstr\bstr.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

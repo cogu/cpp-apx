@@ -1,6 +1,6 @@
 #include <cassert>
 #include "cpp-apx/signature_parser.h"
-#include "bstr.hpp"
+#include "bstr/bstr.hpp"
 
 namespace apx
 {
