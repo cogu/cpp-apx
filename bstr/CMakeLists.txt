@@ -4,7 +4,7 @@ project(bstr LANGUAGES CXX VERSION 0.0.1)
 
 ### Library bstr
 set (BSTR_HEADER_LIST
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/bstr.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/bstr/bstr.hpp
 )
 
 set (BSTR_SOURCE_LIST
@@ -16,7 +16,7 @@ add_library(bstr ${BSTR_HEADER_LIST} ${BSTR_SOURCE_LIST})
 target_include_directories(bstr PUBLIC
 "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
-set_target_properties(bstr PROPERTIES CXX_STANDARD 17)
+set_target_properties(bstr PROPERTIES CXX_STANDARD 20)
 ###
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
