@@ -6,7 +6,7 @@
 #include <variant>
 #include "cpp-apx/vmdefs.h"
 #include "cpp-apx/error.h"
-#include "dtl.hpp"
+#include "dtl/dtl.hpp"
 
 namespace apx
 {

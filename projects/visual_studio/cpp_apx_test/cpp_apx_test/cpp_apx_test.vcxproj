@@ -60,8 +60,8 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vm.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vmdefs.h" />
-    <ClInclude Include="..\..\..\..\bstr\include\bstr.hpp" />
-    <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp" />
+    <ClInclude Include="..\..\..\..\bstr\include\bstr\bstr.hpp" />
+    <ClInclude Include="..\..\..\..\dtl\include\dtl\dtl.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

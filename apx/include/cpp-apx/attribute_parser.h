@@ -5,8 +5,8 @@
 #include <string>
 #include <stack>
 #include <utility>
+#include "dtl/dtl.hpp"
 #include "cpp-apx/types.h"
-#include "dtl.hpp"
 #include "cpp-apx/port_attribute.h"
 #include "cpp-apx/type_attribute.h"
 #include "cpp-apx/error.h"

@@ -33,7 +33,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\dtl\include\dtl.hpp" />
+    <ClInclude Include="..\..\..\..\dtl\include\dtl\dtl.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

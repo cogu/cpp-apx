@@ -10,7 +10,7 @@
 #include <string>
 #include "cpp-apx/types.h"
 #include "cpp-apx/error.h"
-#include "dtl.hpp"
+#include "dtl/dtl.hpp"
 
 namespace apx
 {

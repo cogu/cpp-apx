@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "cpp-apx/attribute_parser.h"
-#include "bstr.hpp"
+#include "bstr/bstr.hpp"
 
 
 namespace apx

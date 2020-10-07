@@ -8,7 +8,7 @@
 #include "cpp-apx/data_type.h"
 #include "cpp-apx/port_attribute.h"
 #include "cpp-apx/error.h"
-#include "dtl.hpp"
+#include "dtl/dtl.hpp"
 
 namespace apx
 {

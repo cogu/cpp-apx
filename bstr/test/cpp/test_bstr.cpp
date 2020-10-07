@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "bstr.hpp"
+#include "bstr/bstr.hpp"
 #include <cstring>
 
 using namespace std;

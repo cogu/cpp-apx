@@ -1,6 +1,5 @@
 #include <stdexcept>
-#include "dtl.hpp"
-#include "..\..\include\dtl.hpp"
+#include "dtl/dtl.hpp"
 
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 
