@@ -20,7 +20,6 @@ namespace apx
 #define APX_PARSE_ERROR               3
 #define APX_DATA_SIGNATURE_ERROR      4
 #define APX_PORT_SIGNATURE_ERROR      5
-#define APX_VALUE_ERROR               6
 #define APX_LENGTH_ERROR              7
 #define APX_ELEMENT_TYPE_ERROR        8
 #define APX_DV_TYPE_ERROR             9
@@ -84,3 +83,4 @@ namespace apx
 #define APX_VALUE_TYPE_ERROR                   67
 #define APX_VALUE_RANGE_ERROR                  68
 #define APX_VALUE_CONVERSION_ERROR             69
+#define APX_VALUE_LENGTH_ERROR                 70
