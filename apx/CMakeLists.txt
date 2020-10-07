@@ -34,7 +34,6 @@ set (CPP_APX_COMMON_LIB_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/decoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/node.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/parser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/port_attribute.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/port.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/program.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/signature_parser.cpp
@@ -46,12 +45,12 @@ add_library(cpp_apx_common ${CPP_APX_COMMON_LIB_HEADER_LIST} ${CPP_APX_COMMON_LI
 
 target_include_directories(cpp_apx_common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set_target_properties(cpp_apx_common PROPERTIES CXX_STANDARD 20)
-target_link_libraries(cpp_apx_common PUBLIC bstr)
+set (CPP_APX_COMMON_LINK_LIBS bstr dtl)
 if (QT_API)
     target_compile_definitions(cpp_apx_common PRIVATE QT_API QT_API_VER=5)
-else()
-    target_link_libraries(cpp_apx_common PUBLIC dtl)
+    list(APPEND CPP_APX_COMMON_LINK_LIBS Qt5::Core)
 endif()
+target_link_libraries(cpp_apx_common PUBLIC "${CPP_APX_COMMON_LINK_LIBS}")
 
 ### Library cpp_apx_dtl
 

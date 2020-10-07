@@ -28,7 +28,7 @@
 #include "cpp-apx/error.h"
 #include "cpp-apx/program.h"
 #ifdef QT_API
-#error("QT API NOT YET IMPLEMENTED");
+#include "cpp-apx/qt_serializer.h"
 #else
 #include "cpp-apx/serializer.h"
 #include "cpp-apx/deserializer.h"
