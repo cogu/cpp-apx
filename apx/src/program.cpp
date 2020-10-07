@@ -211,7 +211,7 @@ namespace apx
                break;
             default:
                assert(0);
-               return APX_VALUE_ERROR;
+               return APX_VALUE_TYPE_ERROR;
             }
             assert((p > encoded_size.data()) && ((p - encoded_size.data()) <= sizeof(encoded_size)));
             header.insert(header.end(), encoded_size.data(), p);

@@ -45,10 +45,20 @@ namespace apx
             std::size_t element_size{ 0 };
             bool is_last_field{ false };
             RangeCheckState range_check_state{ RangeCheckState::NotChecked };
+
             bool is_empty() { return (value_type == dtl::ValueType::NoneType) && (value.dv == nullptr); }
             void set_value(dtl::Value const* dv);
             void reset(dtl::ValueType vt);
             apx::error_t read_scalar_value(TypeCode type_code_arg);
+            apx::error_t read_scalar_value(std::size_t index, TypeCode type_code_arg);
+            bool is_scalar_type() { return ((type_code >= TypeCode::UInt8) && (type_code <= TypeCode::Int64)) || type_code == TypeCode::Bool; }
+            bool is_string_type() { return (type_code == TypeCode::Char) ||
+               (type_code == TypeCode::Char8) ||
+               (type_code == TypeCode::Char16) ||
+               (type_code == TypeCode::Char32); }
+            bool is_bytes_type() { return type_code == TypeCode::Byte; }
+         protected:
+            apx::error_t read_scalar_value(dtl::Scalar const* sv, TypeCode type_code_arg);
          };
 
          struct WriteBuffer
@@ -77,8 +87,12 @@ namespace apx
          void reset_buffer(std::uint8_t* buf, std::size_t len);
          bool is_valid_buffer();
          apx::error_t prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size);
-         apx::error_t pack_value_internal();
+         apx::error_t pack_value();
+         apx::error_t pack_scalar_value();
+         apx::error_t pack_array_of_scalar();
+         apx::error_t pack_scalar_value_internal();
          apx::error_t default_range_check();
+         apx::error_t default_range_check_scalar();
          apx::error_t check_value_range_uint32(std::uint32_t value, std::uint32_t lower_limit, std::uint32_t upper_limit);
       };
    }

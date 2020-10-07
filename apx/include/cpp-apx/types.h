@@ -52,8 +52,8 @@ namespace apx
 
    enum class RangeCheckState : unsigned char {
       NotChecked,
-      CheckedOK,
-      CheckedFailure
+      CheckOK,
+      CheckFail
    };
 
    enum class ProgramType : unsigned char { Unpack, Pack };

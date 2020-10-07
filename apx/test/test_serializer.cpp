@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "cpp-apx/serializer.h"
-#include "dtl.hpp"
 #include <array>
 
 using namespace apx::vm;
@@ -36,7 +35,7 @@ namespace apx_test
    {
       Serializer serializer;
       dtl::ScalarValue sv = dtl::make_sv_int32(18);
-      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);      
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
    }
 
    TEST(Serializer, SetArray)
@@ -131,4 +130,61 @@ namespace apx_test
       ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_VALUE_RANGE_ERROR);
    }
 
+   TEST(Serializer, RangeCheckUInt8Array)
+   {
+      std::array<std::uint8_t, 1> buf = { 0 };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), 1), APX_NO_ERROR);
+      auto av = dtl::make_av();
+      av->push(dtl::make_sv_int32(0));
+      av->push(dtl::make_sv_uint32(7));
+      av->push(dtl::make_sv_uint32(3));
+      ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_NO_ERROR);
+   }
+
+   TEST(Serializer, RangeCheckUInt8ArrayWithOutOfRangeValue)
+   {
+      std::array<std::uint8_t, 1> buf = { 0 };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), 1), APX_NO_ERROR);
+      auto av = dtl::make_av();
+      av->push(dtl::make_sv_int32(0));
+      av->push(dtl::make_sv_int32(8));
+      av->push(dtl::make_sv_int32(7));
+      ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_VALUE_RANGE_ERROR);
+   }
+
+   TEST(Serializer, RangeCheckUInt8ArrayWithBadValue)
+   {
+      std::array<std::uint8_t, 1> buf = { 0 };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), 1), APX_NO_ERROR);
+      auto av = dtl::make_av();
+      av->push(dtl::make_sv_int32(0));
+      av->push(dtl::make_sv_int32(7));
+      av->push(dtl::make_sv_int32(-1));
+      ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_VALUE_CONVERSION_ERROR);
+   }
+
+   TEST(Serializer, PackUInt8ArrayWithDefaultLimitCheck)
+   {
+      std::array<std::uint8_t, 4> buf = { 0, 0, 0, 0 };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto av = dtl::make_av();
+      av->push(dtl::make_sv_int32(1));
+      av->push(dtl::make_sv_int32(2));
+      av->push(dtl::make_sv_int32(3));
+      av->push(dtl::make_sv_int32(4));
+      ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(4u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 4u);
+      ASSERT_EQ(buf[0], 1);
+      ASSERT_EQ(buf[1], 2);
+      ASSERT_EQ(buf[2], 3);
+      ASSERT_EQ(buf[3], 4);
+   }
 }
