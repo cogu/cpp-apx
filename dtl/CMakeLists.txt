@@ -8,7 +8,7 @@ set (DTL_HEADER_LIST
 )
 
 set (DTL_SOURCE_LIST
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp/dtl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/dtl.cpp
 )
 
 add_library(dtl ${DTL_HEADER_LIST} ${DTL_SOURCE_LIST})
@@ -30,8 +30,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     enable_testing()
     include(GoogleTest)
     include("../cmake/test_help.cmake")
-    package_add_test_with_libraries(test_sv test/cpp/test_dtl_sv.cpp dtl)
-    package_add_test_with_libraries(test_av test/cpp/test_dtl_av.cpp dtl)
-    package_add_test_with_libraries(test_hv test/cpp/test_dtl_hv.cpp dtl)
+    package_add_test_with_libraries(test_sv test/test_dtl_sv.cpp dtl)
+    package_add_test_with_libraries(test_av test/test_dtl_av.cpp dtl)
+    package_add_test_with_libraries(test_hv test/test_dtl_hv.cpp dtl)
 endif()
 ###

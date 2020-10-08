@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{ffa6f846-26f1-4fcb-9921-c9014e1e48a9}</ProjectGuid>
+    <ProjectGuid>{7471cfdc-38b2-41d3-b29b-0542303696ba}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
     <ConfigurationType>Application</ConfigurationType>
@@ -32,24 +32,100 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Microsoft-googletest-v140-windesktop-msvcstl-static-rt-dyn-Disable-gtest_main>true</Microsoft-googletest-v140-windesktop-msvcstl-static-rt-dyn-Disable-gtest_main>
+  </PropertyGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\attribute_parser.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\compiler.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_element.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_signature.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_type.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\decoder.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\deserializer.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\error.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\pack.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\parser.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\program.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\serializer.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\signature_parser.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\types.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vm.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vmdefs.h" />
+    <ClInclude Include="..\..\..\..\bstr\include\bstr\bstr.hpp" />
     <ClInclude Include="..\..\..\..\dtl\include\dtl\dtl.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\dtl\src\cpp\dtl.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="..\..\..\..\apx\src\attribute_parser.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\dtl\test\cpp\test_dtl_av.cpp" />
-    <ClCompile Include="..\..\..\..\dtl\test\cpp\test_dtl_hv.cpp" />
-    <ClCompile Include="..\..\..\..\dtl\test\cpp\test_dtl_sv.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\compiler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\data_element.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\data_type.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\decoder.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\node.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\parser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\port.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\port_attribute.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\program.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\serializer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\signature_parser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\type_attribute.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\vm.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_attribute_parser.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_compiler.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_data_element.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_decoder.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_node.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_pack.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_parser.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_port_instance.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_program.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_serializer.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_signature_parser.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_vm.cpp" />
+    <ClCompile Include="..\..\..\..\dtl\src\dtl.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="test_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -68,8 +144,6 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\..\dtl\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -84,9 +158,9 @@
       <PreprocessorDefinitions>X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\..\dtl\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\..\apx\include;$(SolutionDir)..\..\..\dtl\include;$(SolutionDir)..\..\..\bstr\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

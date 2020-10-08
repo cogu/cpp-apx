@@ -7,6 +7,4 @@
 **.vs/
 *.VC.db
 *.VC.opendb
-projects/visual_studio/cpp_apx_test/packages/
-projects/visual_studio/dtl_test/packages/
-projects/visual_studio/bstr_test/packages/
+projects/visual_studio/cpp-apx/packages/

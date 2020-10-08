@@ -2,10 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="..\..\..\..\bstr\src\cpp\bstr.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\bstr\test\cpp\test_bstr.cpp">
+    <ClCompile Include="..\..\..\..\bstr\test\test_bstr.cpp">
       <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
@@ -17,16 +14,10 @@
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
-      <UniqueIdentifier>{847c0ea0-ae5e-4bdf-aefb-fb38884e8625}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{f29efb28-7427-4a1a-bfed-258a0d55b253}</UniqueIdentifier>
+      <UniqueIdentifier>{8f7c817a-d717-4e76-992a-b5ef518194f6}</UniqueIdentifier>
     </Filter>
     <Filter Include="test">
-      <UniqueIdentifier>{c904caba-be8d-46c6-8f5e-faaf9d593df9}</UniqueIdentifier>
+      <UniqueIdentifier>{cf038f5f-5c56-4fa4-8057-5e894cf15132}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>
