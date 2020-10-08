@@ -76,7 +76,7 @@ namespace dtl
       Scalar(const char* begin, const char* end) : Value{ dtl::ValueType::Scalar } { set(begin, end); }
 
       ~Scalar() {}
-      ScalarType sv_type();
+      ScalarType sv_type() const;
       bool has_value() { return m_sv_data.has_value(); }
       void reset();
       void set(int32_t value);

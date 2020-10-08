@@ -139,8 +139,7 @@ namespace dtl
    TEST(ScalarTest, CreateFromBoundedString)
    {
       const char* begin = "first, second";
-      const char* end = begin + 5;
-      bool ok = false;
+      const char* end = begin + 5;      
       auto sv = dtl::make_sv_string(begin, end);
       EXPECT_EQ(sv->to_string(), "first");
    }

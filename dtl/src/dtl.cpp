@@ -1,30 +1,40 @@
 #include <stdexcept>
+#include <cassert>
 #include "dtl/dtl.hpp"
 
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-
-template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
-
 namespace dtl
-{
-   constexpr int I32_ID = 0;
-   constexpr int U32_ID = 1;
-   constexpr int I64_ID = 2;
-   constexpr int U64_ID = 3;
-   constexpr int STR_ID = 4;
+{  
+   constexpr std::size_t I32_ID = 0;
+   constexpr std::size_t U32_ID = 1;
+   constexpr std::size_t I64_ID = 2;
+   constexpr std::size_t U64_ID = 3;
+   constexpr std::size_t STR_ID = 4;
 
-   ScalarType Scalar::sv_type()
+   ScalarType Scalar::sv_type() const
    {
-      dtl::ScalarType retval{ dtl::ScalarType::None };
+      dtl::ScalarType retval{ dtl::ScalarType::None };            
       if (m_sv_data.has_value())
       {
-         std::visit(overloaded{
-            [&retval](int32_t v) { (void)v; retval = dtl::ScalarType::Int32; },
-            [&retval](uint32_t v) { (void)v; retval = dtl::ScalarType::UInt32; },
-            [&retval](int64_t v) { (void)v; retval = dtl::ScalarType::Int64; },
-            [&retval](uint64_t v) { (void)v; retval = dtl::ScalarType::UInt64; },
-            [&retval](std::string& v) { (void)v; retval = dtl::ScalarType::String; }
-            }, m_sv_data.value());
+         switch (m_sv_data.value().index())
+         {
+         case I32_ID:
+            retval = dtl::ScalarType::Int32;
+            break;
+         case U32_ID:
+            retval = dtl::ScalarType::UInt32;
+            break;
+         case I64_ID:
+            retval = dtl::ScalarType::Int64;
+            break;
+         case U64_ID:
+            retval = dtl::ScalarType::UInt64;
+            break;
+         case STR_ID:
+            retval = dtl::ScalarType::String;
+            break;
+         default:
+            assert(0); //NOT IMPLEMENTED
+         }
       }
       return retval;
    }
