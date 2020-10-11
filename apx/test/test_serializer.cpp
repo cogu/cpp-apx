@@ -187,4 +187,64 @@ namespace apx_test
       ASSERT_EQ(buf[2], 3);
       ASSERT_EQ(buf[3], 4);
    }
+
+   TEST(Serializer, PackCharString)
+   {
+      std::array<std::uint8_t, 4> buf = { 0xFF, 0xFF, 0xFF, 0xFF };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto sv = dtl::make_sv("Test");
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_char(4u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 4u);
+      ASSERT_EQ(buf[0], 'T');
+      ASSERT_EQ(buf[1], 'e');
+      ASSERT_EQ(buf[2], 's');
+      ASSERT_EQ(buf[3], 't');
+   }
+
+   TEST(Serializer, PackShorterCharString)
+   {
+      std::array<std::uint8_t, 6> buf = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto sv = dtl::make_sv("Tst");
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_char(6u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 6u);
+      ASSERT_EQ(buf[0], 'T');
+      ASSERT_EQ(buf[1], 's');
+      ASSERT_EQ(buf[2], 't');
+      ASSERT_EQ(buf[3], 0u);
+      ASSERT_EQ(buf[4], 0u);
+      ASSERT_EQ(buf[5], 0u);
+   }
+
+   TEST(Serializer, PackTooLargeCharString)
+   {
+      std::array<std::uint8_t, 4> buf = { 0xFF, 0xFF, 0xFF, 0xFF};
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto sv = dtl::make_sv("Short");
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_char(4u, apx::SizeType::None), APX_BUFFER_BOUNDARY_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 0);
+   }
+
+   TEST(Serializer, PackChar8String)
+   {
+      std::array<std::uint8_t, 4> buf = { 0xFF, 0xFF, 0xFF, 0xFF };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto sv = dtl::make_sv("Test");
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_char8(4u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 4u);
+      ASSERT_EQ(buf[0], 'T');
+      ASSERT_EQ(buf[1], 'e');
+      ASSERT_EQ(buf[2], 's');
+      ASSERT_EQ(buf[3], 't');
+   }
+
+
 }

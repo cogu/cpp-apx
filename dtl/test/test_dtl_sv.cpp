@@ -129,14 +129,17 @@ namespace dtl
    TEST(ScalarTest, CreateTextString)
    {
       auto sv = dtl::make_sv("Little brown fox");
-      EXPECT_EQ(sv->to_string(), "Little brown fox"s);
+      bool ok = false;
+      EXPECT_EQ(sv->to_string(ok), "Little brown fox"s);
+      EXPECT_TRUE(ok);
    }
 
    TEST(ScalarTest, CreateNumericString)
    {
       auto sv = dtl::make_sv("255");
       bool ok = false;
-      EXPECT_EQ(sv->to_string(), "255"s);
+      EXPECT_EQ(sv->to_string(ok), "255"s);
+      EXPECT_TRUE(ok);
       EXPECT_EQ(sv->to_i32(ok), (int32_t)255);
       EXPECT_TRUE(ok);
       EXPECT_EQ(sv->to_u32(ok), (uint32_t)255);
@@ -152,7 +155,9 @@ namespace dtl
       const char* begin = "first, second";
       const char* end = begin + 5;
       auto sv = dtl::make_sv(begin, end);
-      EXPECT_EQ(sv->to_string(), "first");
+      bool ok = false;
+      EXPECT_EQ(sv->to_string(ok), "first");
+      EXPECT_TRUE(ok);
    }
 
    TEST(ScalarTest, CreateBooleanScalar)

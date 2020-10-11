@@ -169,6 +169,10 @@ namespace dtl
             break;
          }
       }
+      else
+      {
+         ok = false;
+      }
       return retval;
    }
 
@@ -225,6 +229,10 @@ namespace dtl
             break;
          }
       }
+      else
+      {
+         ok = false;
+      }
       return retval;
    }
 
@@ -274,6 +282,10 @@ namespace dtl
             //NO CONVERSION ALLOWED
             break;
          }
+      }
+      else
+      {
+         ok = false;
       }
       return retval;
    }
@@ -325,14 +337,19 @@ namespace dtl
             break;
          }
       }
+      else
+      {
+         ok = false;
+      }
       return retval;
    }
 
-   std::string Scalar::to_string() const
+   std::string Scalar::to_string(bool& ok) const
    {
       std::string retval;
       if (m_sv_data.has_value())
       {
+         ok = true;
          switch (m_sv_data.value().index())
          {
          case I32_STORAGE_ID:
@@ -355,8 +372,13 @@ namespace dtl
             break;
          case BYTEARRAY_STORAGE_ID:
             //NO CONVERSION ALLOWED
+            ok = false;
             break;
          }
+      }
+      else
+      {
+         ok = false;
       }
       return retval;
    }
@@ -364,12 +386,12 @@ namespace dtl
    bool Scalar::to_bool(bool &ok) const
    {
       bool retval = false;
-      ok = true;
       std::string const true_string("true");
       std::string const false_string("false");
       std::string tmp;
       if (m_sv_data.has_value())
       {
+         ok = true;
          switch (m_sv_data.value().index())
          {
          case I32_STORAGE_ID:
@@ -408,6 +430,10 @@ namespace dtl
          default:
             ok = false;
          }
+      }
+      else
+      {
+         ok = false;
       }
       return retval;
    }

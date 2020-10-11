@@ -162,8 +162,10 @@ namespace apx_test
       const char* result = parser.parse_initializer(begin, end, dv);
       ASSERT_EQ(result, end);
       auto sv = dynamic_cast<dtl::Scalar*>(dv.get());
+      auto ok = false;
       ASSERT_NE(sv, nullptr);
-      ASSERT_EQ(sv->to_string(), "");
+      ASSERT_EQ(sv->to_string(ok), "");
+      ASSERT_TRUE(ok);
    }
 
    TEST(AttributeParser, ParseInitValue_UTF8String)
@@ -176,7 +178,9 @@ namespace apx_test
       ASSERT_EQ(result, end);
       auto sv = dynamic_cast<dtl::Scalar*>(dv.get());
       ASSERT_NE(sv, nullptr);
-      ASSERT_EQ(sv->to_string(), "\u00c4\u00c5\u00d6");
+      auto ok = false;
+      ASSERT_EQ(sv->to_string(ok), "\u00c4\u00c5\u00d6");
+      ASSERT_TRUE(ok);
    }
 
    TEST(AttributeParser, ScalarInitValueWithExtraCharacters)
@@ -205,7 +209,9 @@ namespace apx_test
       ASSERT_TRUE(ok);
       sv = dynamic_cast<dtl::Scalar*>(av->at(1).get());
       ASSERT_NE(sv, nullptr);
-      ASSERT_EQ(sv->to_string(), "None");
+      ok = false;
+      ASSERT_EQ(sv->to_string(ok), "None");
+      ASSERT_TRUE(ok);
    }
 }
 
@@ -246,8 +252,9 @@ TEST(AttributeParser, ParsePortInitValues)
    sv = dynamic_cast<dtl::Scalar*>(av->at(1).get());
    ASSERT_NE(sv, nullptr);
    ASSERT_EQ(sv->sv_type(), dtl::ScalarType::String);
-   ASSERT_EQ(sv->to_string(), "");
-
+   ok = false;
+   ASSERT_EQ(sv->to_string(ok), "");
+   ASSERT_TRUE(ok);
 }
 
 TEST(AttributeParser, TraditionalValueTable)

@@ -190,6 +190,38 @@ namespace apx
          return pack_value();
       }
 
+      apx::error_t Serializer::pack_char(std::size_t array_len, apx::SizeType dynamic_size)
+      {
+         if (!is_valid_buffer())
+         {
+            return APX_MISSING_BUFFER_ERROR;
+         }
+         m_state->type_code = TypeCode::Char;
+         m_state->element_size = CHAR_SIZE;
+         auto result = prepare_for_array(array_len, dynamic_size);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         return pack_value();
+      }
+
+      apx::error_t Serializer::pack_char8(std::size_t array_len, apx::SizeType dynamic_size)
+      {
+         if (!is_valid_buffer())
+         {
+            return APX_MISSING_BUFFER_ERROR;
+         }
+         m_state->type_code = TypeCode::Char8;
+         m_state->element_size = CHAR8_SIZE;
+         auto result = prepare_for_array(array_len, dynamic_size);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         return pack_value();
+      }
+
       apx::error_t Serializer::check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit)
       {
          apx::error_t retval = APX_NO_ERROR;
@@ -291,7 +323,7 @@ namespace apx
             }
             else if (m_state->is_string_type())
             {
-               retval = APX_NOT_IMPLEMENTED_ERROR;
+               retval = pack_string();
             }
             else if (m_state->is_bytes_type())
             {
@@ -380,7 +412,7 @@ namespace apx
       apx::error_t Serializer::pack_scalar_value_internal()
       {
          apx::error_t retval = APX_NO_ERROR;
-         if ((m_buffer.next + m_state->element_size) <= m_buffer.end)
+         if ((m_buffer.next + m_state->element_size) <= m_buffer.end)if ((m_buffer.next + m_state->element_size) <= m_buffer.end)
          {
             uint32_t u32_val;
             switch (m_state->type_code)
@@ -410,6 +442,62 @@ namespace apx
             retval = APX_BUFFER_BOUNDARY_ERROR;
          }
          return retval;
+      }
+
+      apx::error_t Serializer::pack_string()
+      {
+         assert(m_state != nullptr);
+         if (m_state->value_type != dtl::ValueType::Scalar)
+         {
+            return APX_VALUE_TYPE_ERROR;
+         }
+
+         auto const array_len{ m_state->array_len };
+         bool ok{ false };
+         auto const value = m_state->value.sv->to_string(ok);
+         if (!ok)
+         {
+            return APX_VALUE_CONVERSION_ERROR;
+         }
+         std::size_t const target_string_size{ m_state->element_size * array_len };
+         apx::error_t retval{ APX_NO_ERROR };
+         if ((m_buffer.next + target_string_size) <= m_buffer.end)
+         {
+            std::memset(m_buffer.next, 0, target_string_size);
+            switch (m_state->type_code)
+            {
+            case TypeCode::Char:
+               retval = pack_char_string(value, target_string_size);
+               break;
+            case TypeCode::Char8:
+               // We assume for now that the user has already prepared a valid UTF-8 string.
+               ///TODO: check and encode user-string to utf-8 encoding
+               retval = pack_char_string(value, target_string_size);
+               break;
+            default:
+               retval = APX_NOT_IMPLEMENTED_ERROR;
+            }
+            if (retval == APX_NO_ERROR)
+            {
+               m_buffer.next += target_string_size;
+            }
+         }
+         else
+         {
+            return APX_BUFFER_BOUNDARY_ERROR;
+         }
+         return retval;
+      }
+
+      apx::error_t Serializer::pack_char_string(std::string const& str, std::size_t max_target_size)
+      {
+         auto const required_string_size = str.size();
+         if (required_string_size > max_target_size)
+         {
+            return APX_BUFFER_BOUNDARY_ERROR;
+         }
+         std::memcpy(m_buffer.next, str.data(), required_string_size);
+         return APX_NO_ERROR;
       }
 
       apx::error_t Serializer::default_range_check()
