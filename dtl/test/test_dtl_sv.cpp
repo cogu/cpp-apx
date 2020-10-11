@@ -5,6 +5,12 @@
 using namespace std;
 namespace dtl
 {
+   TEST(ValueTest, CreateNoneTypeValue)
+   {
+      auto dv = dtl::make_dv();
+      EXPECT_EQ(dv->dv_type(), dtl::ValueType::NoneType);
+   }
+
    TEST(ScalarTest, CreateEmptyScalar)
    {
       auto sv1 = dtl::make_sv();
@@ -31,7 +37,7 @@ namespace dtl
    TEST(ScalarTest, CreateInt32Scalar)
    {
       bool ok;
-      auto sv1 = dtl::make_sv_int32();
+      auto sv1 = dtl::make_sv<std::int32_t>(0);
       EXPECT_TRUE(sv1->has_value());
       EXPECT_EQ(sv1->dv_type(), dtl::ValueType::Scalar);
       EXPECT_EQ(sv1->sv_type(), dtl::ScalarType::Int32);
@@ -52,7 +58,7 @@ namespace dtl
    TEST(ScalarTest, CreateUInt32Scalar)
    {
       bool ok;
-      auto sv1 = dtl::make_sv_uint32();
+      auto sv1 = dtl::make_sv<std::uint32_t>(0u);
       EXPECT_TRUE(sv1->has_value());
       EXPECT_EQ(sv1->dv_type(), dtl::ValueType::Scalar);
       EXPECT_EQ(sv1->sv_type(), dtl::ScalarType::UInt32);
@@ -76,7 +82,7 @@ namespace dtl
    TEST(ScalarTest, CreateInt64Scalar)
    {
       bool ok;
-      auto sv1 = dtl::make_sv_int64();
+      auto sv1 = dtl::make_sv<std::int64_t>(0);
       EXPECT_TRUE(sv1->has_value());
       EXPECT_EQ(sv1->dv_type(), dtl::ValueType::Scalar);
       EXPECT_EQ(sv1->sv_type(), dtl::ScalarType::Int64);
@@ -101,7 +107,7 @@ namespace dtl
    TEST(ScalarTest, CreateUInt64Scalar)
    {
       bool ok;
-      auto sv1 = dtl::make_sv_uint64();
+      auto sv1 = dtl::make_sv<std::uint64_t>(0);
       EXPECT_TRUE(sv1->has_value());
       EXPECT_EQ(sv1->dv_type(), dtl::ValueType::Scalar);
       EXPECT_EQ(sv1->sv_type(), dtl::ScalarType::UInt64);
@@ -120,10 +126,15 @@ namespace dtl
       EXPECT_TRUE(ok);
    }
 
+   TEST(ScalarTest, CreateTextString)
+   {
+      auto sv = dtl::make_sv("Little brown fox");
+      EXPECT_EQ(sv->to_string(), "Little brown fox"s);
+   }
 
    TEST(ScalarTest, CreateNumericString)
    {
-      auto sv = dtl::make_sv_string("255");
+      auto sv = dtl::make_sv("255");
       bool ok = false;
       EXPECT_EQ(sv->to_string(), "255"s);
       EXPECT_EQ(sv->to_i32(ok), (int32_t)255);
@@ -139,15 +150,67 @@ namespace dtl
    TEST(ScalarTest, CreateFromBoundedString)
    {
       const char* begin = "first, second";
-      const char* end = begin + 5;      
-      auto sv = dtl::make_sv_string(begin, end);
+      const char* end = begin + 5;
+      auto sv = dtl::make_sv(begin, end);
       EXPECT_EQ(sv->to_string(), "first");
    }
 
-   TEST(ValueTest, CreateNoneTypeValue)
+   TEST(ScalarTest, CreateBooleanScalar)
    {
-      auto dv = dtl::make_dv();
-      EXPECT_EQ(dv->dv_type(), dtl::ValueType::NoneType);
+      bool ok = false;
+      auto sv1 = dtl::make_sv<bool>(true);
+      EXPECT_TRUE(sv1->to_bool(ok));
+      EXPECT_TRUE(ok);
+
+      ok = false;
+      auto sv2 = dtl::make_sv<bool>(false);
+      EXPECT_FALSE(sv2->to_bool(ok));
+      EXPECT_TRUE(ok);
    }
 
+   TEST(ScalarTest, ConvertIntToBoolean)
+   {
+      bool ok = false;
+      auto sv1 = dtl::make_sv<std::int32_t>(0);
+      EXPECT_FALSE(sv1->to_bool(ok));
+      EXPECT_TRUE(ok);
+
+      ok = false;
+      auto sv2 = dtl::make_sv<std::int32_t>(-1);
+      EXPECT_TRUE(sv2->to_bool(ok));
+      EXPECT_TRUE(ok);
+
+      ok = false;
+      auto sv3 = dtl::make_sv<std::int32_t>(1);
+      EXPECT_TRUE(sv3->to_bool(ok));
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(ScalarTest, ConvertStringToBoolean)
+   {
+      bool ok = false;
+      auto sv1 = dtl::make_sv("True");
+      EXPECT_TRUE(sv1->to_bool(ok));
+      EXPECT_TRUE(ok);
+
+      ok = false;
+      auto sv2 = dtl::make_sv("FALSE");
+      EXPECT_FALSE(sv2->to_bool(ok));
+      EXPECT_TRUE(ok);
+
+      ok = false;
+      auto sv3 = dtl::make_sv("true");
+      EXPECT_TRUE(sv3->to_bool(ok));
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(ScalarTest, CreateBytesObject)
+   {
+      dtl::ByteArray data{ 1u, 2u, 3u, 4u, 5u };
+      auto sv = dtl::make_sv(data);
+      EXPECT_EQ(sv->sv_type(), dtl::ScalarType::ByteArray);
+      auto const& tmp{ sv->get_byte_array() };
+      EXPECT_EQ(tmp.size(), data.size());
+      EXPECT_EQ(tmp, data);
+   }
 }

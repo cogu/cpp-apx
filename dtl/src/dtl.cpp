@@ -1,36 +1,59 @@
 #include <stdexcept>
 #include <cassert>
+#include <algorithm>
+#include <typeinfo>
 #include "dtl/dtl.hpp"
 
 namespace dtl
-{  
-   constexpr std::size_t I32_ID = 0;
-   constexpr std::size_t U32_ID = 1;
-   constexpr std::size_t I64_ID = 2;
-   constexpr std::size_t U64_ID = 3;
-   constexpr std::size_t STR_ID = 4;
+{
+   constexpr std::size_t I32_STORAGE_ID = 0;
+   constexpr std::size_t U32_STORAGE_ID = 1;
+   constexpr std::size_t I64_STORAGE_ID = 2;
+   constexpr std::size_t U64_STORAGE_ID = 3;
+   constexpr std::size_t STR_STORAGE_ID = 4;
+   constexpr std::size_t BOOL_STORAGE_ID = 5;
+   constexpr std::size_t BYTEARRAY_STORAGE_ID = 6;
+
+   static bool string_iequals(std::string const& a, std::string const& b)
+   {
+      if (a.size() != b.size())
+      {
+         return false;
+      }
+      return std::equal(a.begin(), a.end(), b.begin(),
+         [](char a, char b)
+         {
+            return tolower(a) == tolower(b);
+         });
+   }
 
    ScalarType Scalar::sv_type() const
    {
-      dtl::ScalarType retval{ dtl::ScalarType::None };            
+      dtl::ScalarType retval{ dtl::ScalarType::None };
       if (m_sv_data.has_value())
       {
          switch (m_sv_data.value().index())
          {
-         case I32_ID:
+         case I32_STORAGE_ID:
             retval = dtl::ScalarType::Int32;
             break;
-         case U32_ID:
+         case U32_STORAGE_ID:
             retval = dtl::ScalarType::UInt32;
             break;
-         case I64_ID:
+         case I64_STORAGE_ID:
             retval = dtl::ScalarType::Int64;
             break;
-         case U64_ID:
+         case U64_STORAGE_ID:
             retval = dtl::ScalarType::UInt64;
             break;
-         case STR_ID:
+         case STR_STORAGE_ID:
             retval = dtl::ScalarType::String;
+            break;
+         case BOOL_STORAGE_ID:
+            retval = dtl::ScalarType::Bool;
+            break;
+         case BYTEARRAY_STORAGE_ID:
+            retval = dtl::ScalarType::ByteArray;
             break;
          default:
             assert(0); //NOT IMPLEMENTED
@@ -80,6 +103,18 @@ namespace dtl
       m_sv_data = std::string{ begin, count };
    }
 
+   void Scalar::set(bool value)
+   {
+      m_sv_data = value;
+   }
+
+   void Scalar::set(const ByteArray& value)
+   {
+       m_sv_data = ByteArray();
+       auto& tmp = std::get<ByteArray>(m_sv_data.value());
+       tmp.assign(value.begin(), value.end());
+   }
+
    int32_t Scalar::to_i32(bool& ok) const
    {
       ok = false;
@@ -88,11 +123,11 @@ namespace dtl
       {
          switch (m_sv_data.value().index())
          {
-         case I32_ID:
+         case I32_STORAGE_ID:
             retval = std::get<int32_t>(m_sv_data.value());
             ok = true;
             break;
-         case U32_ID:
+         case U32_STORAGE_ID:
          {
             uint32_t value = std::get<uint32_t>(m_sv_data.value());
             if (value <= UINT32_MAX)
@@ -102,15 +137,15 @@ namespace dtl
             }
          }
          break;
-         case I64_ID:
+         case I64_STORAGE_ID:
             retval = static_cast<int32_t>(std::get<int64_t>(m_sv_data.value()));
             ok = true;
             break;
-         case U64_ID:
+         case U64_STORAGE_ID:
             retval = static_cast<int32_t>(std::get<uint64_t>(m_sv_data.value()));
             ok = true;
             break;
-         case STR_ID:
+         case STR_STORAGE_ID:
             try
             {
                retval = static_cast<int32_t>(std::stol(std::get<std::string>(m_sv_data.value())));
@@ -125,6 +160,13 @@ namespace dtl
 
             }
             break;
+         case BOOL_STORAGE_ID:
+            retval = std::get<bool>(m_sv_data.value()) ? 1 : 0;
+            ok = true;
+            break;
+         case BYTEARRAY_STORAGE_ID:
+            //NO CONVERSION ALLOWED
+            break;
          }
       }
       return retval;
@@ -138,7 +180,7 @@ namespace dtl
       {
          switch (m_sv_data.value().index())
          {
-         case I32_ID:
+         case I32_STORAGE_ID:
          {
             int32_t value = std::get<int32_t>(m_sv_data.value());
             if (value >= 0)
@@ -148,19 +190,19 @@ namespace dtl
             }
          }
          break;
-         case U32_ID:
+         case U32_STORAGE_ID:
             retval = std::get<uint32_t>(m_sv_data.value());
             ok = true;
             break;
-         case I64_ID:
+         case I64_STORAGE_ID:
             retval = static_cast<uint32_t>(std::get<int64_t>(m_sv_data.value()));
             ok = true;
             break;
-         case U64_ID:
+         case U64_STORAGE_ID:
             retval = static_cast<uint32_t>(std::get<uint64_t>(m_sv_data.value()));
             ok = true;
             break;
-         case STR_ID:
+         case STR_STORAGE_ID:
             try
             {
                retval = static_cast<uint32_t>(std::stoul(std::get<std::string>(m_sv_data.value())));
@@ -175,6 +217,12 @@ namespace dtl
 
             }
             break;
+         case BOOL_STORAGE_ID:
+            retval = std::get<bool>(m_sv_data.value()) ? 1u : 0u;
+            break;
+         case BYTEARRAY_STORAGE_ID:
+            //NO CONVERSION ALLOWED
+            break;
          }
       }
       return retval;
@@ -188,23 +236,23 @@ namespace dtl
       {
          switch (m_sv_data.value().index())
          {
-         case I32_ID:
+         case I32_STORAGE_ID:
             retval = static_cast<int64_t>(std::get<int32_t>(m_sv_data.value()));
             ok = true;
             break;
-         case U32_ID:
+         case U32_STORAGE_ID:
             retval = static_cast<int64_t>(std::get<uint32_t>(m_sv_data.value()));
             ok = true;
             break;
-         case I64_ID:
+         case I64_STORAGE_ID:
             retval = std::get<int64_t>(m_sv_data.value());
             ok = true;
             break;
-         case U64_ID:
+         case U64_STORAGE_ID:
             retval = static_cast<int64_t>(std::get<uint64_t>(m_sv_data.value()));
             ok = true;
             break;
-         case STR_ID:
+         case STR_STORAGE_ID:
             try
             {
                retval = static_cast<int64_t>(std::stoll(std::get<std::string>(m_sv_data.value())));
@@ -219,6 +267,12 @@ namespace dtl
 
             }
             break;
+         case BOOL_STORAGE_ID:
+            retval = std::get<bool>(m_sv_data.value()) ? 1 : 0;
+            break;
+         case BYTEARRAY_STORAGE_ID:
+            //NO CONVERSION ALLOWED
+            break;
          }
       }
       return retval;
@@ -232,23 +286,23 @@ namespace dtl
       {
          switch (m_sv_data.value().index())
          {
-         case I32_ID:
+         case I32_STORAGE_ID:
             retval = static_cast<uint64_t>(std::get<int32_t>(m_sv_data.value()));
             ok = true;
             break;
-         case U32_ID:
+         case U32_STORAGE_ID:
             retval = static_cast<uint64_t>(std::get<uint32_t>(m_sv_data.value()));
             ok = true;
             break;
-         case I64_ID:
+         case I64_STORAGE_ID:
             retval = static_cast<uint64_t>(std::get<uint32_t>(m_sv_data.value()));
             ok = true;
             break;
-         case U64_ID:
+         case U64_STORAGE_ID:
             retval = std::get<uint64_t>(m_sv_data.value());
             ok = true;
             break;
-         case STR_ID:
+         case STR_STORAGE_ID:
             try
             {
                retval = static_cast<uint64_t>(std::stoull(std::get<std::string>(m_sv_data.value())));
@@ -263,6 +317,12 @@ namespace dtl
 
             }
             break;
+         case BOOL_STORAGE_ID:
+            retval = std::get<bool>(m_sv_data.value()) ? 1u : 0u;
+            break;
+         case BYTEARRAY_STORAGE_ID:
+            //NO CONVERSION ALLOWED
+            break;
          }
       }
       return retval;
@@ -275,26 +335,91 @@ namespace dtl
       {
          switch (m_sv_data.value().index())
          {
-         case I32_ID:
+         case I32_STORAGE_ID:
             retval = std::to_string(std::get<int32_t>(m_sv_data.value()));
             break;
-         case U32_ID:
+         case U32_STORAGE_ID:
             retval = std::to_string(std::get<uint32_t>(m_sv_data.value()));
             break;
-         case I64_ID:
+         case I64_STORAGE_ID:
             retval = std::to_string(std::get<int64_t>(m_sv_data.value()));
             break;
-         case U64_ID:
+         case U64_STORAGE_ID:
             retval = std::to_string(std::get<uint64_t>(m_sv_data.value()));
             break;
-         case STR_ID:
+         case STR_STORAGE_ID:
             retval = std::get<std::string>(m_sv_data.value());
+            break;
+         case BOOL_STORAGE_ID:
+            retval = std::get<bool>(m_sv_data.value()) ? std::string("true") : std::string("false");
+            break;
+         case BYTEARRAY_STORAGE_ID:
+            //NO CONVERSION ALLOWED
             break;
          }
       }
       return retval;
    }
 
+   bool Scalar::to_bool(bool &ok) const
+   {
+      bool retval = false;
+      ok = true;
+      std::string const true_string("true");
+      std::string const false_string("false");
+      std::string tmp;
+      if (m_sv_data.has_value())
+      {
+         switch (m_sv_data.value().index())
+         {
+         case I32_STORAGE_ID:
+            retval = std::get<int32_t>(m_sv_data.value()) == 0? false : true;
+            break;
+         case U32_STORAGE_ID:
+            retval = std::get<uint32_t>(m_sv_data.value()) == 0 ? false : true;
+            break;
+         case I64_STORAGE_ID:
+            retval = std::get<int64_t>(m_sv_data.value()) == 0 ? false : true;
+            break;
+         case U64_STORAGE_ID:
+            retval = std::get<uint64_t>(m_sv_data.value()) == 0 ? false : true;
+            break;
+         case STR_STORAGE_ID:
+            tmp = std::get<std::string>(m_sv_data.value());
+            if (string_iequals(tmp, true_string))
+            {
+               retval = true;
+            }
+            else if (string_iequals(tmp, false_string))
+            {
+               retval = false;
+            }
+            else
+            {
+               ok = false;
+            }
+            break;
+         case BOOL_STORAGE_ID:
+            retval = std::get<bool>(m_sv_data.value());
+            break;
+         case BYTEARRAY_STORAGE_ID:
+            //NO CONVERSION ALLOWED
+            break;
+         default:
+            ok = false;
+         }
+      }
+      return retval;
+   }
+
+   dtl::ByteArray const & Scalar::get_byte_array() const
+   {
+      if (!m_sv_data.has_value() || (m_sv_data.value().index() != BYTEARRAY_STORAGE_ID) )
+      {
+         throw std::bad_typeid();
+      }
+      return std::get<dtl::ByteArray>(m_sv_data.value());
+   }
 
    DynamicValue make_dv()
    {
@@ -306,45 +431,7 @@ namespace dtl
       return std::make_shared<Scalar>();
    }
 
-   std::shared_ptr<Scalar> make_sv_int32(int32_t value)
-   {
-      auto sv = std::make_shared<Scalar>();
-      sv->set(value);
-      return sv;
-   }
-   std::shared_ptr<Scalar> make_sv_uint32(uint32_t value)
-   {
-      auto sv = std::make_shared<Scalar>();
-      sv->set(value);
-      return sv;
-   }
-
-   std::shared_ptr<Scalar> make_sv_int64(int64_t value)
-   {
-      auto sv = std::make_shared<Scalar>();
-      sv->set(value);
-      return sv;
-   }
-   std::shared_ptr<Scalar> make_sv_uint64(uint64_t value)
-   {
-      auto sv = std::make_shared<Scalar>();
-      sv->set(value);
-      return sv;
-   }
-
-   std::shared_ptr<Scalar> make_sv_string(const std::string& value)
-   {
-      auto sv = std::make_shared<Scalar>();
-      sv->set(value);
-      return sv;
-   }
-   ScalarValue make_sv_string(const char* value)
-   {
-      auto sv = std::make_shared<Scalar>();
-      sv->set(value);
-      return sv;
-   }
-   ScalarValue make_sv_string(const char* begin, const char* end)
+   ScalarValue make_sv(const char* begin, const char* end)
    {
       auto sv = std::make_shared<Scalar>();
       sv->set(begin, end);

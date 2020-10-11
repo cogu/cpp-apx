@@ -16,6 +16,8 @@ namespace dtl
    class Array;
    class Hash;
 
+   using ByteArray = std::vector<std::uint8_t>;
+
    enum class ValueType : uint8_t
    {
       NoneType,
@@ -49,11 +51,9 @@ namespace dtl
       UInt64,
       Float,
       Double,
-      Bool,
       String,
-      Bytes,
-      ByteArray,
-      Ptr
+      Bool,
+      ByteArray
    };
 
    /* Scalar */
@@ -61,20 +61,15 @@ namespace dtl
    {
    public:
       using ScalarData = std::optional<std::variant<
-         int32_t,             //index 0
-         uint32_t,            //index 1
-         int64_t,             //index 2
-         uint64_t,            //index 3
-         std::string> >;      //index 4
+         int32_t,             //storage id 0
+         uint32_t,            //storage id 1
+         int64_t,             //storage id 2
+         uint64_t,            //storage id 3
+         std::string,         //storage id 4
+         bool,                //storage id 5
+         ByteArray            //storage id 6
+      > >;
       Scalar() : Value{ dtl::ValueType::Scalar } {}
-      Scalar(int32_t value) : Value{ dtl::ValueType::Scalar } { set(value);  }
-      Scalar(uint32_t value) : Value{ dtl::ValueType::Scalar } { set(value); }
-      Scalar(int64_t value) : Value{ dtl::ValueType::Scalar } { set(value); }
-      Scalar(uint64_t value) : Value{ dtl::ValueType::Scalar } { set(value); }
-      Scalar(const std::string& value) : Value{ dtl::ValueType::Scalar } { set(value); }
-      Scalar(const char* value) : Value{ dtl::ValueType::Scalar } { set(value); }
-      Scalar(const char* begin, const char* end) : Value{ dtl::ValueType::Scalar } { set(begin, end); }
-
       ~Scalar() {}
       ScalarType sv_type() const;
       bool has_value() { return m_sv_data.has_value(); }
@@ -86,25 +81,30 @@ namespace dtl
       void set(const std::string& value);
       void set(const char* value);
       void set(const char* begin, const char* end);
+      void set(bool value);
+      void set(const ByteArray&value);
       int32_t to_i32(bool& ok) const;
       uint32_t to_u32(bool& ok) const;
       int64_t to_i64(bool& ok) const;
       uint64_t to_u64(bool& ok) const;
       std::string to_string() const;
+      bool to_bool(bool& ok) const;
+      ByteArray const& get_byte_array() const;
    protected:
       ScalarData m_sv_data;
    };
 
    using ScalarValue = std::shared_ptr<Scalar>;
 
-   ScalarValue make_sv();
-   ScalarValue make_sv_int32(int32_t value = 0);
-   ScalarValue make_sv_uint32(uint32_t value = 0u);
-   ScalarValue make_sv_int64(int64_t value = 0LL);
-   ScalarValue make_sv_uint64(uint64_t value = 0ULL);
-   ScalarValue make_sv_string(const std::string& value);
-   ScalarValue make_sv_string(const char* value);
-   ScalarValue make_sv_string(const char* begin, const char* end);
+   std::shared_ptr<Scalar> make_sv();
+   template <typename T> ScalarValue make_sv(T value)
+   {
+      auto sv = std::make_shared<Scalar>();
+      sv->set(value);
+      return sv;
+   }
+
+   ScalarValue make_sv(const char* begin, const char* end);
 
    /* Array */
    class Array : public dtl::Value
@@ -145,5 +145,22 @@ namespace dtl
 
    using HashValue = std::shared_ptr<dtl::Hash>;
    HashValue make_hv();
+
+   /* Helper functions */
+
+   inline DynamicValue dv_cast(ScalarValue& sv)
+   {
+      return std::dynamic_pointer_cast<Value>(sv);
+   }
+
+   inline DynamicValue dv_cast(ArrayValue& av)
+   {
+      return std::dynamic_pointer_cast<Value>(av);
+   }
+
+   inline DynamicValue dv_cast(HashValue& hv)
+   {
+      return std::dynamic_pointer_cast<Value>(hv);
+   }
 
 }

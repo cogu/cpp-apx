@@ -110,15 +110,14 @@ namespace apx_test
    TEST(DataElement, DeriveProperInitValue_UInt8)
    {
       apx::DataElement elem{ apx::TypeCode::UInt8 };
-      dtl::Scalar* sv = new dtl::Scalar((uint32_t)7u);
-      dtl::DynamicValue parsed{ sv };
+      auto parsed = dtl::make_sv<std::int32_t>(7);
       dtl::DynamicValue derived;
 
-      EXPECT_EQ(elem.derive_proper_init_value(parsed, derived), APX_NO_ERROR);
+      EXPECT_EQ(elem.derive_proper_init_value(dtl::dv_cast(parsed), derived), APX_NO_ERROR);
       dtl::Value* dv = derived.get();
       EXPECT_NE(dv, nullptr);
       EXPECT_EQ(dv->dv_type(), dtl::ValueType::Scalar);
-      sv = dynamic_cast<dtl::Scalar*>(dv);
+      auto sv = dynamic_cast<dtl::Scalar*>(dv);
       EXPECT_NE(sv, nullptr);
       bool ok;
       EXPECT_EQ(sv->to_u32(ok), 7u);
@@ -128,15 +127,14 @@ namespace apx_test
    TEST(DataElement, DeriveProperInitValue_Int8)
    {
       apx::DataElement elem{ apx::TypeCode::Int8 };
-      dtl::Scalar* sv = new dtl::Scalar((int32_t)-1);
-      dtl::DynamicValue parsed{ sv };
+      auto parsed = dtl::make_sv<std::int32_t>(-1);
       dtl::DynamicValue derived;
 
-      EXPECT_EQ(elem.derive_proper_init_value(parsed, derived), APX_NO_ERROR);
+      EXPECT_EQ(elem.derive_proper_init_value(dtl::dv_cast(parsed), derived), APX_NO_ERROR);
       dtl::Value* dv = derived.get();
       EXPECT_NE(dv, nullptr);
       EXPECT_EQ(dv->dv_type(), dtl::ValueType::Scalar);
-      sv = dynamic_cast<dtl::Scalar*>(dv);
+      auto sv = dynamic_cast<dtl::Scalar*>(dv);
       EXPECT_NE(sv, nullptr);
       bool ok;
       EXPECT_EQ(sv->to_i32(ok), -1);
@@ -146,15 +144,14 @@ namespace apx_test
    TEST(DataElement, DeriveProperInitValue_UInt16)
    {
       apx::DataElement elem{ apx::TypeCode::UInt16 };
-      dtl::Scalar* sv = new dtl::Scalar((uint32_t)65535u);
-      dtl::DynamicValue parsed{ sv };
+      auto parsed = dtl::make_sv<std::uint32_t>(65535u);
       dtl::DynamicValue derived;
 
-      EXPECT_EQ(elem.derive_proper_init_value(parsed, derived), APX_NO_ERROR);
+      EXPECT_EQ(elem.derive_proper_init_value(dtl::dv_cast(parsed), derived), APX_NO_ERROR);
       dtl::Value* dv = derived.get();
       EXPECT_NE(dv, nullptr);
       EXPECT_EQ(dv->dv_type(), dtl::ValueType::Scalar);
-      sv = dynamic_cast<dtl::Scalar*>(dv);
+      auto sv = dynamic_cast<dtl::Scalar*>(dv);
       EXPECT_NE(sv, nullptr);
       bool ok;
       EXPECT_EQ(sv->to_u32(ok), 65535u);
@@ -164,15 +161,14 @@ namespace apx_test
    TEST(DataElement, DeriveProperInitValue_Int16)
    {
       apx::DataElement elem{ apx::TypeCode::Int16 };
-      dtl::Scalar* sv = new dtl::Scalar((int32_t) 0);
-      dtl::DynamicValue parsed{ sv };
+      auto parsed = dtl::make_sv<std::int32_t>(0);
       dtl::DynamicValue derived;
 
-      EXPECT_EQ(elem.derive_proper_init_value(parsed, derived), APX_NO_ERROR);
+      EXPECT_EQ(elem.derive_proper_init_value(dtl::dv_cast(parsed), derived), APX_NO_ERROR);
       dtl::Value* dv = derived.get();
       EXPECT_NE(dv, nullptr);
       EXPECT_EQ(dv->dv_type(), dtl::ValueType::Scalar);
-      sv = dynamic_cast<dtl::Scalar*>(dv);
+      auto sv = dynamic_cast<dtl::Scalar*>(dv);
       EXPECT_NE(sv, nullptr);
       bool ok;
       EXPECT_EQ(sv->to_i32(ok), 0);
@@ -186,9 +182,9 @@ namespace apx_test
       dtl::Array* original_av = new dtl::Array();
       dtl::DynamicValue parsed{ original_av };
       dtl::DynamicValue derived;
-      original_av->push(dtl::make_sv_uint32(3));
-      original_av->push(dtl::make_sv_uint32(7));
-      original_av->push(dtl::make_sv_uint32(15));
+      original_av->push(dtl::make_sv<std::uint32_t>(3));
+      original_av->push(dtl::make_sv<std::uint32_t>(7));
+      original_av->push(dtl::make_sv<std::uint32_t>(15));
 
       EXPECT_EQ(elem.derive_proper_init_value(parsed, derived), APX_NO_ERROR);
       dtl::Value* dv = derived.get();

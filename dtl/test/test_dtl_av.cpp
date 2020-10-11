@@ -18,9 +18,9 @@ namespace dtl
       {
          bool ok;
          auto av1 = dtl::make_av();
-         av1->push(dtl::make_sv_uint32(0u));
-         av1->push(dtl::make_sv_uint32(1u));
-         av1->push(dtl::make_sv_uint32(2u));
+         av1->push(dtl::make_sv<std::uint32_t>(0u));
+         av1->push(dtl::make_sv<std::uint32_t>(1u));
+         av1->push(dtl::make_sv<std::uint32_t>(2u));
          EXPECT_EQ(av1->length(), 3u);
          auto sv = std::dynamic_pointer_cast<Scalar>(av1->at(0));
          EXPECT_EQ(sv.use_count(), 2);

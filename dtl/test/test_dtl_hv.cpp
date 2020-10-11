@@ -17,9 +17,9 @@ namespace dtl
    {
       bool ok = false;
       auto hv = dtl::make_hv();
-      hv->insert( { "First"s, dtl::make_sv_uint32(0u) });
-      hv->insert( { "Second"s, dtl::make_sv_uint32(1u) });
-      hv->insert( { "Third"s, dtl::make_sv_uint32(2u) });
+      hv->insert( { "First"s, dtl::make_sv<std::uint32_t>(0u) });
+      hv->insert( { "Second"s, dtl::make_sv<std::uint32_t>(1u) });
+      hv->insert( { "Third"s, dtl::make_sv<std::uint32_t>(2u) });
       EXPECT_EQ(hv->length(), 3);
       auto sv = dynamic_pointer_cast<dtl::Scalar>(hv->at("Second"s));
       EXPECT_EQ(sv.use_count(), 2);
