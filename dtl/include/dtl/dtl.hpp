@@ -87,7 +87,7 @@ namespace dtl
       uint32_t to_u32(bool& ok) const;
       int64_t to_i64(bool& ok) const;
       uint64_t to_u64(bool& ok) const;
-      std::string to_string() const;
+      std::string to_string(bool& ok) const;
       bool to_bool(bool& ok) const;
       ByteArray const& get_byte_array() const;
    protected:

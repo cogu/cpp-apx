@@ -224,7 +224,11 @@ namespace apx
       constexpr std::uint8_t LAST_FIELD_FLAG = INST_FLAG;
 
       constexpr std::uint32_t UINT8_SIZE = sizeof(std::uint8_t);
-      constexpr std::uint32_t BYTE_SIZE = sizeof(std::uint8_t); //TODO: Change to std::byte when C++20 has better support?
+      constexpr std::uint32_t CHAR_SIZE = sizeof(unsigned char);
+      constexpr std::uint32_t CHAR8_SIZE = sizeof(unsigned char); //TODO: Change to char8_t once support for C++20 is more widespread
+      constexpr std::uint32_t CHAR16_SIZE = sizeof(char16_t);
+      constexpr std::uint32_t CHAR32_SIZE = sizeof(char32_t);
+      constexpr std::uint32_t BYTE_SIZE = sizeof(std::uint8_t);
       constexpr std::uint32_t UINT16_SIZE = sizeof(std::uint16_t);
       constexpr std::uint32_t UINT32_SIZE = sizeof(std::uint32_t);
       constexpr std::uint32_t UINT64_SIZE = sizeof(std::uint64_t);
