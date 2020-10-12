@@ -71,6 +71,15 @@ namespace apx
          return read_scalar_value(sv, type_code_arg);
       }
 
+      dtl::Value const* Serializer::State::get_child_value(const char* key)
+      {
+         if (value_type == dtl::ValueType::Hash)
+         {
+            return value.hv->cget(key);
+         }
+         return nullptr;
+      }
+
       apx::error_t Serializer::State::read_scalar_value(dtl::Scalar const* sv, TypeCode type_code_arg)
       {
          apx::error_t retval = APX_NO_ERROR;
@@ -127,7 +136,7 @@ namespace apx
          }
          else
          {
-            m_state = new State();
+            m_state = new Serializer::State();
          }
          while (m_stack.size() > 0)
          {
@@ -277,6 +286,30 @@ namespace apx
          return retval;
       }
 
+      apx::error_t Serializer::record_select(const char* key, bool is_last_field)
+      {
+         if (key != nullptr)
+         {
+            if (m_state->value_type == dtl::ValueType::Hash)
+            {
+               auto const* child_value = m_state->get_child_value(key);
+               if (child_value == nullptr)
+               {
+                  return APX_NOT_FOUND_ERROR;
+               }
+               m_state->set_field_name(key, is_last_field);
+               auto child_state = new Serializer::State();
+               child_state->parent = m_state;
+               m_stack.push(m_state);
+               m_state = child_state;
+               m_state->set_value(child_value);
+               return APX_NO_ERROR;
+            }
+            return APX_VALUE_TYPE_ERROR;
+         }
+         return APX_INVALID_ARGUMENT_ERROR;
+      }
+
       void Serializer::reset_buffer(std::uint8_t* buf, std::size_t len)
       {
          m_buffer.begin = buf;
@@ -333,6 +366,10 @@ namespace apx
          else
          {
             retval = APX_NOT_IMPLEMENTED_ERROR;
+         }
+         if (retval == APX_NO_ERROR)
+         {
+            pop_state();
          }
          return retval;
       }
@@ -588,6 +625,22 @@ namespace apx
             return APX_VALUE_RANGE_ERROR;
          }
          return APX_NO_ERROR;
+      }
+
+      void Serializer::pop_state()
+      {
+         assert(m_state != nullptr);
+         while (m_stack.size() > 0)
+         {
+            delete m_state;
+            m_state = m_stack.top();
+            assert(m_state != nullptr);
+            m_stack.pop();
+            if (!m_state->is_last_field)
+            {
+               break;
+            }
+         }
       }
    }
 }

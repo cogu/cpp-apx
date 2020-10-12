@@ -36,6 +36,7 @@ namespace apx
                dtl::Hash const* hv;
             } value;
 
+            State* parent{ nullptr };
             ScalarStorageType scalar_type;
             std::string field_name;
             std::size_t index{ 0u };
@@ -57,6 +58,8 @@ namespace apx
                (type_code == TypeCode::Char16) ||
                (type_code == TypeCode::Char32); }
             bool is_bytes_type() { return type_code == TypeCode::Byte; }
+            dtl::Value const* get_child_value(const char* key);
+            void set_field_name(const char* name, bool is_last) { field_name = name;  is_last_field = is_last; }
          protected:
             apx::error_t read_scalar_value(dtl::Scalar const* sv, TypeCode type_code_arg);
          };
@@ -81,6 +84,7 @@ namespace apx
          apx::error_t pack_char8(std::size_t array_len, apx::SizeType dynamic_size);
          std::size_t bytes_written() { return std::distance(m_buffer.begin, m_buffer.next); }
          apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
+         apx::error_t record_select(const char* key, bool is_last_field);
 
       protected:
          WriteBuffer m_buffer;
@@ -98,6 +102,7 @@ namespace apx
          apx::error_t default_range_check();
          apx::error_t default_range_check_scalar();
          apx::error_t check_value_range_uint32(std::uint32_t value, std::uint32_t lower_limit, std::uint32_t upper_limit);
+         void pop_state();
       };
    }
 }

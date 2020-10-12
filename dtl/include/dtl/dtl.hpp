@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <initializer_list>
 
 
 namespace dtl
@@ -134,19 +135,31 @@ namespace dtl
       void insert(value_type& v);
       void insert(value_type&& v);
       void set(std::string const& key, DynamicValue value);
-      std::shared_ptr<dtl::Value>& at(std::string const& key) { return m_hv_data.at(key); }
-      std::shared_ptr<dtl::Value>& at(char const* key) { return m_hv_data.at(key); }
-      dtl::Value const* get(std::string const& key) const { auto &tmp = m_hv_data.at(key); return tmp.get(); }
-      dtl::Value const* get(char const* key) const { auto &tmp = m_hv_data.at(key); return tmp.get(); }
+      DynamicValue& at(std::string const& key) { return m_hv_data.at(key); }
+      DynamicValue& at(char const* key) { return m_hv_data.at(key); }
+      dtl::Value const* cget(std::string const& key) const;
+      dtl::Value const* cget(char const* key) const;
       bool is_empty() const { return m_hv_data.empty(); }
+      std::unordered_map<std::string, DynamicValue>::iterator begin() { return m_hv_data.begin(); }
+      std::unordered_map<std::string, DynamicValue>::const_iterator cbegin() { return m_hv_data.cbegin(); }
+      std::unordered_map<std::string, DynamicValue>::iterator end() { return m_hv_data.end(); }
+      std::unordered_map<std::string, DynamicValue>::const_iterator cend() { return m_hv_data.end(); }
+
    protected:
-      std::unordered_map<std::string, std::shared_ptr<dtl::Value>> m_hv_data;
+      std::unordered_map<std::string, DynamicValue> m_hv_data;
    };
 
    using HashValue = std::shared_ptr<dtl::Hash>;
    HashValue make_hv();
+   HashValue make_hv(std::initializer_list<std::pair<std::string, DynamicValue>> initializer);
+
 
    /* Helper functions */
+
+   inline ScalarValue sv_cast(DynamicValue& dv)
+   {
+      return std::dynamic_pointer_cast<Scalar>(dv);
+   }
 
    inline DynamicValue dv_cast(ScalarValue& sv)
    {

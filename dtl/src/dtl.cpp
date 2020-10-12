@@ -496,8 +496,39 @@ namespace dtl
       insert(std::make_pair(key, value));
    }
 
+   dtl::Value const* Hash::cget(std::string const& key) const
+   {
+      auto it = m_hv_data.find(key);
+      if (it != m_hv_data.end())
+      {
+         return it->second.get();
+      }
+      return nullptr;
+   }
+
+
+   dtl::Value const* Hash::cget(char const* key) const
+   {
+      auto it = m_hv_data.find(key);
+      if (it != m_hv_data.end())
+      {
+         return it->second.get();
+      }
+      return nullptr;
+   }
+
    std::shared_ptr<Hash> make_hv()
    {
       return std::make_shared<Hash>();
+   }
+
+   HashValue make_hv(std::initializer_list<std::pair<std::string, DynamicValue>> initializer)
+   {
+      auto hv = std::make_shared<Hash>();
+      for (auto v : initializer)
+      {
+         hv->insert(v);
+      }
+      return hv;
    }
 }
