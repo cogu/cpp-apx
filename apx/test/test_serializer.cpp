@@ -246,5 +246,49 @@ namespace apx_test
       ASSERT_EQ(buf[3], 't');
    }
 
+   TEST(Serializer, PackRecordUInt8)
+   {
+      std::array<std::uint8_t, 3> buf = { 0xFF, 0xFF, 0xFF };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto hv = dtl::make_hv({ {"Red", dtl::make_sv<std::uint8_t>(0x02)},
+                               {"Green", dtl::make_sv<std::uint8_t>(0x12)},
+                               {"Blue", dtl::make_sv<std::uint8_t>(0xaa)} });
+      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("Red", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("Green", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("Blue", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 3u);
+      ASSERT_EQ(buf[0], 0x02);
+      ASSERT_EQ(buf[1], 0x12);
+      ASSERT_EQ(buf[2], 0xaa);
+   }
+
+   TEST(Serializer, PackRecordUInt8WithRangeCheck)
+   {
+      std::array<std::uint8_t, 3> buf = { 0xFF, 0xFF, 0xFF };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto hv = dtl::make_hv({ {"First", dtl::make_sv<std::uint8_t>(7)},
+                               {"Second", dtl::make_sv<std::uint8_t>(3)},
+                               {"Third", dtl::make_sv<std::uint8_t>(3)} });
+      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("First", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("Second", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 3u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("Third", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 3u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 3u);
+      ASSERT_EQ(buf[0], 7u);
+      ASSERT_EQ(buf[1], 3u);
+      ASSERT_EQ(buf[2], 3u);
+   }
 
 }

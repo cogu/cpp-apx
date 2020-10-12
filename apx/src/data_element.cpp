@@ -232,7 +232,7 @@ namespace apx
                      else
                      {
                         delete derived_av;
-                        return APX_DV_TYPE_ERROR;
+                        return APX_VALUE_TYPE_ERROR;
                      }
                   }
                   derived_value.reset(derived_av);
@@ -245,7 +245,7 @@ namespace apx
          }
          else
          {
-            return APX_DV_TYPE_ERROR;
+            return APX_VALUE_TYPE_ERROR;
          }
       }
       else
@@ -256,7 +256,7 @@ namespace apx
          }
          else
          {
-            return APX_DV_TYPE_ERROR;
+            return APX_VALUE_TYPE_ERROR;
          }
       }
       return APX_NO_ERROR;
