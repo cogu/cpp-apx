@@ -8,3 +8,4 @@
 *.VC.db
 *.VC.opendb
 projects/visual_studio/cpp-apx/packages/
+cpp_apx-cppcheck-build-dir

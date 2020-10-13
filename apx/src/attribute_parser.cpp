@@ -143,6 +143,7 @@ namespace apx
          {
          case PortAttributeType::None:
             assert(0);
+            break;
          case PortAttributeType::InitValue:
             result = parse_initializer(next + 1, end, attr.init_value);
             break;
@@ -194,6 +195,7 @@ namespace apx
       {
       case TypeAttributeType::None:
          result = nullptr;
+         break;
       case TypeAttributeType::ValueTable:
          result = parse_value_table(next, end, vt);
          if (result > next)

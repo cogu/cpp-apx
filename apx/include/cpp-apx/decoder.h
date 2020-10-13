@@ -46,7 +46,7 @@ namespace apx
          std::uint8_t const* m_program_next{ nullptr };
          std::uint8_t const* m_program_end{ nullptr };
          OperationType m_operation_type{ OperationType::ProgramEnd };
-         PackUnpackOperationInfo m_pack_unpack_info;
+         PackUnpackOperationInfo m_pack_unpack_info{ TypeCode::None, 0u, false };
          LimitCheckUInt32OperationInfo m_limit_check_uint32_info{ 0u, 0u };
          LimitCheckInt32OperationInfo m_limit_check_int32_info{ 0, 0 };
          LimitCheckUInt64OperationInfo m_limit_check_uint64_info{ 0u, 0u };
