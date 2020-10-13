@@ -63,7 +63,7 @@ namespace apx
       ParseState m_state;
       AttributeParser m_attribute_parser;
       SignatureParser m_signature_parser;
-      apx::error_t m_last_error;
+      apx::error_t m_last_error{APX_NO_ERROR};
       std::string m_parse_error_guide;
    };
 }

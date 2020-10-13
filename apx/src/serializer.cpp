@@ -449,7 +449,7 @@ namespace apx
       apx::error_t Serializer::pack_scalar_value_internal()
       {
          apx::error_t retval = APX_NO_ERROR;
-         if ((m_buffer.next + m_state->element_size) <= m_buffer.end)if ((m_buffer.next + m_state->element_size) <= m_buffer.end)
+         if ((m_buffer.next + m_state->element_size) <= m_buffer.end)
          {
             uint32_t u32_val;
             switch (m_state->type_code)
