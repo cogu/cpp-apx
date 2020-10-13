@@ -127,31 +127,44 @@ namespace apx
       }
       if (retval == APX_NO_ERROR)
       {
-         if (has_limits && is_pack_prog)
-         {
-            retval = compile_limit_instruction(data_element, is_signed_type, is_array, limit_check_variant);
-            if (retval != APX_NO_ERROR)
-            {
-               return retval;
-            }
-         }
-         std::uint8_t instruction = vm::encode_instruction(opcode, data_variant, is_array);
-         m_program->push_back(instruction);
-         if (is_array)
-         {
-            retval = compile_array_size_instruction(array_length, is_dynamic_array);
-            if (retval != APX_NO_ERROR)
-            {
-               return retval;
-            }
-            if (is_dynamic_array)
-            {
-               m_is_dynamic = true;
-            }
-         }
          if (is_record)
          {
+            auto const instruction = vm::encode_instruction(opcode, data_variant, is_array);
+            m_program->push_back(instruction);
             retval = compile_record_fields(data_element, program_type, elem_size);
+         }
+         else
+         {
+            if (has_limits && is_pack_prog)
+            {
+               retval = compile_limit_instruction(data_element, is_signed_type, is_array, limit_check_variant);
+               if (retval != APX_NO_ERROR)
+               {
+                  return retval;
+               }
+            }
+            auto const instruction = vm::encode_instruction(opcode, data_variant, is_array);
+            m_program->push_back(instruction);
+            if (is_array)
+            {
+               retval = compile_array_size_instruction(array_length, is_dynamic_array);
+               if (retval != APX_NO_ERROR)
+               {
+                  return retval;
+               }
+               if (is_dynamic_array)
+               {
+                  m_is_dynamic = true;
+               }
+            }
+            if (has_limits && !is_pack_prog)
+            {
+               retval = compile_limit_instruction(data_element, is_signed_type, is_array, limit_check_variant);
+               if (retval != APX_NO_ERROR)
+               {
+                  return retval;
+               }
+            }
          }
       }
       if (retval == APX_NO_ERROR)
