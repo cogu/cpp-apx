@@ -1,5 +1,6 @@
 #include "cpp-apx/parser.h"
-#include <iostream>
+//#include <iostream>
+#include <sstream>
 #include <cassert>
 #include <cstdlib>
 
@@ -51,6 +52,28 @@ namespace apx
          }
       }
       return false;
+   }
+
+   apx::error_t Parser::parse(char const* str)
+   {
+      std::stringstream ss;
+      ss.str(str);
+      if (!parse(ss))
+      {
+         return get_last_error();
+      }
+      return APX_NO_ERROR;
+   }
+
+   apx::error_t Parser::parse(std::string const& str)
+   {
+      std::stringstream ss;
+      ss.str(str);
+      if (!parse(ss))
+      {
+         return get_last_error();
+      }
+      return APX_NO_ERROR;
    }
 
    void Parser::reset()

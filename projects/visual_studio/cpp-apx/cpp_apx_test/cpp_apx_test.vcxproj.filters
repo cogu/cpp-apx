@@ -62,9 +62,6 @@
     <ClCompile Include="..\..\..\..\apx\src\port.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\apx\src\port_attribute.cpp">
-      <Filter>apx\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\program.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
@@ -84,6 +81,21 @@
       <Filter>dtl\src</Filter>
     </ClCompile>
     <ClCompile Include="test_main.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\node_instance.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\node_manager.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_node_manager.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\sample_nodes.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\port_instance.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -155,6 +167,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vmdefs.h">
       <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_manager.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_instance.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\test\sample_nodes.h">
+      <Filter>apx\test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

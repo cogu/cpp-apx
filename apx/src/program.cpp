@@ -319,6 +319,14 @@ namespace apx
          return APX_INVALID_ARGUMENT_ERROR;
       }
 
+      apx::error_t decode_program_header(apx::vm::Program const& program, ProgramHeader& header)
+      {
+         std::uint8_t const* begin = program.data();
+         std::uint8_t const* end = begin + program.size();
+         std::uint8_t const* next{ nullptr };
+         return decode_program_header(begin, end, next, header);
+      }
+
       std::uint8_t encode_instruction(std::uint8_t opcode, std::uint8_t variant, bool flag)
       {
          uint8_t result = (opcode & INST_OPCODE_MASK) | ((variant & INST_VARIANT_MASK) << INST_VARIANT_SHIFT);

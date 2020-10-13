@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 #include <vector>
 #include <string>
 
@@ -59,6 +60,7 @@ namespace apx
    enum class ProgramType : unsigned char { Unpack, Pack };
    enum class PortType : unsigned char { RequirePort, ProvidePort };
    enum class ArrayType : unsigned char { None, UInt8, UInt16, UInt32 };
+   enum class Mode : unsigned char { Client, Server };
 
    using type_id_t = std::uint32_t;
    using port_id_t = std::uint32_t;

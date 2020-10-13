@@ -13,20 +13,20 @@ namespace apx
    {
    public:
       Node() {}
-      Node(const char* name) : m_name{ name } {}
-      Node(const std::string& name) : m_name{ name } {}
-      apx::error_t append(apx::DataType* data_type);
-      apx::error_t append(apx::Port* port);
-      std::string& get_name() { return m_name; }
-      std::size_t get_num_data_types() { return m_data_types.size(); }
-      std::size_t get_num_require_ports() { return m_require_ports.size(); }
-      std::size_t get_num_provide_ports() { return m_provide_ports.size(); }
-      apx::DataType* get_data_type(apx::type_id_t id);
-      apx::Port* get_require_port(apx::port_id_t id);
-      apx::Port* get_provide_port(apx::port_id_t id);
-      apx::DataType* get_last_data_type();
-      apx::Port* get_last_require_port();
-      apx::Port* get_last_provide_port();
+      Node(char const* name) : m_name{ name } {}
+      Node(std::string const& name) : m_name{ name } {}
+      apx::error_t append(DataType* data_type);
+      apx::error_t append(Port* port);
+      std::string const& get_name() const { return m_name; }
+      std::size_t get_num_data_types() const { return m_data_types.size(); }
+      std::size_t get_num_require_ports() const { return m_require_ports.size(); }
+      std::size_t get_num_provide_ports() const { return m_provide_ports.size(); }
+      apx::DataType* get_data_type(type_id_t id) const;
+      apx::Port* get_require_port(port_id_t id) const;
+      apx::Port* get_provide_port(port_id_t id) const;
+      apx::DataType* get_last_data_type() const;
+      apx::Port* get_last_require_port() const;
+      apx::Port* get_last_provide_port() const;
       apx::error_t finalize();
       int get_last_error_line() const { return m_last_error_line; }
    protected:

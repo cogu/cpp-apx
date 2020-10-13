@@ -3,6 +3,7 @@
 #include <istream>
 #include <string>
 #include <regex>
+#include <memory>
 #include "cpp-apx/error.h"
 #include "cpp-apx/types.h"
 #include "cpp-apx/attribute_parser.h"
@@ -15,7 +16,6 @@ namespace apx
 {
    enum class FileSection {Version, Node, Type, Port};
 
-   using char_range_t = std::pair<const char*, const char*>;
    class Parser
    {
    public:
@@ -33,7 +33,9 @@ namespace apx
 
       Parser();
       bool parse(std::basic_istream<char> &is);
-      apx::Node* take_last_node() { return m_state.node.release(); }
+      apx::error_t parse(char const* str);
+      apx::error_t parse(std::string const& str);
+      std::unique_ptr<apx::Node> take_last_node() { return std::move(m_state.node); }
       apx::error_t get_last_error() const { return m_last_error; }
       const std::string& get_parse_error_str() const { return m_parse_error_guide; }
       int get_line_number() const { return m_state.lineno; }
