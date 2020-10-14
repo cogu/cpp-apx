@@ -24,7 +24,7 @@ namespace apx_test
       EXPECT_EQ(elem.get_type_code(), apx::TypeCode::UInt8);
       EXPECT_FALSE(elem.is_array());
       EXPECT_TRUE(elem.has_limits());
-      auto const [lower_limit, upper_limit] = elem.get_limits_unsigned();
+      auto const [lower_limit, upper_limit] = elem.get_limits_u32();
       EXPECT_EQ(lower_limit, (uint32_t)0u);
       EXPECT_EQ(upper_limit, (uint32_t)7u);
    }
@@ -43,7 +43,7 @@ namespace apx_test
       apx::DataElement elem{ apx::TypeCode::UInt8, 0u, 7u, 10u };
       EXPECT_EQ(elem.get_type_code(), apx::TypeCode::UInt8);
       EXPECT_TRUE(elem.has_limits());
-      auto const [lower_limit, upper_limit] = elem.get_limits_unsigned();
+      auto const [lower_limit, upper_limit] = elem.get_limits_u32();
       EXPECT_EQ(lower_limit, (uint32_t)0u);
       EXPECT_EQ(upper_limit, (uint32_t)7u);
       EXPECT_TRUE(elem.is_array());
@@ -64,7 +64,7 @@ namespace apx_test
          apx::DataElement elem(apx::TypeCode::Int8, -10, 10);
          EXPECT_EQ(elem.get_type_code(), apx::TypeCode::Int8);
          EXPECT_TRUE(elem.has_limits());
-         auto const [lower_limit, upper_limit] = elem.get_limits_signed();
+         auto const [lower_limit, upper_limit] = elem.get_limits_i32();
          EXPECT_EQ(lower_limit, (int32_t)-10);
          EXPECT_EQ(upper_limit, (int32_t)10);
       }
@@ -75,7 +75,7 @@ namespace apx_test
          EXPECT_FALSE(elem.has_limits());
          elem.set_limits((int32_t)0, (int32_t)10);
          EXPECT_TRUE(elem.has_limits());
-         auto const [lower_limit, upper_limit] = elem.get_limits_signed();
+         auto const [lower_limit, upper_limit] = elem.get_limits_i32();
          EXPECT_EQ(lower_limit, (int32_t)0);
          EXPECT_EQ(upper_limit, (int32_t)10);
       }
@@ -86,7 +86,7 @@ namespace apx_test
       apx::DataElement elem{ apx::TypeCode::Int8, -100, 100, 20u };
       EXPECT_EQ(elem.get_type_code(), apx::TypeCode::Int8);
       EXPECT_TRUE(elem.has_limits());
-      auto const [lower_limit, upper_limit] = elem.get_limits_signed();
+      auto const [lower_limit, upper_limit] = elem.get_limits_i32();
       EXPECT_EQ(lower_limit, (int32_t)-100);
       EXPECT_EQ(upper_limit, (int32_t)100);
       EXPECT_TRUE(elem.is_array());

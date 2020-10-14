@@ -70,6 +70,7 @@ namespace apx
       bool const has_limits = data_element->has_limits();
       bool const is_pack_prog = program_type == apx::ProgramType::Pack ? true : false;
       bool is_signed_type = false;
+      bool is_64_bit_type = false;
       bool is_record = false;
       std::uint8_t const opcode = is_pack_prog ? vm::OPCODE_PACK : vm::OPCODE_UNPACK;
       apx::TypeCode const type_code = data_element->get_type_code();
@@ -90,6 +91,12 @@ namespace apx
          limit_check_variant = vm::VARIANT_LIMIT_CHECK_U32;
          elem_size = vm::UINT32_SIZE;
          break;
+      case apx::TypeCode::UInt64:
+         data_variant = vm::VARIANT_U64;
+         limit_check_variant = vm::VARIANT_LIMIT_CHECK_U64;
+         elem_size = vm::UINT64_SIZE;
+         is_64_bit_type = true;
+         break;
       case apx::TypeCode::Int8:
          data_variant = vm::VARIANT_S8;
          limit_check_variant = vm::VARIANT_LIMIT_CHECK_S8;
@@ -108,13 +115,24 @@ namespace apx
          elem_size = vm::INT32_SIZE;
          is_signed_type = true;
          break;
+      case apx::TypeCode::Int64:
+         data_variant = vm::VARIANT_S64;
+         limit_check_variant = vm::VARIANT_LIMIT_CHECK_S64;
+         elem_size = vm::INT64_SIZE;
+         is_signed_type = true;
+         is_64_bit_type = true;
+         break;
       case apx::TypeCode::Byte:
          data_variant = vm::VARIANT_BYTE;
          limit_check_variant = vm::VARIANT_LIMIT_CHECK_U8;
-         elem_size = vm::UINT8_SIZE;
+         elem_size = vm::BYTE_SIZE;
          break;
       case apx::TypeCode::Char:
          data_variant = vm::VARIANT_ASCII_CHAR;
+         elem_size = vm::UINT8_SIZE;
+         break;
+      case apx::TypeCode::Char8:
+         data_variant = vm::VARIANT_CHAR8;
          elem_size = vm::UINT8_SIZE;
          break;
       case apx::TypeCode::Record:
@@ -137,7 +155,7 @@ namespace apx
          {
             if (has_limits && is_pack_prog)
             {
-               retval = compile_limit_instruction(data_element, is_signed_type, is_array, limit_check_variant);
+               retval = compile_limit_instruction(data_element, is_signed_type, is_64_bit_type, is_array, limit_check_variant);
                if (retval != APX_NO_ERROR)
                {
                   return retval;
@@ -159,7 +177,7 @@ namespace apx
             }
             if (has_limits && !is_pack_prog)
             {
-               retval = compile_limit_instruction(data_element, is_signed_type, is_array, limit_check_variant);
+               retval = compile_limit_instruction(data_element, is_signed_type, is_64_bit_type, is_array, limit_check_variant);
                if (retval != APX_NO_ERROR)
                {
                   return retval;
@@ -184,31 +202,41 @@ namespace apx
       return retval;
    }
 
-   apx::error_t Compiler::compile_limit_instruction(apx::DataElement const* data_element, bool is_signed_type, bool is_array, std::uint8_t limit_variant)
+   apx::error_t Compiler::compile_limit_instruction(apx::DataElement const* data_element, bool is_signed_type, bool is_64_bit_type, bool is_array, std::uint8_t limit_variant)
    {
-      if ((limit_variant != vm::VARIANT_LIMIT_CHECK_NONE) )
+      if ((limit_variant != vm::VARIANT_LIMIT_CHECK_NONE))
       {
          apx::error_t retval = APX_NO_ERROR;
-         if ((limit_variant == vm::VARIANT_LIMIT_CHECK_U64) || (limit_variant == vm::VARIANT_LIMIT_CHECK_S64))
+         std::uint8_t const opcode = vm::OPCODE_DATA_CTRL;
+         std::uint8_t instruction_header = vm::encode_instruction(opcode, limit_variant, is_array);
+         m_program->push_back(instruction_header);
+         if (is_64_bit_type)
          {
-            retval = APX_NOT_IMPLEMENTED_ERROR; //64-bit limits not yet implemented
-         }
-         else
-         {
-            std::uint8_t const opcode = vm::OPCODE_DATA_CTRL;
-            std::uint8_t instruction_header = vm::encode_instruction(opcode, limit_variant, is_array);
-            m_program->push_back(instruction_header);
             if (is_signed_type)
             {
-               auto const limits = data_element->get_limits_signed();
+               auto const limits = data_element->get_limits_i64();
                retval = compile_limit_values(limit_variant, limits.first, limits.second);
             }
             else
             {
-               auto const limits = data_element->get_limits_unsigned();
+               auto const limits = data_element->get_limits_u64();
                retval = compile_limit_values(limit_variant, limits.first, limits.second);
             }
          }
+         else
+         {
+            if (is_signed_type)
+            {
+               auto const limits = data_element->get_limits_i32();
+               retval = compile_limit_values(limit_variant, limits.first, limits.second);
+            }
+            else
+            {
+               auto const limits = data_element->get_limits_u32();
+               retval = compile_limit_values(limit_variant, limits.first, limits.second);
+            }
+         }
+
          return retval;
       }
       return APX_INVALID_ARGUMENT_ERROR;
@@ -283,6 +311,52 @@ namespace apx
          apx::packLE<std::uint32_t>(p, static_cast<std::uint32_t>(lower_limit));
          p += elem_size;
          apx::packLE<std::uint32_t>(p, static_cast<std::uint32_t>(upper_limit));
+         p += elem_size;
+         m_program->insert(m_program->end(), buf.data(), p);
+         break;
+      default:
+         retval = APX_ELEMENT_TYPE_ERROR;
+      }
+      return retval;
+   }
+
+   apx::error_t Compiler::compile_limit_values(std::uint8_t limit_variant, std::int64_t lower_limit, std::int64_t upper_limit)
+   {
+      apx::error_t retval = APX_NO_ERROR;
+      std::array<std::uint8_t, sizeof(std::int64_t) * 2> buf;
+      std::uint8_t* p = buf.data();
+      std::size_t elem_size;
+      assert(sizeof(buf) == 16);
+      switch (limit_variant)
+      {
+      case vm::VARIANT_LIMIT_CHECK_S64:
+         elem_size = sizeof(std::int64_t);
+         apx::packLE<std::int64_t>(p, static_cast<std::int64_t>(lower_limit));
+         p += elem_size;
+         apx::packLE<std::int64_t>(p, static_cast<std::int64_t>(upper_limit));
+         p += elem_size;
+         m_program->insert(m_program->end(), buf.data(), p);
+         break;
+      default:
+         retval = APX_ELEMENT_TYPE_ERROR;
+      }
+      return retval;
+   }
+
+   apx::error_t Compiler::compile_limit_values(std::uint8_t limit_variant, std::uint64_t lower_limit, std::uint64_t upper_limit)
+   {
+      apx::error_t retval = APX_NO_ERROR;
+      std::array<std::uint8_t, sizeof(std::uint64_t) * 2> buf;
+      std::uint8_t* p = buf.data();
+      std::size_t elem_size;
+      assert(sizeof(buf) == 16);
+      switch (limit_variant)
+      {
+      case vm::VARIANT_LIMIT_CHECK_U64:
+         elem_size = sizeof(std::uint32_t);
+         apx::packLE<std::uint64_t>(p, static_cast<std::uint64_t>(lower_limit));
+         p += elem_size;
+         apx::packLE<std::uint64_t>(p, static_cast<std::uint64_t>(upper_limit));
          p += elem_size;
          m_program->insert(m_program->end(), buf.data(), p);
          break;

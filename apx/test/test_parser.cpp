@@ -25,7 +25,7 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       EXPECT_EQ(node->get_name(), "EmptyNode"s);
    }
 
@@ -39,7 +39,7 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       auto data_type = node->get_last_data_type();
       EXPECT_NE(data_type, nullptr);
       EXPECT_EQ(data_type->name, "Percentage_T"s);
@@ -58,14 +58,14 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       auto data_type = node->get_last_data_type();
       EXPECT_NE(data_type, nullptr);
       EXPECT_EQ(data_type->name, "OnOff_T"s);
       auto data_element = data_type->dsg.element.get();
       EXPECT_NE(data_element, nullptr);
       EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::UInt8);
-      auto [lower_limit, upper_limit] = data_element->get_limits_unsigned();
+      auto [lower_limit, upper_limit] = data_element->get_limits_u32();
       EXPECT_EQ(lower_limit, 0u);
       EXPECT_EQ(upper_limit, 3u);
       auto attr = data_type->get_attributes();
@@ -89,7 +89,7 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       auto port = node->get_last_require_port();
       ASSERT_NE(port, nullptr);
       ASSERT_EQ(port->name, "FuelLevel"s);
@@ -108,7 +108,7 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       auto port = node->get_last_require_port();
       ASSERT_NE(port, nullptr);
       ASSERT_EQ(port->name, "DataPoints"s);
@@ -129,7 +129,7 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       auto port = node->get_last_require_port();
       ASSERT_NE(port, nullptr);
       ASSERT_EQ(port->name, "FuelLevel"s);
@@ -157,14 +157,14 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       auto port = node->get_last_require_port();
       ASSERT_NE(port, nullptr);
       ASSERT_EQ(port->name, "U8Value"s);
       auto data_element = port->get_data_element();
       EXPECT_NE(data_element, nullptr);
       EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::UInt8);
-      auto [lower, upper] = data_element->get_limits_unsigned();
+      auto [lower, upper] = data_element->get_limits_u32();
       EXPECT_EQ(lower, 0u);
       EXPECT_EQ(upper, 3u);
       auto attr = port->get_attributes();
@@ -189,7 +189,7 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       ASSERT_EQ(node->get_name(), "TestNode"s);
       ASSERT_EQ(node->get_num_require_ports(), 2u);
       auto port = node->get_require_port(0u);
@@ -218,7 +218,7 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       auto port = node->get_data_type(0u);
       ASSERT_NE(port, nullptr);
       ASSERT_EQ(port->name, "Notification_T"s);
@@ -265,12 +265,44 @@ namespace apx_test
       std::stringstream ss;
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
-      std::unique_ptr<apx::Node> node{ parser.take_last_node() };
+      auto node{ parser.take_last_node() };
       auto port = node->get_provide_port(0u);
       ASSERT_NE(port, nullptr);
       auto attr = port->get_attributes();
       EXPECT_NE(attr, nullptr);
       EXPECT_EQ(attr->queue_length, 10u);
+   }
+
+   TEST(ApxParser, ParseChar)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "P\"CharSignal\"a\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_last_provide_port();
+      ASSERT_NE(port, nullptr);
+      auto data_element = port->get_data_element();
+      EXPECT_NE(data_element, nullptr);
+      EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Char);
+   }
+
+   TEST(ApxParser, ParseChar8)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "P\"CharSignal\"A\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_last_provide_port();
+      ASSERT_NE(port, nullptr);
+      auto data_element = port->get_data_element();
+      EXPECT_NE(data_element, nullptr);
+      EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Char8);
    }
 
 }

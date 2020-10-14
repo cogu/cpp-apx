@@ -48,6 +48,7 @@ namespace apx
       }
       const char c = *next;
       bool is_signed_type = true;
+      bool is_64_bit_type = false;
       bool check_limits = true;
       apx::TypeCode type_code = apx::TypeCode::None;
       apx::TokenClass token_class = apx::TokenClass::DataElement;
@@ -67,6 +68,10 @@ namespace apx
          break;
       case 'a':
          type_code = apx::TypeCode::Char;
+         check_limits = false;
+         break;
+      case 'A':
+         type_code = apx::TypeCode::Char8;
          check_limits = false;
          break;
       case 'b':
@@ -91,6 +96,15 @@ namespace apx
          type_code = apx::TypeCode::UInt32;
          is_signed_type = false;
          break;
+      case 'q':
+         type_code = apx::TypeCode::Int64;
+         is_64_bit_type = true;
+         break;
+      case 'Q':
+         type_code = apx::TypeCode::UInt64;
+         is_signed_type = false;
+         is_64_bit_type = true;
+         break;
       case 's':
          type_code = apx::TypeCode::Int16;
          break;
@@ -103,11 +117,12 @@ namespace apx
          check_limits = false;
          break;
       case 'u':
-         type_code = apx::TypeCode::Int64;
+         type_code = apx::TypeCode::Char16;
+         check_limits = false;
          break;
       case 'U':
-         type_code = apx::TypeCode::UInt64;
-         is_signed_type = false;
+         type_code = apx::TypeCode::Char32;
+         check_limits = false;
          break;
       }
       if (token_class == apx::TokenClass::DataElement)
@@ -179,7 +194,15 @@ namespace apx
          }
          if (check_limits)
          {
-            auto result = parse_limits(next, end, is_signed_type);
+            char const* result{ nullptr };
+            if (is_64_bit_type)
+            {
+               result = is_signed_type ? parse_limits_i64(next, end) : parse_limits_u64(next, end);
+            }
+            else
+            {
+               result = is_signed_type ? parse_limits_i32(next, end) : parse_limits_u32(next, end);
+            }
             if (result > next)
             {
                next = result;
@@ -208,7 +231,8 @@ namespace apx
       }
       return next;
    }
-   const char* SignatureParser::parse_limits(const char* begin, const char* end, bool is_signed_type)
+
+   const char* SignatureParser::parse_limits_i32(const char* begin, const char* end)
    {
       const char* next = begin;
       if (next < end)
@@ -222,80 +246,227 @@ namespace apx
          {
             return nullptr;
          }
-         if (is_signed_type)
+         int32_t lower_limit, upper_limit;
+         const char* result = parse_i32(next, end, lower_limit);
+         if (result > next)
          {
-            int32_t lower_limit, upper_limit;
-            const char* result = parse_i32(next, end, lower_limit);
-            if (result > next)
-            {
-               next = result;
-            }
-            else
-            {
-               return nullptr;
-            }
-            next = bstr::lstrip(next, end);
-            if (next >= end)
-            {
-               return nullptr;
-            }
-            if (*next++ != ',')
-            {
-               return nullptr;
-            }
-            next = bstr::lstrip(next, end);
-            if (next >= end)
-            {
-               return nullptr;
-            }
-            result = parse_i32(next, end, upper_limit);
-            if (result > next)
-            {
-               next = result;
-            }
-            else
-            {
-               return nullptr;
-            }
-            m_state->data_element->set_limits(lower_limit, upper_limit);
+            next = result;
          }
          else
          {
-            uint32_t lower_limit, upper_limit;
-            const char* result = parse_u32(next, end, lower_limit);
-            if (result > next)
-            {
-               next = result;
-            }
-            else
-            {
-               return nullptr;
-            }
-            next = bstr::lstrip(next, end);
-            if (next >= end)
-            {
-               return nullptr;
-            }
-            if (*next++ != ',')
-            {
-               return nullptr;
-            }
-            next = bstr::lstrip(next, end);
-            if (next >= end)
-            {
-               return nullptr;
-            }
-            result = parse_u32(next, end, upper_limit);
-            if (result > next)
-            {
-               next = result;
-            }
-            else
-            {
-               return nullptr;
-            }
-            m_state->data_element->set_limits(lower_limit, upper_limit);
+            return nullptr;
          }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         if (*next++ != ',')
+         {
+            return nullptr;
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         result = parse_i32(next, end, upper_limit);
+         if (result > next)
+         {
+            next = result;
+         }
+         else
+         {
+            return nullptr;
+         }
+         m_state->data_element->set_limits(lower_limit, upper_limit);
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         if (*next++ != ')')
+         {
+            return nullptr;
+         }
+         return next;
+      }
+      return begin;
+   }
+
+   const char* SignatureParser::parse_limits_u32(const char* begin, const char* end)
+   {
+      const char* next = begin;
+      if (next < end)
+      {
+         if (*next++ != '(')
+         {
+            return begin; //This is not the beginning of a limit expression
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         uint32_t lower_limit, upper_limit;
+         const char* result = parse_u32(next, end, lower_limit);
+         if (result > next)
+         {
+            next = result;
+         }
+         else
+         {
+            return nullptr;
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         if (*next++ != ',')
+         {
+            return nullptr;
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         result = parse_u32(next, end, upper_limit);
+         if (result > next)
+         {
+            next = result;
+         }
+         else
+         {
+            return nullptr;
+         }
+         m_state->data_element->set_limits(lower_limit, upper_limit);
+
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         if (*next++ != ')')
+         {
+            return nullptr;
+         }
+         return next;
+      }
+      return begin;
+   }
+
+   const char* SignatureParser::parse_limits_i64(const char* begin, const char* end)
+   {
+      const char* next = begin;
+      if (next < end)
+      {
+         if (*next++ != '(')
+         {
+            return begin; //This is not the beginning of a limit expression
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         int64_t lower_limit, upper_limit;
+         const char* result = parse_i64(next, end, lower_limit);
+         if (result > next)
+         {
+            next = result;
+         }
+         else
+         {
+            return nullptr;
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         if (*next++ != ',')
+         {
+            return nullptr;
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         result = parse_i64(next, end, upper_limit);
+         if (result > next)
+         {
+            next = result;
+         }
+         else
+         {
+            return nullptr;
+         }
+         m_state->data_element->set_limits(lower_limit, upper_limit);
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         if (*next++ != ')')
+         {
+            return nullptr;
+         }
+         return next;
+      }
+      return begin;
+   }
+
+   const char* SignatureParser::parse_limits_u64(const char* begin, const char* end)
+   {
+      const char* next = begin;
+      if (next < end)
+      {
+         if (*next++ != '(')
+         {
+            return begin; //This is not the beginning of a limit expression
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         uint64_t lower_limit, upper_limit;
+         const char* result = parse_u64(next, end, lower_limit);
+         if (result > next)
+         {
+            next = result;
+         }
+         else
+         {
+            return nullptr;
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         if (*next++ != ',')
+         {
+            return nullptr;
+         }
+         next = bstr::lstrip(next, end);
+         if (next >= end)
+         {
+            return nullptr;
+         }
+         result = parse_u64(next, end, upper_limit);
+         if (result > next)
+         {
+            next = result;
+         }
+         else
+         {
+            return nullptr;
+         }
+         m_state->data_element->set_limits(lower_limit, upper_limit);
          next = bstr::lstrip(next, end);
          if (next >= end)
          {
@@ -314,7 +485,7 @@ namespace apx
    {
       const char* retval = nullptr;
       char* end_ptr;
-      v = (int32_t)std::strtol(begin, &end_ptr, 0);
+      v = static_cast<std::int32_t>(std::strtol(begin, &end_ptr, 0));
       if ((end_ptr > begin) && (end_ptr < end))
       {
          retval = end_ptr;
@@ -326,7 +497,31 @@ namespace apx
    {
       const char* retval = nullptr;
       char* end_ptr;
-      v = (uint32_t)std::strtoul(begin, &end_ptr, 0);
+      v = static_cast<std::uint32_t>(std::strtoul(begin, &end_ptr, 0));
+      if ((end_ptr > begin) && (end_ptr < end))
+      {
+         retval = end_ptr;
+      }
+      return retval;
+   }
+
+   const char* SignatureParser::parse_i64(const char* begin, const char* end, std::int64_t& v)
+   {
+      const char* retval = nullptr;
+      char* end_ptr;
+      v = static_cast<std::int64_t>(std::strtoll(begin, &end_ptr, 0));
+      if ((end_ptr > begin) && (end_ptr < end))
+      {
+         retval = end_ptr;
+      }
+      return retval;
+   }
+
+   const char* SignatureParser::parse_u64(const char* begin, const char* end, std::uint64_t& v)
+   {
+      const char* retval = nullptr;
+      char* end_ptr;
+      v = static_cast<std::uint64_t>(std::strtoull(begin, &end_ptr, 0));
       if ((end_ptr > begin) && (end_ptr < end))
       {
          retval = end_ptr;

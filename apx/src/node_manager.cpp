@@ -66,8 +66,13 @@ namespace apx
          {
             return result;
          }
+         auto unpack_program = m_compiler.compile_port(port, ProgramType::Unpack, result);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
          std::uint32_t data_size{ 0 };
-         result = node_instance->create_require_port(port_id, port->name, std::move(pack_program), std::unique_ptr<apx::vm::Program>() , data_offset, data_size);
+         result = node_instance->create_require_port(port_id, port->name, std::move(pack_program), std::move(unpack_program), data_offset, data_size);
          if (result != APX_NO_ERROR)
          {
             return result;

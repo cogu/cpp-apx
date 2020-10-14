@@ -7,7 +7,7 @@ namespace apx
    {
       apx::error_t result = APX_NO_ERROR;
       result = process_info_from_program_header(
-         (m_port_type == PortType::ProvidePort)? m_pack_program.get() : m_pack_program.get() ); //FIXME: CHANGE to m_unpack_program once compiler supports it
+         (m_port_type == PortType::ProvidePort)? m_pack_program.get() : m_unpack_program.get() );
       if (result != APX_NO_ERROR)
       {
          return result;
