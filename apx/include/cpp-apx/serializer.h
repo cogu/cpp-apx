@@ -71,18 +71,21 @@ namespace apx
             std::uint8_t* next{ nullptr };
             std::uint8_t* adjusted_next{ nullptr }; //Needed for dynamic arrays
          };
-         Serializer() { reset(); }
+         Serializer() { m_state = new Serializer::State(); }
          ~Serializer();
          void reset();
          apx::error_t set_write_buffer(std::uint8_t* buf, std::size_t len);
+         std::size_t bytes_written() { return std::distance(m_buffer.begin, m_buffer.next); }
          apx::error_t set_value(dtl::Value const* dv);
          apx::error_t set_value(dtl::ScalarValue sv);
          apx::error_t set_value(dtl::ArrayValue av);
          apx::error_t set_value(dtl::HashValue hv);
+         void clear_value();
          apx::error_t pack_uint8(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_uint16(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_uint32(std::size_t array_len, apx::SizeType dynamic_size);
          apx::error_t pack_char(std::size_t array_len, apx::SizeType dynamic_size);
          apx::error_t pack_char8(std::size_t array_len, apx::SizeType dynamic_size);
-         std::size_t bytes_written() { return std::distance(m_buffer.begin, m_buffer.next); }
          apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
          apx::error_t record_select(const char* key, bool is_last_field);
 
