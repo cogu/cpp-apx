@@ -1,6 +1,6 @@
+#include <cassert>
 #include "cpp-apx/serializer.h"
 #include "cpp-apx/pack.h"
-#include <cassert>
 
 namespace apx
 {

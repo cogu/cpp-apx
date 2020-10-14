@@ -96,6 +96,12 @@
     <ClCompile Include="..\..\..\..\apx\src\port_instance.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_deserializer.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\deserializer.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
