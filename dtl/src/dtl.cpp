@@ -477,6 +477,16 @@ namespace dtl
       return std::make_shared<Array>(length);
    }
 
+   ArrayValue make_av(std::initializer_list<DynamicValue> initializer)
+   {
+      auto av = std::make_shared<Array>();
+      for (auto v : initializer)
+      {
+         av->push(v);
+      }
+      return av;
+   }
+
    Hash::Hash() : dtl::Value(ValueType::Hash)
    {
    }

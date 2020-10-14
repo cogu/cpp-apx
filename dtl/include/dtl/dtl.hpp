@@ -123,6 +123,7 @@ namespace dtl
 
    using ArrayValue = std::shared_ptr<dtl::Array>;
    ArrayValue make_av(std::size_t length = 0u);
+   ArrayValue make_av(std::initializer_list<DynamicValue> initializer);
 
    /* Hash*/
 

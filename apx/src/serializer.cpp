@@ -130,21 +130,14 @@ namespace apx
 
       void Serializer::reset()
       {
-         if (m_state != nullptr)
-         {
-            m_state->reset(dtl::ValueType::NoneType);
-         }
-         else
-         {
-            m_state = new Serializer::State();
-         }
          while (m_stack.size() > 0)
          {
-            auto state = m_stack.top();
-            assert(state != nullptr);
-            delete state;
+            delete m_state;
+            m_state = m_stack.top();
+            assert(m_state != nullptr);
             m_stack.pop();
          }
+         clear_value();
       }
 
       apx::error_t Serializer::set_write_buffer(std::uint8_t* buf, std::size_t len)
@@ -183,6 +176,12 @@ namespace apx
          return set_value(hv.get());
       }
 
+      void Serializer::clear_value()
+      {
+         m_state->value_type = dtl::ValueType::NoneType;
+         m_state->value.dv = nullptr;
+      }
+
       apx::error_t Serializer::pack_uint8(std::size_t array_len, apx::SizeType dynamic_size)
       {
          if (!is_valid_buffer())
@@ -191,6 +190,38 @@ namespace apx
          }
          m_state->type_code = TypeCode::UInt8;
          m_state->element_size = UINT8_SIZE;
+         auto result = prepare_for_array(array_len, dynamic_size);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         return pack_value();
+      }
+
+      apx::error_t Serializer::pack_uint16(std::size_t array_len, apx::SizeType dynamic_size)
+      {
+         if (!is_valid_buffer())
+         {
+            return APX_MISSING_BUFFER_ERROR;
+         }
+         m_state->type_code = TypeCode::UInt16;
+         m_state->element_size = UINT16_SIZE;
+         auto result = prepare_for_array(array_len, dynamic_size);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         return pack_value();
+      }
+
+      apx::error_t Serializer::pack_uint32(std::size_t array_len, apx::SizeType dynamic_size)
+      {
+         if (!is_valid_buffer())
+         {
+            return APX_MISSING_BUFFER_ERROR;
+         }
+         m_state->type_code = TypeCode::UInt32;
+         m_state->element_size = UINT32_SIZE;
          auto result = prepare_for_array(array_len, dynamic_size);
          if (result != APX_NO_ERROR)
          {
