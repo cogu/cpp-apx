@@ -72,14 +72,24 @@ namespace apx
       return false;
    }
 
-   std::pair<int32_t, int32_t>  DataElement::get_limits_signed() const
+   std::pair<std::int32_t, std::int32_t>  DataElement::get_limits_i32() const
    {
-      return std::make_pair(std::get<int32_t>(m_lower_limit.value()), std::get<int32_t>(m_upper_limit.value()));
+      return std::make_pair(std::get<std::int32_t>(m_lower_limit.value()), std::get<std::int32_t>(m_upper_limit.value()));
    }
 
-   std::pair<uint32_t, uint32_t>  DataElement::get_limits_unsigned() const
+   std::pair<std::uint32_t, std::uint32_t>  DataElement::get_limits_u32() const
    {
-      return std::make_pair(std::get<uint32_t>(m_lower_limit.value()), std::get<uint32_t>(m_upper_limit.value()));
+      return std::make_pair(std::get<std::uint32_t>(m_lower_limit.value()), std::get<std::uint32_t>(m_upper_limit.value()));
+   }
+
+   std::pair<std::int64_t, std::int64_t>  DataElement::get_limits_i64() const
+   {
+      return std::make_pair(std::get<std::int64_t>(m_lower_limit.value()), std::get<std::int64_t>(m_upper_limit.value()));
+   }
+
+   std::pair<std::uint64_t, std::uint64_t>  DataElement::get_limits_u64() const
+   {
+      return std::make_pair(std::get<std::uint64_t>(m_lower_limit.value()), std::get<std::uint64_t>(m_upper_limit.value()));
    }
 
    void DataElement::append(std::unique_ptr<DataElement> child_element)

@@ -34,8 +34,12 @@ namespace apx
       bool get_upper_limit(std::uint32_t& limit) const noexcept;
       void set_limits(std::int32_t lower, std::int32_t upper) { m_lower_limit = lower; m_upper_limit = upper;  }
       void set_limits(std::uint32_t lower, std::uint32_t upper) { m_lower_limit = lower; m_upper_limit = upper; }
-      std::pair<std::int32_t, std::int32_t> get_limits_signed() const;
-      std::pair<std::uint32_t, std::uint32_t> get_limits_unsigned() const;
+      void set_limits(std::int64_t lower, std::int64_t upper) { m_lower_limit = lower; m_upper_limit = upper; }
+      void set_limits(std::uint64_t lower, std::uint64_t upper) { m_lower_limit = lower; m_upper_limit = upper; }
+      std::pair<std::int32_t, std::int32_t> get_limits_i32() const;
+      std::pair<std::uint32_t, std::uint32_t> get_limits_u32() const;
+      std::pair<std::int64_t, std::int64_t> get_limits_i64() const;
+      std::pair<std::uint64_t, std::uint64_t> get_limits_u64() const;
       void append(std::unique_ptr<DataElement> child_element);
       std::size_t get_num_child_elements() const { return m_elements->size(); }
       DataElement* get_child_at(std::size_t i) const { return m_elements->at(i).get(); }
@@ -63,11 +67,11 @@ namespace apx
       apx::TypeCode m_type_code = apx::TypeCode::None;
       std::uint32_t m_array_len = 0u;
       bool m_dynamic_array = false;
-      std::variant<std::uint32_t, std::string, DataType*> m_type_ref;    // uint32_t when m_type_code equals TypeRefId,
-                                                                    // String when m_type_code equals TypeRefName,
-                                                                    // Pointer when m_type_code equals TypeRefPtr
+      std::variant<apx::type_id_t, std::string, DataType*> m_type_ref;   // type_id_t when m_type_code equals TypeRefId,
+                                                                         // String when m_type_code equals TypeRefName,
+                                                                         // Pointer when m_type_code equals TypeRefPtr
       std::unique_ptr<std::vector<std::unique_ptr<DataElement>>> m_elements = nullptr;
-      std::optional<std::variant<std::int32_t, std::uint32_t>> m_lower_limit = {};
-      std::optional <std::variant<std::int32_t, std::uint32_t>> m_upper_limit = {};
+      std::optional<std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_lower_limit = {};
+      std::optional <std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_upper_limit = {};
    };
 }

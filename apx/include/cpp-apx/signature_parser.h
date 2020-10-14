@@ -28,9 +28,14 @@ namespace apx
       void reset();
       void set_error(apx::error_t error, const char* error_next = nullptr) { m_last_error = error; m_error_next = error_next; }
       const char* parse_data_element(const char* begin, const char* end);
-      const char* parse_limits(const char* begin, const char* end, bool is_signed_type);
-      const char* parse_i32(const char* begin, const char* end, int32_t& v);
-      const char* parse_u32(const char* begin, const char* end, uint32_t& v);
+      const char* parse_limits_i32(const char* begin, const char* end);
+      const char* parse_limits_u32(const char* begin, const char* end);
+      const char* parse_limits_i64(const char* begin, const char* end);
+      const char* parse_limits_u64(const char* begin, const char* end);
+      const char* parse_i32(const char* begin, const char* end, std::int32_t& v);
+      const char* parse_u32(const char* begin, const char* end, std::uint32_t& v);
+      const char* parse_i64(const char* begin, const char* end, std::int64_t& v);
+      const char* parse_u64(const char* begin, const char* end, std::uint64_t& v);
       const char* parse_type_reference(const char* begin, const char* end);
       const char* parse_array(const char* begin, const char* end);
 
