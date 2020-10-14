@@ -80,6 +80,9 @@
     <ClCompile Include="..\..\..\..\apx\src\decoder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\deserializer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\node.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -120,6 +123,7 @@
     <ClCompile Include="..\..\..\..\apx\test\test_compiler.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_data_element.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_decoder.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_deserializer.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_node.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_node_manager.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_pack.cpp" />
