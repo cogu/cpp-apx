@@ -75,8 +75,6 @@ namespace dtl
       EXPECT_EQ(sv2.use_count(), 2);
       EXPECT_EQ(sv2->to_u32(ok), (uint32_t)0xFFFFFFFF);
       EXPECT_TRUE(ok);
-      EXPECT_EQ(sv1->to_i32(ok), -1);
-      EXPECT_TRUE(ok);
    }
 
    TEST(ScalarTest, CreateInt64Scalar)
@@ -218,4 +216,6 @@ namespace dtl
       EXPECT_EQ(tmp.size(), data.size());
       EXPECT_EQ(tmp, data);
    }
+
+
 }
