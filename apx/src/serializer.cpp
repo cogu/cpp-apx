@@ -19,7 +19,7 @@ namespace apx
          range_check_state = RangeCheckState::NotChecked;
          scalar_value = static_cast<std::int32_t>(0);
          scalar_type = ScalarStorageType::None;
-         assert(scalar_value.index() == 0);
+         dynamic_size_type = apx::SizeType::None;
       }
 
       void Serializer::State::set_value(dtl::Value const* dv)
@@ -78,6 +78,43 @@ namespace apx
             return value.hv->cget(key);
          }
          return nullptr;
+      }
+
+      apx::error_t Serializer::State::determine_array_length_from_value()
+      {
+         dtl::ScalarType sv_type;
+         switch (value_type)
+         {
+         case dtl::ValueType::Scalar:
+            sv_type = value.sv->sv_type();
+            if (sv_type == dtl::ScalarType::String)
+            {
+               auto ok{ false };
+               auto tmp = value.sv->to_string(ok);
+               if (ok)
+               {
+                  array_len = tmp.length();
+               }
+               else
+               {
+                  return APX_CONNECTION_ERROR;
+               }
+            }
+            else if (sv_type == dtl::ScalarType::ByteArray)
+            {
+               auto tmp = value.sv->get_byte_array();
+               array_len = tmp.size();
+            }
+            break;
+         case dtl::ValueType::Array:
+            array_len = value.av->length();
+            break;
+         case dtl::ValueType::NoneType: //NOT ARRAY-COMPATIBLE
+         case dtl::ValueType::Hash:     //NOT ARRAY-COMPATIBLE
+         default:
+            return APX_VALUE_TYPE_ERROR;
+         }
+         return APX_NO_ERROR;
       }
 
       apx::error_t Serializer::State::read_scalar_value(dtl::Scalar const* sv, TypeCode type_code_arg)
@@ -215,7 +252,7 @@ namespace apx
          m_state->value.dv = nullptr;
       }
 
-      apx::error_t Serializer::pack_uint8(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_uint8(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -223,7 +260,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::UInt8;
          m_state->element_size = UINT8_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -231,7 +268,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_uint16(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_uint16(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -239,7 +276,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::UInt16;
          m_state->element_size = UINT16_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -247,7 +284,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_uint32(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_uint32(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -255,7 +292,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::UInt32;
          m_state->element_size = UINT32_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -263,7 +300,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_uint64(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_uint64(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -271,7 +308,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::UInt64;
          m_state->element_size = UINT64_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -279,7 +316,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_int8(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_int8(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -287,7 +324,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::Int8;
          m_state->element_size = INT8_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -295,7 +332,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_int16(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_int16(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -303,7 +340,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::Int16;
          m_state->element_size = INT16_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -311,7 +348,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_int32(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_int32(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -319,7 +356,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::Int32;
          m_state->element_size = INT32_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -327,7 +364,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_int64(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_int64(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -335,7 +372,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::Int64;
          m_state->element_size = INT64_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -343,7 +380,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_bool(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_bool(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -351,7 +388,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::Bool;
          m_state->element_size = UINT8_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -359,7 +396,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_byte_array(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_byte_array(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -371,7 +408,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::Byte;
          m_state->element_size = BYTE_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -379,7 +416,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_char(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_char(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -387,7 +424,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::Char;
          m_state->element_size = CHAR_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -395,7 +432,7 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::pack_char8(std::size_t array_len, apx::SizeType dynamic_size)
+      apx::error_t Serializer::pack_char8(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -403,7 +440,7 @@ namespace apx
          }
          m_state->type_code = TypeCode::Char8;
          m_state->element_size = CHAR8_SIZE;
-         auto result = prepare_for_array(array_len, dynamic_size);
+         auto result = prepare_for_array(array_len, dynamic_size_type);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -670,14 +707,24 @@ namespace apx
          return ((m_buffer.next != nullptr) && (m_buffer.end != nullptr) && (m_buffer.next <= m_buffer.end));
       }
 
-      apx::error_t Serializer::prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size)
+      apx::error_t Serializer::prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size_type)
       {
          if (array_size > 0)
          {
-            if (dynamic_size != apx::SizeType::None)
+            if (dynamic_size_type != apx::SizeType::None)
             {
                m_state->max_array_len = array_size;
-               return APX_NOT_IMPLEMENTED_ERROR;
+               auto result = m_state->determine_array_length_from_value();
+               if (result != APX_NO_ERROR)
+               {
+                  return result;
+               }
+               //on success, the value m_state->array_len has been successfully updated.
+               if (m_state->array_len > m_state->max_array_len)
+               {
+                  return APX_VALUE_LENGTH_ERROR;
+               }
+               m_state->dynamic_size_type = dynamic_size_type;
             }
             else
             {
@@ -755,7 +802,11 @@ namespace apx
          assert(m_state->value.av != nullptr);
          if (m_state->max_array_len > 0)
          {
-            return APX_NOT_IMPLEMENTED_ERROR;
+            auto result = write_dynamic_value_to_buffer(m_state->array_len, m_state->dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
          }
          else
          {
@@ -1134,6 +1185,64 @@ namespace apx
                break;
             }
          }
+      }
+
+      apx::error_t Serializer::write_dynamic_value_to_buffer(std::size_t value, apx::SizeType size_type)
+      {
+         //Internal development check that we have set size type correctly
+         std::size_t value_size = 0u;
+         switch (size_type)
+         {
+         case apx::SizeType::UInt8:
+            if (value > static_cast<std::size_t>(UINT8_MAX))
+            {
+               return APX_LENGTH_ERROR;
+            }
+            value_size = UINT8_SIZE;
+            break;
+         case apx::SizeType::UInt16:
+            if (value > static_cast<std::size_t>(UINT16_MAX))
+            {
+               return APX_LENGTH_ERROR;
+            }
+            value_size = UINT16_SIZE;
+            break;
+         case apx::SizeType::UInt32:
+            if constexpr (sizeof(std::size_t) > sizeof(std::uint32_t))
+            {
+               if (value > static_cast<std::size_t>(UINT32_MAX))
+               {
+                  return APX_LENGTH_ERROR;
+               }
+            }
+            value_size = UINT32_SIZE;
+            break;
+         default:
+            return APX_INTERNAL_ERROR;
+         }
+         if (m_buffer.next + value_size < m_buffer.end)
+         {
+            switch (value_size)
+            {
+            case UINT8_SIZE:
+               packLE<std::uint8_t>(m_buffer.next, static_cast<std::uint8_t>(value));
+               break;
+            case UINT16_SIZE:
+               packLE<std::uint16_t>(m_buffer.next, static_cast<std::uint16_t>(value));
+               break;
+            case UINT32_SIZE:
+               packLE<std::uint32_t>(m_buffer.next, static_cast<std::uint32_t>(value));
+               break;
+            default:
+               return APX_INTERNAL_ERROR;
+            }
+            m_buffer.next += value_size;
+         }
+         else
+         {
+            return APX_BUFFER_BOUNDARY_ERROR;
+         }
+         return APX_NO_ERROR;
       }
    }
 }

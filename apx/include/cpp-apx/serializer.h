@@ -47,6 +47,7 @@ namespace apx
             std::size_t element_size{ 0 };
             bool is_last_field{ false };
             RangeCheckState range_check_state{ RangeCheckState::NotChecked };
+            apx::SizeType dynamic_size_type{ apx::SizeType::None };
 
             bool is_empty() { return (value_type == dtl::ValueType::NoneType) && (value.dv == nullptr); }
             void set_value(dtl::Value const* dv);
@@ -61,6 +62,7 @@ namespace apx
             bool is_bytes_type() { return type_code == TypeCode::Byte; }
             dtl::Value const* get_child_value(const char* key);
             void set_field_name(const char* name, bool is_last) { field_name = name;  is_last_field = is_last; }
+            apx::error_t determine_array_length_from_value();
          protected:
             apx::error_t read_scalar_value(dtl::Scalar const* sv, TypeCode type_code_arg);
          };
@@ -82,18 +84,18 @@ namespace apx
          apx::error_t set_value(dtl::ArrayValue av);
          apx::error_t set_value(dtl::HashValue hv);
          void clear_value();
-         apx::error_t pack_uint8(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_uint16(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_uint32(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_uint64(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_int8(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_int16(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_int32(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_int64(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_bool(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_byte_array(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_char(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t pack_char8(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_uint8(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_uint16(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_uint32(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_uint64(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_int8(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_int16(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_int32(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_int64(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_bool(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_byte_array(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_char(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t pack_char8(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t check_value_range_i32(std::int32_t lower_limit, std::int32_t upper_limit);
          apx::error_t check_value_range_u32(std::uint32_t lower_limit, std::uint32_t upper_limit);
          apx::error_t check_value_range_i64(std::int64_t lower_limit, std::int64_t upper_limit);
@@ -106,7 +108,7 @@ namespace apx
          std::stack<State*> m_stack;
          void reset_buffer(std::uint8_t* buf, std::size_t len);
          bool is_valid_buffer();
-         apx::error_t prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size);
+         apx::error_t prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size_type);
          apx::error_t pack_value();
          apx::error_t pack_scalar_value();
          apx::error_t pack_array_of_scalar();
@@ -121,6 +123,7 @@ namespace apx
          apx::error_t value_in_range_i64(std::int64_t value, std::int64_t lower_limit, std::int64_t upper_limit);
          apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
          void pop_state();
+         apx::error_t write_dynamic_value_to_buffer(std::size_t value, apx::SizeType size_type);
       };
    }
 }
