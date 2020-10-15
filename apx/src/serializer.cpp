@@ -923,6 +923,14 @@ namespace apx
          }
 
          auto const array_len{ m_state->array_len };
+         if (m_state->max_array_len > 0u)
+         {
+            auto result = write_dynamic_value_to_buffer(array_len, m_state->dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+         }
          bool ok{ false };
          auto const value = m_state->value.sv->to_string(ok);
          if (!ok)
@@ -980,9 +988,20 @@ namespace apx
          }
          auto const array_len{ m_state->array_len };
          auto const byte_array = m_state->value.sv->get_byte_array();
-         if (array_len != byte_array.size())
+         if (m_state->max_array_len > 0)
          {
-            return APX_VALUE_LENGTH_ERROR;
+            auto result = write_dynamic_value_to_buffer(array_len, m_state->dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+         }
+         else
+         {
+            if (array_len != byte_array.size())
+            {
+               return APX_VALUE_LENGTH_ERROR;
+            }
          }
          apx::error_t retval{ APX_NO_ERROR };
          if ( (m_buffer.next + array_len) <= m_buffer.end)
