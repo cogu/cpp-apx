@@ -927,4 +927,48 @@ namespace apx_test
       ASSERT_EQ(serializer.pack_byte_array(2u, apx::SizeType::None), APX_VALUE_LENGTH_ERROR);
       ASSERT_EQ(serializer.bytes_written(), 0u);
    }
+
+   TEST(Serializer, PackDynamicUInt8ArrayWithUint8Length)
+   {
+      std::array<std::uint8_t, UINT8_SIZE * 5> buf = { 0, 0, 0, 0, 0 };
+      std::size_t const element_size { UINT8_SIZE };
+      std::size_t const max_array_length{ 4 };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto av = dtl::make_av({
+         dtl::make_sv<std::uint32_t>(10)
+         });
+      ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(max_array_length, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 2u);
+      ASSERT_EQ(buf[0], 1u);
+      ASSERT_EQ(buf[1], 10u);
+      av->push(dtl::make_sv<std::uint32_t>(11));
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(max_array_length, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 3u);
+      ASSERT_EQ(buf[0], 2u);
+      ASSERT_EQ(buf[1], 10u);
+      ASSERT_EQ(buf[2], 11u);
+      av->push(dtl::make_sv<std::uint32_t>(12));
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(max_array_length, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 4u);
+      ASSERT_EQ(buf[0], 3u);
+      ASSERT_EQ(buf[1], 10u);
+      ASSERT_EQ(buf[2], 11u);
+      ASSERT_EQ(buf[3], 12u);
+      av->push(dtl::make_sv<std::uint32_t>(13));
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(max_array_length, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), buf.size());
+      ASSERT_EQ(buf[0], 4u);
+      ASSERT_EQ(buf[1], 10u);
+      ASSERT_EQ(buf[2], 11u);
+      ASSERT_EQ(buf[3], 12u);
+      ASSERT_EQ(buf[4], 13u);
+      av->push(dtl::make_sv<std::uint32_t>(14));
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(max_array_length, apx::SizeType::UInt8), APX_VALUE_LENGTH_ERROR);
+   }
 }
