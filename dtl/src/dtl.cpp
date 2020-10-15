@@ -124,31 +124,37 @@ namespace dtl
          switch (m_sv_data.value().index())
          {
          case I32_STORAGE_ID:
-            retval = std::get<int32_t>(m_sv_data.value());
+            retval = std::get<std::int32_t>(m_sv_data.value());
             ok = true;
             break;
          case U32_STORAGE_ID:
          {
-            uint32_t value = std::get<uint32_t>(m_sv_data.value());
-            if (value <= UINT32_MAX)
+            uint32_t value = std::get<std::uint32_t>(m_sv_data.value());
+            if (value <= static_cast<std::uint32_t> (INT32_MAX))
             {
                retval = static_cast<int32_t>(value);
                ok = true;
             }
-         }
-         break;
-         case I64_STORAGE_ID:
-            retval = static_cast<int32_t>(std::get<int64_t>(m_sv_data.value()));
-            ok = true;
             break;
+         }
+         case I64_STORAGE_ID:
+         {
+            int64_t value = std::get<std::int64_t>(m_sv_data.value());
+            if ( (value >= static_cast<std::int64_t> (INT32_MIN)) && (value <= static_cast<std::int64_t> (INT32_MAX)) )
+            {
+               retval = static_cast<int32_t>(value);
+               ok = true;
+            }
+            break;
+         }
          case U64_STORAGE_ID:
-            retval = static_cast<int32_t>(std::get<uint64_t>(m_sv_data.value()));
+            retval = static_cast<std::int32_t>(std::get<std::uint64_t>(m_sv_data.value()));
             ok = true;
             break;
          case STR_STORAGE_ID:
             try
             {
-               retval = static_cast<int32_t>(std::stol(std::get<std::string>(m_sv_data.value())));
+               retval = static_cast<std::int32_t>(std::stol(std::get<std::string>(m_sv_data.value())));
                ok = true;
             }
             catch (std::invalid_argument)
@@ -179,31 +185,37 @@ namespace dtl
    uint32_t Scalar::to_u32(bool& ok) const
    {
       ok = false;
-      uint32_t retval = 0;
+      std::uint32_t retval = 0;
       if (m_sv_data.has_value())
       {
          switch (m_sv_data.value().index())
          {
          case I32_STORAGE_ID:
          {
-            int32_t value = std::get<int32_t>(m_sv_data.value());
+            std::int32_t value = std::get<std::int32_t>(m_sv_data.value());
             if (value >= 0)
             {
-               retval = static_cast<uint32_t>(value);
+               retval = static_cast<std::uint32_t>(value);
                ok = true;
             }
+            break;
          }
-         break;
          case U32_STORAGE_ID:
-            retval = std::get<uint32_t>(m_sv_data.value());
+            retval = std::get<std::uint32_t>(m_sv_data.value());
             ok = true;
             break;
          case I64_STORAGE_ID:
-            retval = static_cast<uint32_t>(std::get<int64_t>(m_sv_data.value()));
-            ok = true;
+         {
+            std::int64_t value = std::get<std::int64_t>(m_sv_data.value());
+            if ( (value >= 0) && (value <= static_cast<std::int64_t>(UINT32_MAX)) )
+            {
+               retval = static_cast<std::uint32_t>(value);
+               ok = true;
+            }
             break;
+         }
          case U64_STORAGE_ID:
-            retval = static_cast<uint32_t>(std::get<uint64_t>(m_sv_data.value()));
+            retval = static_cast<uint32_t>(std::get<std::uint64_t>(m_sv_data.value()));
             ok = true;
             break;
          case STR_STORAGE_ID:
@@ -257,8 +269,14 @@ namespace dtl
             ok = true;
             break;
          case U64_STORAGE_ID:
-            retval = static_cast<int64_t>(std::get<uint64_t>(m_sv_data.value()));
-            ok = true;
+            {
+               uint64_t value = std::get<uint64_t>(m_sv_data.value());
+               if (value <= static_cast<std::uint64_t>(INT64_MAX))
+               {
+                  retval = static_cast<int64_t>(value);
+                  ok = true;
+               }
+            }
             break;
          case STR_STORAGE_ID:
             try
@@ -299,17 +317,29 @@ namespace dtl
          switch (m_sv_data.value().index())
          {
          case I32_STORAGE_ID:
-            retval = static_cast<uint64_t>(std::get<int32_t>(m_sv_data.value()));
-            ok = true;
+         {
+            int32_t value = std::get<int32_t>(m_sv_data.value());
+            if (value >= 0)
+            {
+               retval = static_cast<uint64_t>(value);
+               ok = true;
+            }
             break;
+         }
          case U32_STORAGE_ID:
             retval = static_cast<uint64_t>(std::get<uint32_t>(m_sv_data.value()));
             ok = true;
             break;
          case I64_STORAGE_ID:
-            retval = static_cast<uint64_t>(std::get<uint32_t>(m_sv_data.value()));
-            ok = true;
+         {
+            int64_t value = std::get<int64_t>(m_sv_data.value());
+            if (value >= 0)
+            {
+               retval = static_cast<uint64_t>(value);
+               ok = true;
+            }
             break;
+         }
          case U64_STORAGE_ID:
             retval = std::get<uint64_t>(m_sv_data.value());
             ok = true;

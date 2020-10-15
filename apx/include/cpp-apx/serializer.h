@@ -25,7 +25,8 @@ namespace apx
                std::int32_t,             //index 0
                std::uint32_t,            //index 1
                std::int64_t,             //index 2
-               std::uint64_t             //index 3
+               std::uint64_t,            //index 3
+               bool                      //index 4
             > scalar_value;
 
             union value_tag
@@ -84,9 +85,19 @@ namespace apx
          apx::error_t pack_uint8(std::size_t array_len, apx::SizeType dynamic_size);
          apx::error_t pack_uint16(std::size_t array_len, apx::SizeType dynamic_size);
          apx::error_t pack_uint32(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_uint64(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_int8(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_int16(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_int32(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_int64(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_bool(std::size_t array_len, apx::SizeType dynamic_size);
+         apx::error_t pack_byte_array(std::size_t array_len, apx::SizeType dynamic_size);
          apx::error_t pack_char(std::size_t array_len, apx::SizeType dynamic_size);
          apx::error_t pack_char8(std::size_t array_len, apx::SizeType dynamic_size);
-         apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
+         apx::error_t check_value_range_i32(std::int32_t lower_limit, std::int32_t upper_limit);
+         apx::error_t check_value_range_u32(std::uint32_t lower_limit, std::uint32_t upper_limit);
+         apx::error_t check_value_range_i64(std::int64_t lower_limit, std::int64_t upper_limit);
+         apx::error_t check_value_range_u64(std::uint64_t lower_limit, std::uint64_t upper_limit);
          apx::error_t record_select(const char* key, bool is_last_field);
 
       protected:
@@ -102,9 +113,13 @@ namespace apx
          apx::error_t pack_scalar_value_internal();
          apx::error_t pack_string();
          apx::error_t pack_char_string(std::string const& str, std::size_t max_target_size);
-         apx::error_t default_range_check();
+         apx::error_t pack_byte_array_internal();
+         apx::error_t default_range_check_value();
          apx::error_t default_range_check_scalar();
-         apx::error_t check_value_range_uint32(std::uint32_t value, std::uint32_t lower_limit, std::uint32_t upper_limit);
+         apx::error_t value_in_range_i32(std::int32_t value, std::int32_t lower_limit, std::int32_t upper_limit);
+         apx::error_t value_in_range_u32(std::uint32_t value, std::uint32_t lower_limit, std::uint32_t upper_limit);
+         apx::error_t value_in_range_i64(std::int64_t value, std::int64_t lower_limit, std::int64_t upper_limit);
+         apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
          void pop_state();
       };
    }
