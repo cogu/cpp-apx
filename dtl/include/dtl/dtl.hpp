@@ -105,6 +105,14 @@ namespace dtl
       return sv;
    }
 
+   template <typename T> DynamicValue make_sv_dv(T value)
+   {
+      auto sv = std::make_shared<Scalar>();
+      sv->set(value);
+      return dv_cast(sv);
+   }
+
+
    ScalarValue make_sv(const char* begin, const char* end);
 
    /* Array */
@@ -124,6 +132,7 @@ namespace dtl
    using ArrayValue = std::shared_ptr<dtl::Array>;
    ArrayValue make_av(std::size_t length = 0u);
    ArrayValue make_av(std::initializer_list<DynamicValue> initializer);
+   DynamicValue make_av_dv(std::initializer_list<DynamicValue> initializer);
 
    /* Hash*/
 
@@ -153,6 +162,7 @@ namespace dtl
    using HashValue = std::shared_ptr<dtl::Hash>;
    HashValue make_hv();
    HashValue make_hv(std::initializer_list<std::pair<std::string, DynamicValue>> initializer);
+   DynamicValue make_hv_dv(std::initializer_list<std::pair<std::string, DynamicValue>> initializer);
 
 
    /* Helper functions */

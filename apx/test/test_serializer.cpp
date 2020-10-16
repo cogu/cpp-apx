@@ -1174,4 +1174,97 @@ namespace apx_test
       ASSERT_EQ(buf[3], 'm');
       ASSERT_EQ(buf[4], 'e');
    }
+
+   TEST(Serializer, PackStringsInRecord)
+   {
+      std::size_t const element_size{ CHAR_SIZE };
+      std::array<std::uint8_t, (10+10) * element_size> buf;
+      std::memset(buf.data(), 0, buf.size());
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto hv = dtl::make_hv({
+         std::make_pair("First", dtl::make_sv("Hello")),
+         std::make_pair("Second", dtl::make_sv("APX"))
+         });
+      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("First", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_char(10, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("Second", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_char(10, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), buf.size());
+   }
+
+   TEST(Serializer, PackDynamicStringsInRecord)
+   {
+      std::array<std::uint8_t, UINT8_SIZE + 10 + UINT8_SIZE + 10> buf;
+      std::memset(buf.data(), 0, buf.size());
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto hv = dtl::make_hv({
+         std::make_pair("First", dtl::make_sv("Hello")),
+         std::make_pair("Second", dtl::make_sv("APX"))
+         });
+      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("First", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_char(10, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("Second", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_char(10, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 1+10+1+3);
+      ASSERT_EQ(buf[0], 5u);
+      ASSERT_EQ(buf[1], 'H');
+      ASSERT_EQ(buf[2], 'e');
+      ASSERT_EQ(buf[3], 'l');
+      ASSERT_EQ(buf[4], 'l');
+      ASSERT_EQ(buf[5], 'o');
+      ASSERT_EQ(buf[6], 0);
+      ASSERT_EQ(buf[7], 0);
+      ASSERT_EQ(buf[8], 0);
+      ASSERT_EQ(buf[9], 0);
+      ASSERT_EQ(buf[10], 0);
+      ASSERT_EQ(buf[11], 3u);
+      ASSERT_EQ(buf[12], 'A');
+      ASSERT_EQ(buf[13], 'P');
+      ASSERT_EQ(buf[14], 'X');
+      ASSERT_EQ(buf[15], 0);
+      ASSERT_EQ(buf[16], 0);
+      ASSERT_EQ(buf[17], 0);
+      ASSERT_EQ(buf[18], 0);
+      ASSERT_EQ(buf[19], 0);
+      ASSERT_EQ(buf[20], 0);
+      ASSERT_EQ(buf[21], 0);
+   }
+
+   TEST(Serializer, PackDynamicUint16ArrayInRecord)
+   {
+      //DATA SIGNATURE: {"First"S[5*]"Second"C}
+      std::array<std::uint8_t, UINT8_SIZE + UINT16_SIZE*5 + UINT8_SIZE> buf;
+      std::memset(buf.data(), 0, buf.size());
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      auto hv = dtl::make_hv({
+         std::make_pair("First", dtl::make_av_dv({
+            dtl::make_sv<std::uint32_t>(1000),
+            dtl::make_sv<std::uint32_t>(2000),
+         })),
+         std::make_pair("Second", dtl::make_sv_dv<std::uint32_t>(255))
+         });
+      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("First", false), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint16(5, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.record_select("Second", true), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), buf.size());
+      ASSERT_EQ(buf[0], 2u);
+      ASSERT_EQ(buf[1], 0xE8U);
+      ASSERT_EQ(buf[2], 0x03U);
+      ASSERT_EQ(buf[3], 0xD0);
+      ASSERT_EQ(buf[4], 0x07);
+      ASSERT_EQ(buf[5], 0);
+      ASSERT_EQ(buf[6], 0);
+      ASSERT_EQ(buf[7], 0);
+      ASSERT_EQ(buf[8], 0);
+      ASSERT_EQ(buf[9], 0);
+      ASSERT_EQ(buf[10], 0);
+      ASSERT_EQ(buf[11], 0xFF);
+   }
 }

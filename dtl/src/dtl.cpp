@@ -517,6 +517,12 @@ namespace dtl
       return av;
    }
 
+   DynamicValue make_av_dv(std::initializer_list<DynamicValue> initializer)
+   {
+      ArrayValue av = make_av(initializer);
+      return dv_cast(av);
+   }
+
    Hash::Hash() : dtl::Value(ValueType::Hash)
    {
    }
@@ -571,4 +577,11 @@ namespace dtl
       }
       return hv;
    }
+
+   DynamicValue make_hv_dv(std::initializer_list<std::pair<std::string, DynamicValue>> initializer)
+   {
+      HashValue hv = make_hv(initializer);
+      return dv_cast(hv);
+   }
+
 }

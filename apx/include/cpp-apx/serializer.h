@@ -72,8 +72,10 @@ namespace apx
             std::uint8_t* begin{ nullptr };
             std::uint8_t* end{ nullptr };
             std::uint8_t* next{ nullptr };
-            std::uint8_t* adjusted_next{ nullptr }; //Needed for dynamic arrays
+            std::uint8_t* padded_next{ nullptr }; //Used when serializing dynamic arrays
          };
+
+
          Serializer() { m_state = new Serializer::State(); }
          ~Serializer();
          void reset();
@@ -124,6 +126,7 @@ namespace apx
          apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
          void pop_state();
          apx::error_t write_dynamic_value_to_buffer(std::size_t value, apx::SizeType size_type);
+         apx::error_t prepare_for_buffer_write();
       };
    }
 }
