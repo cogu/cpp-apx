@@ -19,7 +19,6 @@ namespace apx
 
       apx::DataElement* get_data_element() const { return dsg.element.get(); }
       apx::DataElement const *get_const_data_element() const { return dsg.element.get(); }
-      apx::DataElement const* get_derived_data_element() const;
 
       apx::PortAttributes* get_attributes() const { return attr.get(); }
       apx::error_t derive_types(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
@@ -27,6 +26,8 @@ namespace apx
       bool is_queued() const;
       bool is_parameter() const;
       std::uint32_t get_queue_length() const;
+      apx::error_t derive_data_element(apx::DataElement*& data_element) const;
+      apx::error_t derive_data_element(apx::DataElement const *& data_element) const;
 
       apx::PortType port_type;
       std::string name;
@@ -35,6 +36,7 @@ namespace apx
       std::int32_t line_number;
       port_id_t port_id{ INVALID_PORT_ID };
       dtl::DynamicValue proper_init_value{ nullptr };
+   protected:
    };
 }
 

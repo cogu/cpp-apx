@@ -55,10 +55,12 @@ namespace apx
       void set_dynamic_array() { m_dynamic_array = true; }
       bool is_dynamic_array() const { return m_dynamic_array; }
       apx::error_t derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
-      apx::TypeCode resolve_type_code();
       apx::error_t derive_proper_init_value(dtl::DynamicValue const &parsed_init_value, dtl::DynamicValue& derived_value);
       apx::error_t create_default_init_value(dtl::DynamicValue& derived_value);
       apx::error_t derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv);
+      apx::error_t derive_data_element(apx::DataElement*& data_element) const;
+      apx::error_t derive_data_element(apx::DataElement const*& data_element) const;
+
 
 
    protected:
@@ -73,5 +75,7 @@ namespace apx
       std::unique_ptr<std::vector<std::unique_ptr<DataElement>>> m_elements = nullptr;
       std::optional<std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_lower_limit = {};
       std::optional <std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_upper_limit = {};
+
+
    };
 }
