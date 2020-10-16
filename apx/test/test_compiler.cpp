@@ -23,6 +23,7 @@ namespace apx_test
       apx::Compiler compiler;
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
+      ASSERT_EQ(error_code, APX_NO_ERROR);
       Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
          OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT)
       };
@@ -631,6 +632,68 @@ namespace apx_test
          LAST_FIELD_FLAG | OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
          'S', 'e', 'c', 'o', 'n', 'd', '\0',
          OPCODE_PACK | (VARIANT_U16 << INST_VARIANT_SHIFT),
+      };
+      ASSERT_EQ(*program, expected);
+   }
+
+   TEST(CompilerPack, PackUInt8Reference)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "T\"Type_T\"C(0,3):VT(\"Off\",\"On\",\"Error\",\"NotAvailable\")\n"
+         "R\"UInt8Port\"T[0]:=3\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      apx::Compiler compiler;
+      apx::error_t error_code = APX_NO_ERROR;
+      auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
+      ASSERT_EQ(error_code, APX_NO_ERROR);
+      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
+         OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U8 << INST_VARIANT_SHIFT),
+         0u,
+         3u,
+         OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT)
+      };
+      ASSERT_EQ(*program, expected);
+   }
+
+   TEST(CompilerPack, PackRecordTypeRefsContainingElementTypeRefsById)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "T\"FirstType_T\"C(0,3)\n"
+         "T\"SecondType_T\"C(0,7)\n"
+         "T\"RecordType_T\"{\"First\"T[0]\"Second\"T[1]}\n"
+         "R\"RecordPort\"T[2]:={3,7}\n";
+
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      apx::Compiler compiler;
+      apx::error_t error_code = APX_NO_ERROR;
+      auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
+      ASSERT_EQ(error_code, APX_NO_ERROR);
+      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE + UINT8_SIZE,
+         OPCODE_PACK | (VARIANT_RECORD << INST_VARIANT_SHIFT),
+         OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
+         'F', 'i', 'r', 's', 't', '\0',
+         OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U8 << INST_VARIANT_SHIFT),
+         0u,
+         3u,
+         OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
+         LAST_FIELD_FLAG | OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
+         'S', 'e', 'c', 'o', 'n', 'd', '\0',
+         OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U8 << INST_VARIANT_SHIFT),
+         0u,
+         7u,
+         OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
       };
       ASSERT_EQ(*program, expected);
    }
@@ -1565,6 +1628,7 @@ namespace apx_test
       };
       ASSERT_EQ(*program, expected);
    }
+
 
 
 }

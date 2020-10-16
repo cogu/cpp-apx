@@ -138,6 +138,11 @@ namespace apx
          {
             return APX_NULL_PTR_ERROR;
          }
+         auto result = data_type->derive_types_on_element(type_list, type_map);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
          set_typeref(data_type);
       }
       else if (type_code == apx::TypeCode::TypeRefName)
@@ -146,7 +151,17 @@ namespace apx
          auto it = type_map.find(type_name);
          if (it != type_map.end())
          {
-            set_typeref(it->second);
+            apx::DataType* data_type = it->second;
+            if (data_type == nullptr)
+            {
+               return APX_NULL_PTR_ERROR;
+            }
+            auto result = data_type->derive_types_on_element(type_list, type_map);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            set_typeref(data_type);
          }
          else
          {
@@ -160,28 +175,9 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   /*
-   * Note: Calling this function before finalizing the node is not allowed
-   */
-   apx::TypeCode DataElement::resolve_type_code()
-   {
-      if ((m_type_code == apx::TypeCode::TypeRefId) || (m_type_code == apx::TypeCode::TypeRefName))
-      {
-         return apx::TypeCode::None;
-      }
-      else if (m_type_code == apx::TypeCode::TypeRefPtr)
-      {
-         apx::DataType* data_type = get_typeref_ptr();
-         assert(data_type != nullptr);
-         return data_type->resolve_type_code();
-      }
-      return m_type_code;
-   }
-
-
    apx::error_t DataElement::derive_proper_init_value(dtl::DynamicValue const & parsed_init_value, dtl::DynamicValue& derived_value)
    {
-      apx::TypeCode type_code = resolve_type_code();
+      apx::TypeCode type_code = get_type_code();
       assert(  (type_code != apx::TypeCode::None) &&
                (type_code != apx::TypeCode::TypeRefId) &&
                (type_code != apx::TypeCode::TypeRefName) &&
@@ -289,9 +285,14 @@ namespace apx
       for (std::size_t i = 0u; i < num_children; i++)
       {
          DataElement* child_element = get_child_at(i);
+         apx::error_t result = derive_data_element(child_element);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
          dtl::DynamicValue const parsed_dv = parsed_av->at(i);
          dtl::DynamicValue derived_dv;
-         apx::error_t result = child_element->derive_proper_init_value(parsed_dv, derived_dv);
+         result = child_element->derive_proper_init_value(parsed_dv, derived_dv);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -302,5 +303,47 @@ namespace apx
       return APX_NO_ERROR;
    }
 
+   apx::error_t DataElement::derive_data_element(apx::DataElement*& data_element) const
+   {
+      apx::error_t retval = APX_NO_ERROR;
+      assert(data_element != nullptr);
+      apx::TypeCode type_code = data_element->get_type_code();
+      assert((type_code != apx::TypeCode::TypeRefId) && (type_code != apx::TypeCode::TypeRefName));
+      if (type_code == apx::TypeCode::TypeRefPtr)
+      {
+         auto data_type = data_element->get_typeref_ptr();
+         if (data_type != nullptr)
+         {
+            retval = data_type->derive_data_element(data_element);
+            assert(data_element != nullptr);
+         }
+         else
+         {
+            retval = APX_NULL_PTR_ERROR;
+         }
+      }
+      return retval;
+   }
 
+   apx::error_t DataElement::derive_data_element(apx::DataElement const*& data_element) const
+   {
+      apx::error_t retval = APX_NO_ERROR;
+      assert(data_element != nullptr);
+      apx::TypeCode type_code = data_element->get_type_code();
+      assert((type_code != apx::TypeCode::TypeRefId) && (type_code != apx::TypeCode::TypeRefName));
+      if (type_code == apx::TypeCode::TypeRefPtr)
+      {
+         auto data_type = data_element->get_typeref_ptr();
+         if (data_type != nullptr)
+         {
+            retval = data_type->derive_data_element(data_element);
+            assert(data_element != nullptr);
+         }
+         else
+         {
+            retval = APX_NULL_PTR_ERROR;
+         }
+      }
+      return retval;
+   }
 }

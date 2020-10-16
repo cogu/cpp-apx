@@ -5,11 +5,6 @@
 namespace apx
 {
 
-   DataElement const* apx::Port::get_derived_data_element() const
-   {
-      return get_const_data_element();
-   }
-
    apx::error_t Port::derive_types(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map)
    {
       auto data_element = get_data_element();
@@ -22,8 +17,13 @@ namespace apx
 
    apx::error_t Port::derive_proper_init_value()
    {
-      auto data_element = get_data_element();
       dtl::DynamicValue derived_init_value;
+      auto* data_element = get_data_element();
+      auto result = derive_data_element(data_element);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
       if (data_element == nullptr)
       {
          return APX_NULL_PTR_ERROR;
@@ -33,8 +33,7 @@ namespace apx
          dtl::DynamicValue parsed_init_value = attr->get_shared_init_value();
          if (parsed_init_value.get() != nullptr)
          {
-            assert(parsed_init_value.use_count() == 2);
-            apx::error_t result = data_element->derive_proper_init_value(parsed_init_value, derived_init_value);
+            result = data_element->derive_proper_init_value(parsed_init_value, derived_init_value);
             if (result != APX_NO_ERROR)
             {
                return result;
@@ -43,7 +42,7 @@ namespace apx
       }
       if (proper_init_value.get() == nullptr)
       {
-         apx::error_t result = data_element->create_default_init_value(derived_init_value);
+         result = data_element->create_default_init_value(derived_init_value);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -81,6 +80,48 @@ namespace apx
          return attributes->queue_length;
       }
       return 0u;
+   }
+
+   apx::error_t Port::derive_data_element(apx::DataElement*& data_element) const
+   {
+      apx::error_t retval = APX_NO_ERROR;
+      assert(data_element != nullptr);
+      apx::TypeCode type_code = data_element->get_type_code();
+      if (type_code == apx::TypeCode::TypeRefPtr)
+      {
+         auto data_type = data_element->get_typeref_ptr();
+         if (data_type != nullptr)
+         {
+            retval = data_type->derive_data_element(data_element);
+            assert(data_element != nullptr);
+         }
+         else
+         {
+            retval = APX_NULL_PTR_ERROR;
+         }
+      }
+      return retval;
+   }
+
+   apx::error_t Port::derive_data_element(apx::DataElement const*& data_element) const
+   {
+      apx::error_t retval = APX_NO_ERROR;
+      assert(data_element != nullptr);
+      apx::TypeCode type_code = data_element->get_type_code();
+      if (type_code == apx::TypeCode::TypeRefPtr)
+      {
+         auto data_type = data_element->get_typeref_ptr();
+         if (data_type != nullptr)
+         {
+            retval = data_type->derive_data_element(data_element);
+            assert(data_element != nullptr);
+         }
+         else
+         {
+            retval = APX_NULL_PTR_ERROR;
+         }
+      }
+      return retval;
    }
 }
 

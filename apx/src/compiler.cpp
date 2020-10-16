@@ -26,13 +26,17 @@ namespace apx
          if (m_last_error == APX_NO_ERROR)
          {
             auto data_element = port->get_const_data_element();
-            if (data_element != nullptr)
+            m_last_error = port->derive_data_element(data_element);
+            if (m_last_error == APX_NO_ERROR)
             {
-               m_last_error = compile_data_element(data_element, program_type, element_size);
-            }
-            else
-            {
-               m_last_error = APX_NULL_PTR_ERROR;
+               if (data_element != nullptr)
+               {
+                  m_last_error = compile_data_element(data_element, program_type, element_size);
+               }
+               else
+               {
+                  m_last_error = APX_NULL_PTR_ERROR;
+               }
             }
          }
       }
@@ -73,7 +77,7 @@ namespace apx
       bool is_64_bit_type = false;
       bool is_record = false;
       std::uint8_t const opcode = is_pack_prog ? vm::OPCODE_PACK : vm::OPCODE_UNPACK;
-      apx::TypeCode const type_code = data_element->get_type_code();
+      apx::TypeCode type_code = data_element->get_type_code();
       switch (type_code)
       {
       case apx::TypeCode::UInt8:
@@ -143,6 +147,7 @@ namespace apx
          retval = APX_ELEMENT_TYPE_ERROR;
          break;
       }
+
       if (retval == APX_NO_ERROR)
       {
          if (is_record)
@@ -276,7 +281,7 @@ namespace apx
          m_program->insert(m_program->end(), buf.data(), p);
          break;
       default:
-         retval = APX_ELEMENT_TYPE_ERROR;
+         retval = APX_UNSUPPORTED_ERROR;
       }
       return retval;
    }
@@ -315,7 +320,7 @@ namespace apx
          m_program->insert(m_program->end(), buf.data(), p);
          break;
       default:
-         retval = APX_ELEMENT_TYPE_ERROR;
+         retval = APX_UNSUPPORTED_ERROR;
       }
       return retval;
    }
@@ -338,7 +343,7 @@ namespace apx
          m_program->insert(m_program->end(), buf.data(), p);
          break;
       default:
-         retval = APX_ELEMENT_TYPE_ERROR;
+         retval = APX_UNSUPPORTED_ERROR;
       }
       return retval;
    }
@@ -361,7 +366,7 @@ namespace apx
          m_program->insert(m_program->end(), buf.data(), p);
          break;
       default:
-         retval = APX_ELEMENT_TYPE_ERROR;
+         retval = APX_UNSUPPORTED_ERROR;
       }
       return retval;
    }
@@ -412,12 +417,20 @@ namespace apx
       {
          std::uint32_t child_size = 0u;
          apx::DataElement const* child_element = data_element->get_child_at(i);
-         apx::error_t result  = compile_record_select_instruction(child_element, (i == (num_children-1))? true : false );
+         assert(child_element != nullptr);
+         apx::error_t result = compile_record_select_instruction(child_element, (i == (num_children-1))? true : false );
          if (result != APX_NO_ERROR)
          {
             return result;
          }
-         result = compile_data_element(child_element, program_type, child_size);
+         auto derived_element = child_element;
+         result = data_element->derive_data_element(derived_element);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         assert(derived_element != nullptr);
+         result = compile_data_element(derived_element, program_type, child_size);
          if (result != APX_NO_ERROR)
          {
             return result;

@@ -208,6 +208,72 @@ namespace apx_test
       EXPECT_NE(data_element->get_typeref_ptr(), nullptr);
    }
 
+   TEST(ApxParser, ParseRequirePortDeclaration_U8Ref)
+   {
+
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "T\"Type_T\"C(0,3):VT(\"Off\",\"On\",\"Error\",\"NotAvailable\")\n"
+         "R\"UInt8Port\"T[0]:=3\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      ASSERT_EQ(port->name, "UInt8Port"s);
+      auto data_element = port->get_data_element();
+      EXPECT_NE(data_element, nullptr);
+      EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+      EXPECT_NE(data_element->get_typeref_ptr(), nullptr);
+   }
+
+   TEST(ApxParser, RecordTypeRefsContainingElementTypeRefsById)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "T\"FirstType_T\"C(0,3)\n"
+         "T\"SecondType_T\"C(0,7)\n"
+         "T\"RecordType_T\"{\"First\"T[0]\"Second\"T[1]}\n"
+         "R\"RecordPort\"T[2]:={3,7}\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      ASSERT_EQ(node->get_num_require_ports(), 1u);
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      auto data_element = port->get_data_element();
+      EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+      auto data_type = data_element->get_typeref_ptr();
+      EXPECT_NE(data_type, nullptr);
+      auto record_element = data_type->get_data_element();
+      EXPECT_EQ(record_element->get_type_code(), apx::TypeCode::Record);
+      {
+         auto child_type_element = record_element->get_child_at(0);
+         EXPECT_NE(child_type_element, nullptr);
+         EXPECT_EQ(child_type_element->get_name(), "First");
+         EXPECT_EQ(child_type_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+         auto child_data_type = child_type_element->get_typeref_ptr();
+         EXPECT_NE(child_data_type, nullptr);
+         auto child_data_element = child_data_type->get_data_element();
+         EXPECT_NE(child_data_element, nullptr);
+         EXPECT_EQ(child_data_element->get_type_code(), apx::TypeCode::UInt8);
+      }
+      {
+         auto child_type_element = record_element->get_child_at(1);
+         EXPECT_NE(child_type_element, nullptr);
+         EXPECT_EQ(child_type_element->get_name(), "Second");
+         EXPECT_EQ(child_type_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+         auto child_data_type = child_type_element->get_typeref_ptr();
+         EXPECT_NE(child_data_type, nullptr);
+         auto child_data_element = child_data_type->get_data_element();
+         EXPECT_NE(child_data_element, nullptr);
+         EXPECT_EQ(child_data_element->get_type_code(), apx::TypeCode::UInt8);
+      }
+
+   }
+
    TEST(ApxParser, Record_Notification_T)
    {
       const char* apx_text =
