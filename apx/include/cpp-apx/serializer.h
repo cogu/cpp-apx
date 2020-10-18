@@ -73,8 +73,18 @@ namespace apx
             std::uint8_t* end{ nullptr };
             std::uint8_t* next{ nullptr };
             std::uint8_t* padded_next{ nullptr }; //Used when serializing dynamic arrays
+            std::uint8_t* mark{ nullptr };        //Used to verify correctness of queued writes
          };
 
+         struct QueuedWriteState
+         {
+            std::uint32_t max_length{ 0u };
+            std::uint32_t current_length{ 0u };
+            std::uint32_t element_size{ 0u };
+            std::uint8_t* length_ptr{ nullptr };
+            apx::SizeType size_type{ apx::SizeType::None };
+            bool is_enabled{ false };
+         };
 
          Serializer() { m_state = new Serializer::State(); }
          ~Serializer();
@@ -103,9 +113,12 @@ namespace apx
          apx::error_t check_value_range_i64(std::int64_t lower_limit, std::int64_t upper_limit);
          apx::error_t check_value_range_u64(std::uint64_t lower_limit, std::uint64_t upper_limit);
          apx::error_t record_select(const char* key, bool is_last_field);
+         apx::error_t queued_write_begin(std::uint32_t element_size, std::uint32_t max_length, bool clear_queue);
+         apx::error_t queued_write_end();
 
       protected:
          WriteBuffer m_buffer;
+         QueuedWriteState m_queued_write;
          State* m_state{ nullptr };
          std::stack<State*> m_stack;
          void reset_buffer(std::uint8_t* buf, std::size_t len);
@@ -126,6 +139,8 @@ namespace apx
          apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
          void pop_state();
          apx::error_t write_dynamic_value_to_buffer(std::size_t value, apx::SizeType size_type);
+         apx::error_t write_dynamic_value_to_buffer(std::uint8_t* begin, std::uint8_t* end, std::size_t value, std::size_t value_size);
+         apx::error_t read_dynamic_value_from_buffer(std::uint8_t const* begin, std::uint8_t const* end, std::size_t &value, std::size_t value_size);
          apx::error_t prepare_for_buffer_write();
       };
    }
