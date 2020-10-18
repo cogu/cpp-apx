@@ -28,6 +28,24 @@ namespace apx
          return value_size;
       }
 
+      static apx::SizeType size_to_size_type(std::uint32_t size)
+      {
+         apx::SizeType size_type{ apx::SizeType::None };
+         if (size <= UINT8_MAX)
+         {
+            size_type = SizeType::UInt8;
+         }
+         else if (size <= UINT16_MAX)
+         {
+            size_type = SizeType::UInt16;
+         }
+         else
+         {
+            size_type = SizeType::UInt32;
+         }
+         return size_type;
+      }
+
       void Serializer::State::reset(dtl::ValueType vt)
       {
          value_type = vt;
@@ -727,6 +745,47 @@ namespace apx
          return APX_INVALID_ARGUMENT_ERROR;
       }
 
+      apx::error_t Serializer::queued_write_begin(std::uint32_t element_size, std::uint32_t max_length, bool clear_queue)
+      {
+         assert(m_state != nullptr);
+         m_queued_write.element_size = element_size;
+         m_queued_write.length_ptr = m_buffer.next;
+         m_queued_write.max_length = max_length;
+         m_queued_write.is_enabled = true;
+         m_queued_write.size_type = size_to_size_type(max_length);
+         std::size_t const value_size = size_type_to_size(m_queued_write.size_type);
+         if (clear_queue)
+         {
+            m_queued_write.current_length = 0u;
+         }
+         else
+         {
+            std::size_t tmp;
+            apx::error_t result = read_dynamic_value_from_buffer(m_queued_write.length_ptr,
+               m_queued_write.length_ptr + value_size, tmp, value_size);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_queued_write.current_length = (std::uint32_t) tmp;
+         }
+         m_buffer.next += value_size;
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Serializer::queued_write_end()
+      {
+         if (!m_queued_write.is_enabled)
+         {
+            return APX_INTERNAL_ERROR;
+         }
+         m_queued_write.is_enabled = false;
+         std::size_t const value_size = size_type_to_size(m_queued_write.size_type);
+         apx::error_t retval = write_dynamic_value_to_buffer(m_queued_write.length_ptr,
+            m_queued_write.length_ptr + value_size, m_queued_write.current_length, value_size);
+         return retval;
+      }
+
       void Serializer::reset_buffer(std::uint8_t* buf, std::size_t len)
       {
          m_buffer.begin = buf;
@@ -779,6 +838,13 @@ namespace apx
       {
          apx::error_t retval = APX_NO_ERROR;
          assert(m_state != nullptr);
+         if (m_queued_write.is_enabled)
+         {
+            if (m_queued_write.current_length >= m_queued_write.max_length)
+            {
+               return APX_QUEUE_FULL_ERROR;
+            }
+         }
          if (m_state->array_len == 0)
          {
             retval = pack_scalar_value();
@@ -804,6 +870,10 @@ namespace apx
          }
          if (retval == APX_NO_ERROR)
          {
+            if (m_queued_write.is_enabled)
+            {
+               m_queued_write.current_length++;
+            }
             pop_state();
          }
          return retval;
@@ -1249,25 +1319,32 @@ namespace apx
 
       apx::error_t Serializer::write_dynamic_value_to_buffer(std::size_t value, apx::SizeType size_type)
       {
-         //Internal development check that we have set size type correctly
-         std::size_t value_size = 0u;
-         switch (size_type)
+         std::size_t value_size = size_type_to_size(size_type);
+         auto retval = write_dynamic_value_to_buffer(m_buffer.next, m_buffer.end, value, value_size);
+         if (retval == APX_NO_ERROR)
          {
-         case apx::SizeType::UInt8:
+            m_buffer.next += value_size;
+         }
+         return retval;
+      }
+
+      apx::error_t Serializer::write_dynamic_value_to_buffer(std::uint8_t* begin, std::uint8_t* end, std::size_t value, std::size_t value_size)
+      {
+         switch (value_size)
+         {
+         case UINT8_SIZE:
             if (value > static_cast<std::size_t>(UINT8_MAX))
             {
                return APX_LENGTH_ERROR;
             }
-            value_size = UINT8_SIZE;
             break;
-         case apx::SizeType::UInt16:
+         case UINT16_SIZE:
             if (value > static_cast<std::size_t>(UINT16_MAX))
             {
                return APX_LENGTH_ERROR;
             }
-            value_size = UINT16_SIZE;
             break;
-         case apx::SizeType::UInt32:
+         case UINT32_SIZE:
             if constexpr (sizeof(std::size_t) > sizeof(std::uint32_t))
             {
                if (value > static_cast<std::size_t>(UINT32_MAX))
@@ -1275,28 +1352,52 @@ namespace apx
                   return APX_LENGTH_ERROR;
                }
             }
-            value_size = UINT32_SIZE;
             break;
          default:
             return APX_INTERNAL_ERROR;
          }
-         if (m_buffer.next + value_size < m_buffer.end)
+         if (begin + value_size <= end)
          {
             switch (value_size)
             {
             case UINT8_SIZE:
-               packLE<std::uint8_t>(m_buffer.next, static_cast<std::uint8_t>(value));
+               packLE<std::uint8_t>(begin, static_cast<std::uint8_t>(value));
                break;
             case UINT16_SIZE:
-               packLE<std::uint16_t>(m_buffer.next, static_cast<std::uint16_t>(value));
+               packLE<std::uint16_t>(begin, static_cast<std::uint16_t>(value));
                break;
             case UINT32_SIZE:
-               packLE<std::uint32_t>(m_buffer.next, static_cast<std::uint32_t>(value));
+               packLE<std::uint32_t>(begin, static_cast<std::uint32_t>(value));
                break;
             default:
                return APX_INTERNAL_ERROR;
             }
-            m_buffer.next += value_size;
+         }
+         else
+         {
+            return APX_BUFFER_FULL_ERROR;
+         }
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Serializer::read_dynamic_value_from_buffer(std::uint8_t const* begin, std::uint8_t const* end, std::size_t& value, std::size_t value_size)
+      {
+         if (begin + value_size <= end)
+         {
+            switch (value_size)
+            {
+            case UINT8_SIZE:
+               value = static_cast<std::size_t>(unpackLE<std::uint8_t>(begin));
+               break;
+            case UINT16_SIZE:
+               value = static_cast<std::size_t>(unpackLE<std::uint16_t>(begin));
+               break;
+            case UINT32_SIZE:
+               value = static_cast<std::size_t>(unpackLE<std::uint32_t>(begin));
+               break;
+            default:
+               return APX_INTERNAL_ERROR;
+            }
          }
          else
          {

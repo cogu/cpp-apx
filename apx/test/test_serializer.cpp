@@ -1267,4 +1267,47 @@ namespace apx_test
       ASSERT_EQ(buf[10], 0);
       ASSERT_EQ(buf[11], 0xFF);
    }
+
+   TEST(Serializer, PackUInt8QueuedElement)
+   {
+      //DATA SIGNATURE: C:Q[10]
+      std::array<std::uint8_t, UINT8_SIZE + UINT8_SIZE * 5> buf;
+      std::memset(buf.data(), 0, buf.size());
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(serializer.queued_write_begin(UINT8_SIZE, 10, true), APX_NO_ERROR);
+      auto sv = dtl::make_sv<std::uint32_t>(7);
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.queued_write_end(), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), UINT8_SIZE*2);
+      ASSERT_EQ(buf[0], 1u);
+      ASSERT_EQ(buf[1], 7u);
+   }
+
+   TEST(Serializer, PackMultipleUInt8QueuedElements)
+   {
+      //DATA SIGNATURE: C:Q[10]
+      std::array<std::uint8_t, UINT8_SIZE + UINT8_SIZE * 5> buf;
+      std::memset(buf.data(), 0, buf.size());
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(serializer.queued_write_begin(UINT8_SIZE, 5, true), APX_NO_ERROR);
+      auto sv = dtl::make_sv<std::uint32_t>(7);
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0, apx::SizeType::UInt8), APX_NO_ERROR);
+      sv->set((std::uint32_t) 8);
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0, apx::SizeType::UInt8), APX_NO_ERROR);
+      sv->set((std::uint32_t) 9);
+      ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_uint8(0, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(serializer.queued_write_end(), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), UINT8_SIZE * 4);
+      ASSERT_EQ(buf[0], 3u);
+      ASSERT_EQ(buf[1], 7u);
+      ASSERT_EQ(buf[2], 8u);
+      ASSERT_EQ(buf[3], 9u);
+   }
+
 }
