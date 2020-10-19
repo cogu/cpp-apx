@@ -24,16 +24,43 @@ namespace apx
 
    apx::error_t NodeManager::create_node_instance(Node const* node)
    {
-      apx::error_t result = APX_NO_ERROR;
       if (node == nullptr)
       {
          return APX_INVALID_ARGUMENT_ERROR;
       }
+      apx::error_t result = APX_NO_ERROR;
       auto node_instance = std::make_unique<apx::NodeInstance>(node->get_name());
+      std::size_t expected_provide_port_data_size{ 0u };
+      std::size_t expected_require_port_data_size{ 0u };
+      result = create_ports_on_node_instance(node_instance.get(), node, expected_provide_port_data_size, expected_require_port_data_size);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+
+      result = create_init_data_on_node_instance(node_instance.get(), node, expected_provide_port_data_size, expected_require_port_data_size);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      attach_node(node_instance.release());
+      return APX_NO_ERROR;
+   }
+
+   void NodeManager::attach_node(apx::NodeInstance* node_instance)
+   {
+      m_instance_map.insert(std::make_pair(node_instance->get_name(), std::unique_ptr<apx::NodeInstance>(node_instance)));
+      m_last_attached = node_instance;
+   }
+
+   apx::error_t NodeManager::create_ports_on_node_instance(apx::NodeInstance* node_instance, Node const* node,
+      std::size_t& expected_provide_port_data_size, std::size_t& expected_require_port_data_size)
+   {
+      apx::error_t result = APX_NO_ERROR;
       auto const num_provide_ports = static_cast<port_id_t>(node->get_num_provide_ports());
       auto const num_require_ports = static_cast<port_id_t>(node->get_num_require_ports());
 
-      node_instance->init_port_memory(num_provide_ports, num_require_ports);
+      node_instance->alloc_port_instance_memory(num_provide_ports, num_require_ports);
       std::uint32_t data_offset{ 0u };
       for (port_id_t port_id = 0u; port_id < num_provide_ports; port_id++)
       {
@@ -56,6 +83,7 @@ namespace apx
          }
          data_offset += data_size;
       }
+      expected_provide_port_data_size = static_cast<std::size_t>(data_offset);
       data_offset = 0u;
       for (port_id_t port_id = 0u; port_id < num_require_ports; port_id++)
       {
@@ -83,14 +111,104 @@ namespace apx
          }
          data_offset += data_size;
       }
-      attach_node(node_instance.release());
+      expected_require_port_data_size = static_cast<std::size_t>(data_offset);
       return APX_NO_ERROR;
    }
 
-   void NodeManager::attach_node(apx::NodeInstance* node_instance)
+   apx::error_t NodeManager::create_init_data_on_node_instance(apx::NodeInstance* node_instance, Node const* node,
+      std::size_t expected_provide_port_data_size, std::size_t expected_require_port_data_size)
    {
-      m_instance_map.insert(std::make_pair(node_instance->get_name(), std::unique_ptr<apx::NodeInstance>(node_instance)));
-      m_last_attached = node_instance;
+      std::size_t provide_port_data_size{ 0u };
+      std::size_t require_port_data_size{ 0u };
+      std::uint8_t* provide_port_data{ nullptr };
+      std::uint8_t* require_port_data{ nullptr };
+      apx::error_t result = node_instance->create_port_init_data_memory(provide_port_data, provide_port_data_size,
+         require_port_data, require_port_data_size);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      if ((provide_port_data_size != expected_provide_port_data_size) ||
+         (require_port_data_size != expected_require_port_data_size))
+      {
+         return APX_LENGTH_ERROR;
+      }
+
+      auto const num_provide_ports = static_cast<port_id_t>(node->get_num_provide_ports());
+      auto const num_require_ports = static_cast<port_id_t>(node->get_num_require_ports());
+      if ((num_provide_ports > 0) && (provide_port_data == nullptr))
+      {
+         return APX_MEM_ERROR;
+      }
+      if ((num_require_ports > 0) && (require_port_data == nullptr))
+      {
+         return APX_MEM_ERROR;
+      }
+      std::size_t data_offset{ 0u };
+      for (port_id_t port_id = 0u; port_id < num_provide_ports; port_id++)
+      {
+         auto parsed_port = node->get_provide_port(port_id);
+         auto port_instance = node_instance->get_provide_port(port_id);
+         if ( (parsed_port == nullptr) || (port_instance == nullptr) )
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         auto data_size = port_instance->get_data_size();
+         assert(data_size > 0u);
+         auto const* proper_init_value = parsed_port->proper_init_value.get();
+         if (proper_init_value != nullptr)
+         {
+            result = create_port_init_data(port_instance, proper_init_value, provide_port_data + data_offset, data_size);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+         }
+         data_offset += data_size;
+      }
+      data_offset = 0u;
+      for (port_id_t port_id = 0u; port_id < num_require_ports; port_id++)
+      {
+         auto parsed_port = node->get_require_port(port_id);
+         auto port_instance = node_instance->get_require_port(port_id);
+         if ((parsed_port == nullptr) || (port_instance == nullptr))
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         auto data_size = port_instance->get_data_size();
+         assert(data_size > 0u);
+         auto const* proper_init_value = parsed_port->proper_init_value.get();
+         if (proper_init_value != nullptr)
+         {
+            result = create_port_init_data(port_instance, proper_init_value, require_port_data + data_offset, data_size);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+         }
+         data_offset += data_size;
+      }
+
+      return APX_NO_ERROR;
+   }
+
+   apx::error_t NodeManager::create_port_init_data(apx::PortInstance* port_instance, dtl::Value const* value, std::uint8_t* data, std::size_t data_size)
+   {
+      assert(port_instance != nullptr);
+      assert(value != nullptr);
+      assert(data != nullptr);
+      vm::Program const& pack_program = port_instance->get_pack_program();
+      auto result = m_vm.select_program(pack_program);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      result = m_vm.set_write_buffer(data, data_size);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      return m_vm.pack_value(value);
    }
 }
 

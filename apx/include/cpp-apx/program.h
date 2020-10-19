@@ -56,6 +56,8 @@ namespace apx
       std::size_t variant_to_size_full(std::uint8_t variant);
       std::size_t variant_to_size_integer(std::uint8_t variant);
       TypeCode variant_to_type_code(std::uint8_t variant);
+      std::size_t size_type_to_size(apx::SizeType size_type);
+      apx::SizeType size_to_size_type(std::size_t size);
    }
 }
 

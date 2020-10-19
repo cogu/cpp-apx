@@ -471,5 +471,47 @@ namespace apx
          }
          return retval;
       }
+
+      std::size_t size_type_to_size(apx::SizeType size_type)
+      {
+         std::size_t value_size = 0u;
+         switch (size_type)
+         {
+         case apx::SizeType::UInt8:
+            value_size = UINT8_SIZE;
+            break;
+         case apx::SizeType::UInt16:
+            value_size = UINT16_SIZE;
+            break;
+         case apx::SizeType::UInt32:
+            value_size = UINT32_SIZE;
+            break;
+         default:
+            throw std::invalid_argument("size_type");
+         }
+         return value_size;
+      }
+
+      apx::SizeType size_to_size_type(std::size_t size)
+      {
+         apx::SizeType size_type{ apx::SizeType::None };
+         if (size > 0u)
+         {
+            if (size <= UINT8_MAX)
+            {
+               size_type = SizeType::UInt8;
+            }
+            else if (size <= UINT16_MAX)
+            {
+               size_type = SizeType::UInt16;
+            }
+            else
+            {
+               size_type = SizeType::UInt32;
+            }
+         }
+         return size_type;
+      }
+
    }
 }

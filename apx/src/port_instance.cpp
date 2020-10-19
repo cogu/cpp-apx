@@ -3,7 +3,7 @@
 
 namespace apx
 {
-   apx::error_t PortInstance::derive_properties(std::uint32_t offset, std::uint32_t& size)
+    apx::error_t PortInstance::derive_properties(std::uint32_t offset, std::uint32_t& size)
    {
       apx::error_t result = APX_NO_ERROR;
       result = process_info_from_program_header(

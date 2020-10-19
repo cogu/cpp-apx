@@ -27,6 +27,8 @@
 #include "cpp-apx/vmdefs.h"
 #include "cpp-apx/error.h"
 #include "cpp-apx/program.h"
+#include "cpp-apx/types.h"
+#include "cpp-apx/decoder.h"
 #ifdef QT_API
 #include "cpp-apx/qt_serializer.h"
 #else
@@ -40,11 +42,32 @@ namespace apx
    {
    public:
       apx::error_t select_program(apx::vm::Program const& program);
+      apx::error_t set_write_buffer(std::uint8_t* data, std::size_t size);
+      apx::error_t set_read_buffer(std::uint8_t const* data, std::size_t size);
+#ifdef QT_API
+      //TODO: ADD QT API
+#else
+      apx::error_t pack_value(dtl::Value const* value);
+      apx::error_t pack_value(dtl::ScalarValue const& value);
+      apx::error_t unpack_value(dtl::ScalarValue& value);
+#endif
    protected:
       apx::error_t parse_program_header();
-      std::uint8_t const* m_begin{ nullptr };
-      std::uint8_t const* m_end{ nullptr };
-      std::uint8_t const* m_next{ nullptr };
-   };
+      std::uint8_t const* m_program_begin{ nullptr };
+      std::uint8_t const* m_program_end{ nullptr };
+      std::uint8_t const* m_program_next{ nullptr };
+      vm::ProgramHeader m_program_header;
+      vm::Decoder m_decoder;
+#ifdef QT_API
+      vm::QSerializer m_serializer;
+#else
+      vm::Serializer m_serializer;
+      vm::Deserializer m_deserializer;
+#endif
 
+      apx::error_t run_pack_program();
+      apx::error_t run_unpack_program();
+      apx::error_t run_pack_instruction(TypeCode type_code, std::size_t array_length, bool is_dynamic_array);
+      apx::error_t run_unpack_instruction(TypeCode type_code, std::size_t array_length, bool is_dynamic_array);
+   };
 }

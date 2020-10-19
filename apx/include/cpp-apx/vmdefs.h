@@ -252,7 +252,7 @@ namespace apx
       struct PackUnpackOperationInfo
       {
          apx::TypeCode type_code;
-         std::uint32_t array_size;
+         std::uint32_t array_length;
          bool is_dynamic_array;
       };
 
