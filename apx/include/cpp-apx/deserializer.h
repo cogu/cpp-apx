@@ -62,10 +62,19 @@ namespace apx
 
          apx::error_t set_read_buffer(std::uint8_t const* buf, std::size_t len);
          std::size_t bytes_read() { return std::distance(m_buffer.begin, m_buffer.next); }
-         apx::error_t unpack_uint8(std::size_t array_len, apx::SizeType dynamic_size, dtl::ValueType &value_type);
-         dtl::Scalar const* get_scalar() { return m_state->sv.get(); }
-         dtl::Array const* get_array() { return m_state->av.get(); }
-         dtl::Hash const* get_hash() { return m_state->hv.get(); }
+         dtl::ValueType value_type() { return m_state->value_type; }
+         dtl::ScalarValue take_sv();
+         dtl::ArrayValue take_av();
+         dtl::HashValue take_hv();
+         void clear_value();
+         apx::error_t unpack_uint8(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_uint16(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_uint32(std::size_t array_len, apx::SizeType dynamic_size_type);
+#ifdef UNIT_TEST
+         dtl::Scalar const* get_sv_ptr() { return m_state->sv.get(); }
+         dtl::Array const* get_av_ptr() { return m_state->av.get(); }
+         dtl::Hash const* get_hv_ptr() { return m_state->hv.get(); }
+#endif
 
 
       protected:

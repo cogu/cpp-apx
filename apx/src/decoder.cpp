@@ -150,7 +150,7 @@ namespace apx
 
       void Decoder::reset_pack_unpack_info(apx::TypeCode type_code)
       {
-         m_pack_unpack_info.array_size = 0u;
+         m_pack_unpack_info.array_length = 0u;
          m_pack_unpack_info.is_dynamic_array = false;
          m_pack_unpack_info.type_code = type_code;
       }
@@ -169,7 +169,7 @@ namespace apx
                {
                   return APX_INVALID_INSTRUCTION_ERROR;
                }
-               std::uint8_t const* result = parse_uint32_by_variant(m_program_next, m_program_end, variant, m_pack_unpack_info.array_size);
+               std::uint8_t const* result = parse_uint32_by_variant(m_program_next, m_program_end, variant, m_pack_unpack_info.array_length);
                if ((result > m_program_next) && (m_program_next <= m_program_end))
                {
                   m_program_next = result;

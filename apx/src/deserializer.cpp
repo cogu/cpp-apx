@@ -1,4 +1,5 @@
 #include <cassert>
+#include <typeinfo>
 #include "cpp-apx/deserializer.h"
 #include "cpp-apx/pack.h"
 
@@ -59,7 +60,63 @@ namespace apx
          }
       }
 
-      apx::error_t Deserializer::unpack_uint8(std::size_t array_len, apx::SizeType dynamic_size, dtl::ValueType& value_type)
+      dtl::ScalarValue Deserializer::take_sv()
+      {
+         assert(m_state != nullptr);
+         if (m_state->value_type != dtl::ValueType::Scalar)
+         {
+            throw std::bad_typeid();
+         }
+         dtl::ScalarValue tmp;
+         tmp.swap(m_state->sv);
+         return tmp;
+      }
+
+      dtl::ArrayValue Deserializer::take_av()
+      {
+         assert(m_state != nullptr);
+         if (m_state->value_type != dtl::ValueType::Array)
+         {
+            throw std::bad_typeid();
+         }
+         dtl::ArrayValue tmp;
+         tmp.swap(m_state->av);
+         return tmp;
+      }
+
+      dtl::HashValue Deserializer::take_hv()
+      {
+         assert(m_state != nullptr);
+         if (m_state->value_type != dtl::ValueType::Hash)
+         {
+            throw std::bad_typeid();
+         }
+         dtl::HashValue tmp;
+         tmp.swap(m_state->hv);
+         return tmp;
+      }
+
+      void Deserializer::clear_value()
+      {
+         assert(m_state != nullptr);
+         switch (m_state->value_type)
+         {
+         case dtl::ValueType::NoneType:
+            break;
+         case dtl::ValueType::Scalar:
+            m_state->sv.reset();
+            break;
+         case dtl::ValueType::Array:
+            m_state->av.reset();
+            break;
+         case dtl::ValueType::Hash:
+            m_state->hv.reset();
+            break;
+         }
+         m_state->value_type = dtl::ValueType::NoneType;
+      }
+
+      apx::error_t Deserializer::unpack_uint8(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
          if (!is_valid_buffer())
          {
@@ -71,7 +128,7 @@ namespace apx
          apx::error_t result = APX_NO_ERROR;
          if (array_len > 0u)
          {
-            result = prepare_for_array(array_len, dynamic_size);
+            result = prepare_for_array(array_len, dynamic_size_type);
             if (result != APX_NO_ERROR)
             {
                return result;
@@ -84,7 +141,62 @@ namespace apx
             m_state->init_scalar_value();
             result = unpack_scalar_value(m_state->sv.get());
          }
-         value_type = m_state->value_type;
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_uint16(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         if (!is_valid_buffer())
+         {
+            return APX_MISSING_BUFFER_ERROR;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::UInt16;
+         m_state->element_size = UINT16_SIZE;
+         apx::error_t result = APX_NO_ERROR;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_array_value();
+            result = APX_NOT_IMPLEMENTED_ERROR;
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_uint32(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         if (!is_valid_buffer())
+         {
+            return APX_MISSING_BUFFER_ERROR;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::UInt32;
+         m_state->element_size = UINT32_SIZE;
+         apx::error_t result = APX_NO_ERROR;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_array_value();
+            result = APX_NOT_IMPLEMENTED_ERROR;
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
          return result;
       }
 

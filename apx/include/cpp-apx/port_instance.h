@@ -24,10 +24,12 @@ namespace apx
       apx::error_t derive_properties(std::uint32_t offset, std::uint32_t&size);
       std::string const& get_name() { return m_name; }
       std::uint32_t get_data_offset() { return m_data_offset; }
-      std::uint32_t get_data_size() { return m_data_size; }
+      std::size_t get_data_size() { return static_cast<std::size_t>(m_data_size); }
       std::uint32_t get_queue_length() { return m_queue_length; }
-      std::uint32_t get_element_size() { return m_element_size; }
+      std::size_t get_element_size() { return static_cast<std::size_t>(m_element_size); }
       bool is_dynamic_data() { return m_is_dynamic_data; }
+      apx::vm::Program const& get_pack_program() { return *m_pack_program; }
+      apx::vm::Program const& get_unpack_program() { return *m_unpack_program; }
    protected:
       apx::PortType m_port_type;
       apx::port_id_t m_port_id;

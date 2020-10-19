@@ -303,7 +303,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Unpack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::UInt8);
-      EXPECT_EQ(info.array_size, 0x12u);
+      EXPECT_EQ(info.array_length, 0x12u);
       EXPECT_EQ(info.is_dynamic_array, false);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -320,7 +320,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Pack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::UInt8);
-      EXPECT_EQ(info.array_size, 0x12u);
+      EXPECT_EQ(info.array_length, 0x12u);
       EXPECT_EQ(info.is_dynamic_array, false);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -337,7 +337,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Unpack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::UInt8);
-      EXPECT_EQ(info.array_size, 0x1234u);
+      EXPECT_EQ(info.array_length, 0x1234u);
       EXPECT_EQ(info.is_dynamic_array, false);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -354,7 +354,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Pack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::UInt8);
-      EXPECT_EQ(info.array_size, 0x1234u);
+      EXPECT_EQ(info.array_length, 0x1234u);
       EXPECT_EQ(info.is_dynamic_array, false);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -371,7 +371,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Unpack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::UInt8);
-      EXPECT_EQ(info.array_size, 0x12345678u);
+      EXPECT_EQ(info.array_length, 0x12345678u);
       EXPECT_EQ(info.is_dynamic_array, false);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -388,7 +388,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Pack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::UInt8);
-      EXPECT_EQ(info.array_size, 0x12345678u);
+      EXPECT_EQ(info.array_length, 0x12345678u);
       EXPECT_EQ(info.is_dynamic_array, false);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -405,7 +405,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Unpack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::Byte);
-      EXPECT_EQ(info.array_size, 0x12u);
+      EXPECT_EQ(info.array_length, 0x12u);
       EXPECT_EQ(info.is_dynamic_array, true);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -422,7 +422,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Pack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::Byte);
-      EXPECT_EQ(info.array_size, 0x12u);
+      EXPECT_EQ(info.array_length, 0x12u);
       EXPECT_EQ(info.is_dynamic_array, true);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -431,7 +431,7 @@ namespace apx_test
    TEST(Decoder, PackDynamicByterrayWithUInt16Length)
    {
       std::array<std::uint8_t, 4> program{ apx::vm::ARRAY_FLAG | (apx::vm::VARIANT_BYTE << apx::vm::INST_VARIANT_SHIFT) | apx::vm::OPCODE_UNPACK,
-                                           apx::vm::DYN_ARRAY_FLAG | (apx::vm::VARIANT_ARRAY_SIZE_U16 << apx::vm::INST_VARIANT_SHIFT) | apx::vm::OPCODE_DATA_SIZE, 
+                                           apx::vm::DYN_ARRAY_FLAG | (apx::vm::VARIANT_ARRAY_SIZE_U16 << apx::vm::INST_VARIANT_SHIFT) | apx::vm::OPCODE_DATA_SIZE,
                                            0x34, 0x12 };
       apx::vm::Decoder decoder;
       EXPECT_EQ(decoder.select_program(program.data(), program.data() + program.size()), APX_NO_ERROR);
@@ -440,7 +440,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Unpack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::Byte);
-      EXPECT_EQ(info.array_size, 0x1234u);
+      EXPECT_EQ(info.array_length, 0x1234u);
       EXPECT_EQ(info.is_dynamic_array, true);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -458,7 +458,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Pack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::Byte);
-      EXPECT_EQ(info.array_size, 0x1234u);
+      EXPECT_EQ(info.array_length, 0x1234u);
       EXPECT_EQ(info.is_dynamic_array, true);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -476,7 +476,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Unpack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::Byte);
-      EXPECT_EQ(info.array_size, 0x12345678u);
+      EXPECT_EQ(info.array_length, 0x12345678u);
       EXPECT_EQ(info.is_dynamic_array, true);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
@@ -494,7 +494,7 @@ namespace apx_test
       EXPECT_EQ(operation, apx::vm::OperationType::Pack);
       auto const& info = decoder.get_pack_unpack_info();
       EXPECT_EQ(info.type_code, apx::TypeCode::Byte);
-      EXPECT_EQ(info.array_size, 0x12345678u);
+      EXPECT_EQ(info.array_length, 0x12345678u);
       EXPECT_EQ(info.is_dynamic_array, true);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
