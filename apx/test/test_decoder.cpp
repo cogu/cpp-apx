@@ -2,6 +2,7 @@
 #include <array>
 #include "cpp-apx/decoder.h"
 
+using namespace std::string_literals;
 
 namespace apx_test
 {
@@ -281,15 +282,6 @@ namespace apx_test
    TEST(Decoder, PackChar8)
    {
       std::array<std::uint8_t, 1> program{ (apx::vm::VARIANT_CHAR8 << apx::vm::INST_VARIANT_SHIFT) | apx::vm::OPCODE_PACK };
-      apx::vm::Decoder decoder;
-      EXPECT_EQ(decoder.select_program(program.data(), program.data() + program.size()), APX_NO_ERROR);
-      apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
-      EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
-      EXPECT_EQ(operation, apx::vm::OperationType::Pack);
-      auto const& info = decoder.get_pack_unpack_info();
-      EXPECT_EQ(info.type_code, apx::TypeCode::Char8);
-      EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
-      EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
    }
 
    TEST(Decoder, UnpackUInt8ArrayWithUInt8Length)
@@ -509,7 +501,7 @@ namespace apx_test
       apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::LimitCheckUInt32);
-      auto const& info = decoder.get_limit_check_uint32();
+      auto const& info = decoder.get_range_check_uint32();
       EXPECT_EQ(info.lower_limit, 0u);
       EXPECT_EQ(info.upper_limit, 7u);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
@@ -525,7 +517,7 @@ namespace apx_test
       apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::LimitCheckInt32);
-      auto const& info = decoder.get_limit_check_int32();
+      auto const& info = decoder.get_range_check_int32();
       EXPECT_EQ(info.lower_limit, -10);
       EXPECT_EQ(info.upper_limit, 10);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
@@ -541,7 +533,7 @@ namespace apx_test
       apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::LimitCheckUInt32);
-      auto const& info = decoder.get_limit_check_uint32();
+      auto const& info = decoder.get_range_check_uint32();
       EXPECT_EQ(info.lower_limit, 0u);
       EXPECT_EQ(info.upper_limit, 0x1234u);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
@@ -557,7 +549,7 @@ namespace apx_test
       apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::LimitCheckInt32);
-      auto const& info = decoder.get_limit_check_int32();
+      auto const& info = decoder.get_range_check_int32();
       EXPECT_EQ(info.lower_limit, -10000);
       EXPECT_EQ(info.upper_limit, 10000);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
@@ -573,7 +565,7 @@ namespace apx_test
       apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::LimitCheckUInt32);
-      auto const& info = decoder.get_limit_check_uint32();
+      auto const& info = decoder.get_range_check_uint32();
       EXPECT_EQ(info.lower_limit, 0u);
       EXPECT_EQ(info.upper_limit, 0x12345678u);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
@@ -589,7 +581,7 @@ namespace apx_test
       apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::LimitCheckInt32);
-      auto const& info = decoder.get_limit_check_int32();
+      auto const& info = decoder.get_range_check_int32();
       EXPECT_EQ(info.lower_limit, -10000);
       EXPECT_EQ(info.upper_limit, 10000);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
@@ -605,7 +597,7 @@ namespace apx_test
       apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::LimitCheckUInt64);
-      auto const& info = decoder.get_limit_check_uint64();
+      auto const& info = decoder.get_range_check_uint64();
       EXPECT_EQ(info.lower_limit, 0u);
       EXPECT_EQ(info.upper_limit, 0x123456789abcdefful);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
@@ -621,9 +613,37 @@ namespace apx_test
       apx::vm::OperationType operation = apx::vm::OperationType::ProgramEnd;
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::LimitCheckInt64);
-      auto const& info = decoder.get_limit_check_int64();
+      auto const& info = decoder.get_range_check_int64();
       EXPECT_EQ(info.lower_limit, -1);
       EXPECT_EQ(info.upper_limit, 1);
+      EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
+      EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
+   }
+
+   TEST(Decoder, PackRecord)
+   {
+      std::array<std::uint8_t, 1> program{ (apx::vm::VARIANT_RECORD << apx::vm::INST_VARIANT_SHIFT) | apx::vm::OPCODE_PACK };
+      apx::vm::Decoder decoder;
+      EXPECT_EQ(decoder.select_program(program.data(), program.data() + program.size()), APX_NO_ERROR);
+      apx::vm::OperationType operation{ apx::vm::OperationType::ProgramEnd };
+      EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
+      EXPECT_EQ(operation, apx::vm::OperationType::Pack);
+      auto const& info = decoder.get_pack_unpack_info();
+      EXPECT_EQ(info.type_code, apx::TypeCode::Record);
+      EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
+      EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
+   }
+
+   TEST(Decoder, RecordSelect)
+   {
+      std::array<std::uint8_t, 7> program{ (apx::vm::VARIANT_RECORD_SELECT << apx::vm::INST_VARIANT_SHIFT) | apx::vm::OPCODE_DATA_CTRL,
+         'F', 'i', 'r', 's', 't', '\0' };
+      apx::vm::Decoder decoder;
+      EXPECT_EQ(decoder.select_program(program.data(), program.data() + program.size()), APX_NO_ERROR);
+      apx::vm::OperationType operation{ apx::vm::OperationType::ProgramEnd };
+      EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
+      EXPECT_EQ(operation, apx::vm::OperationType::RecordSelect);
+      EXPECT_EQ(decoder.get_field_name(), "First"s);
       EXPECT_EQ(decoder.parse_next_operation(operation), APX_NO_ERROR);
       EXPECT_EQ(operation, apx::vm::OperationType::ProgramEnd);
    }

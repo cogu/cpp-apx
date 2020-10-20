@@ -67,7 +67,13 @@ namespace apx
 
       apx::error_t run_pack_program();
       apx::error_t run_unpack_program();
-      apx::error_t run_pack_instruction(TypeCode type_code, std::size_t array_length, bool is_dynamic_array);
-      apx::error_t run_unpack_instruction(TypeCode type_code, std::size_t array_length, bool is_dynamic_array);
+      apx::error_t run_pack_instruction();
+      apx::error_t run_unpack_instruction();
+      apx::error_t run_range_check_pack_int32();
+      apx::error_t run_range_check_pack_uint32();
+      apx::error_t run_range_check_pack_int64();
+      apx::error_t run_range_check_pack_uint64();
+      apx::error_t run_record_select();
+
    };
 }

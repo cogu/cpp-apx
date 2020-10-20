@@ -1,5 +1,9 @@
 #include "pch.h"
+#include <string>
 #include "cpp-apx/data_element.h"
+
+
+using namespace std::string_literals;
 
 namespace apx_test
 {
@@ -211,6 +215,23 @@ namespace apx_test
       EXPECT_EQ(child_value->dv_type(), dtl::ValueType::Scalar);
       sv = dynamic_cast<dtl::Scalar*>(child_value.get());
       EXPECT_EQ(sv->to_u32(ok), 15u);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(DataElement, DeriveProperInitValue_CharArray)
+   {
+      apx::DataElement elem{ apx::TypeCode::Char };
+      elem.set_array_length(5);
+      auto parsed = dtl::make_sv_dv("init");
+      dtl::DynamicValue derived;
+      EXPECT_EQ(elem.derive_proper_init_value(parsed, derived), APX_NO_ERROR);
+      dtl::Value* dv = derived.get();
+      EXPECT_NE(dv, nullptr);
+      EXPECT_EQ(dv->dv_type(), dtl::ValueType::Scalar);
+      auto sv = dynamic_cast<dtl::Scalar*>(dv);
+      EXPECT_NE(sv, nullptr);
+      bool ok;
+      EXPECT_EQ(sv->to_string(ok), "init"s);
       EXPECT_TRUE(ok);
    }
 }

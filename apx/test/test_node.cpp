@@ -219,7 +219,6 @@ namespace apx_test
       ss.str(apx_text);
       EXPECT_TRUE(parser.parse(ss));
       std::unique_ptr<apx::Node> node{ parser.take_last_node() };
-      EXPECT_EQ(node->finalize(), APX_NO_ERROR);
 
       auto port = node->get_require_port(0u);
       ASSERT_NE(port, nullptr);

@@ -77,10 +77,6 @@ namespace apx
          {
             return result;
          }
-         else
-         {
-            pack_program.release();
-         }
          data_offset += data_size;
       }
       expected_provide_port_data_size = static_cast<std::size_t>(data_offset);
@@ -104,10 +100,6 @@ namespace apx
          if (result != APX_NO_ERROR)
          {
             return result;
-         }
-         else
-         {
-            pack_program.release();
          }
          data_offset += data_size;
       }

@@ -23,6 +23,7 @@
 ******************************************************************************/
 #pragma once
 
+#include <string>
 #include "cpp-apx/vmdefs.h"
 #include "cpp-apx/error.h"
 #include "cpp-apx/program.h"
@@ -37,29 +38,33 @@ namespace apx
          apx::error_t select_program(std::uint8_t const* begin, std::uint8_t const* end);
          apx::error_t parse_next_operation(OperationType& operation_type);
          PackUnpackOperationInfo const& get_pack_unpack_info() { return m_pack_unpack_info; }
-         LimitCheckUInt32OperationInfo const& get_limit_check_uint32() { return m_limit_check_uint32_info; }
-         LimitCheckInt32OperationInfo const& get_limit_check_int32() { return m_limit_check_int32_info; }
-         LimitCheckUInt64OperationInfo const& get_limit_check_uint64() { return m_limit_check_uint64_info; }
-         LimitCheckInt64OperationInfo const& get_limit_check_int64() { return m_limit_check_int64_info; }
+         RangeCheckUInt32OperationInfo const& get_range_check_uint32() { return m_range_check_uint32_info; }
+         RangeCheckInt32OperationInfo const& get_range_check_int32() { return m_range_check_int32_info; }
+         RangeCheckUInt64OperationInfo const& get_range_check_uint64() { return m_range_check_uint64_info; }
+         RangeCheckInt64OperationInfo const& get_range_check_int64() { return m_range_check_int64_info; }
+         std::string const& get_field_name() { return m_field_name; }
+         bool is_last_field() { return m_is_last_field; }
 
       protected:
          std::uint8_t const* m_program_next{ nullptr };
          std::uint8_t const* m_program_end{ nullptr };
          OperationType m_operation_type{ OperationType::ProgramEnd };
          PackUnpackOperationInfo m_pack_unpack_info{ TypeCode::None, 0u, false };
-         LimitCheckUInt32OperationInfo m_limit_check_uint32_info{ 0u, 0u };
-         LimitCheckInt32OperationInfo m_limit_check_int32_info{ 0, 0 };
-         LimitCheckUInt64OperationInfo m_limit_check_uint64_info{ 0u, 0u };
-         LimitCheckInt64OperationInfo m_limit_check_int64_info{ 0, 0 };
-
+         RangeCheckUInt32OperationInfo m_range_check_uint32_info{ 0u, 0u };
+         RangeCheckInt32OperationInfo m_range_check_int32_info{ 0, 0 };
+         RangeCheckUInt64OperationInfo m_range_check_uint64_info{ 0u, 0u };
+         RangeCheckInt64OperationInfo m_range_check_int64_info{ 0, 0 };
+         std::string m_field_name;
+         bool m_is_last_field{ false };
 
          apx::error_t decode_next_instruction_internal();
          void Decoder::reset_pack_unpack_info(apx::TypeCode type_code);
          apx::error_t decode_array_size();
-         apx::error_t decode_limit_check_uint32(std::uint8_t variant);
-         apx::error_t decode_limit_check_uint64(std::uint8_t variant);
-         apx::error_t decode_limit_check_int32(std::uint8_t variant);
-         apx::error_t decode_limit_check_int64(std::uint8_t variant);
+         apx::error_t decode_range_check_uint32(std::uint8_t variant);
+         apx::error_t decode_range_check_uint64(std::uint8_t variant);
+         apx::error_t decode_range_check_int32(std::uint8_t variant);
+         apx::error_t decode_range_check_int64(std::uint8_t variant);
+         apx::error_t decode_record_select(bool is_last_field);
 
       };
    }

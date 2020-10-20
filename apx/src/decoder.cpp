@@ -1,9 +1,12 @@
 #include "cpp-apx\decoder.h"
+#include "bstr/bstr.hpp"
 
 namespace apx
 {
    namespace vm
    {
+      static bool not_zero_predicate(std::uint8_t c) { return c != 0u; }
+
       apx::error_t Decoder::select_program(std::uint8_t const* begin, std::uint8_t const* end)
       {
          if ((begin == nullptr) || (end == nullptr) || (begin > end))
@@ -66,7 +69,7 @@ namespace apx
          case OPCODE_DATA_CTRL:
             if (variant == VARIANT_RECORD_SELECT)
             {
-               m_operation_type = OperationType::RecordSelect;
+               return decode_record_select(flag);
             }
             else if (variant <= VARIANT_LIMIT_CHECK_LAST)
             {
@@ -128,21 +131,21 @@ namespace apx
             case VARIANT_RECORD_SELECT:
                break;
             case VARIANT_LIMIT_CHECK_U8:
-               return decode_limit_check_uint32(VARIANT_U8);
+               return decode_range_check_uint32(VARIANT_U8);
             case VARIANT_LIMIT_CHECK_U16:
-               return decode_limit_check_uint32(VARIANT_U16);
+               return decode_range_check_uint32(VARIANT_U16);
             case VARIANT_LIMIT_CHECK_U32:
-               return decode_limit_check_uint32(VARIANT_U32);
+               return decode_range_check_uint32(VARIANT_U32);
             case VARIANT_LIMIT_CHECK_U64:
-               return decode_limit_check_uint64(VARIANT_U64);
+               return decode_range_check_uint64(VARIANT_U64);
             case VARIANT_LIMIT_CHECK_S8:
-               return decode_limit_check_int32(VARIANT_S8);
+               return decode_range_check_int32(VARIANT_S8);
             case VARIANT_LIMIT_CHECK_S16:
-               return decode_limit_check_int32(VARIANT_S16);
+               return decode_range_check_int32(VARIANT_S16);
             case VARIANT_LIMIT_CHECK_S32:
-               return decode_limit_check_int32(VARIANT_S32);
+               return decode_range_check_int32(VARIANT_S32);
             case VARIANT_LIMIT_CHECK_S64:
-               return decode_limit_check_int64(VARIANT_S64);
+               return decode_range_check_int64(VARIANT_S64);
             }
          }
          return APX_NO_ERROR;
@@ -184,12 +187,12 @@ namespace apx
          return APX_UNEXPECTED_END_ERROR;
       }
 
-      apx::error_t Decoder::decode_limit_check_uint32(std::uint8_t variant)
+      apx::error_t Decoder::decode_range_check_uint32(std::uint8_t variant)
       {
          std::size_t data_size = variant_to_size_integer(variant);
          if (m_program_next + (data_size * 2) <= m_program_end)
          {
-            std::uint8_t const* result = parse_uint32_by_variant(m_program_next, m_program_end, variant, m_limit_check_uint32_info.lower_limit);
+            std::uint8_t const* result = parse_uint32_by_variant(m_program_next, m_program_end, variant, m_range_check_uint32_info.lower_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
             {
                m_program_next = result;
@@ -198,7 +201,7 @@ namespace apx
             {
                APX_INVALID_INSTRUCTION_ERROR;
             }
-            result = parse_uint32_by_variant(m_program_next, m_program_end, variant, m_limit_check_uint32_info.upper_limit);
+            result = parse_uint32_by_variant(m_program_next, m_program_end, variant, m_range_check_uint32_info.upper_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
             {
                m_program_next = result;
@@ -212,12 +215,12 @@ namespace apx
          return APX_UNEXPECTED_END_ERROR;
       }
 
-      apx::error_t Decoder::decode_limit_check_uint64(std::uint8_t variant)
+      apx::error_t Decoder::decode_range_check_uint64(std::uint8_t variant)
       {
          std::size_t data_size = variant_to_size_integer(variant);
          if (m_program_next + (data_size * 2) <= m_program_end)
          {
-            std::uint8_t const* result = parse_uint64_by_variant(m_program_next, m_program_end, variant, m_limit_check_uint64_info.lower_limit);
+            std::uint8_t const* result = parse_uint64_by_variant(m_program_next, m_program_end, variant, m_range_check_uint64_info.lower_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
             {
                m_program_next = result;
@@ -226,7 +229,7 @@ namespace apx
             {
                APX_INVALID_INSTRUCTION_ERROR;
             }
-            result = parse_uint64_by_variant(m_program_next, m_program_end, variant, m_limit_check_uint64_info.upper_limit);
+            result = parse_uint64_by_variant(m_program_next, m_program_end, variant, m_range_check_uint64_info.upper_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
             {
                m_program_next = result;
@@ -240,12 +243,12 @@ namespace apx
          return APX_UNEXPECTED_END_ERROR;
       }
 
-      apx::error_t Decoder::decode_limit_check_int32(std::uint8_t variant)
+      apx::error_t Decoder::decode_range_check_int32(std::uint8_t variant)
       {
          std::size_t data_size = variant_to_size_integer(variant);
          if (m_program_next + (data_size * 2) <= m_program_end)
          {
-            std::uint8_t const* result = parse_int32_by_variant(m_program_next, m_program_end, variant, m_limit_check_int32_info.lower_limit);
+            std::uint8_t const* result = parse_int32_by_variant(m_program_next, m_program_end, variant, m_range_check_int32_info.lower_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
             {
                m_program_next = result;
@@ -254,7 +257,7 @@ namespace apx
             {
                APX_INVALID_INSTRUCTION_ERROR;
             }
-            result = parse_int32_by_variant(m_program_next, m_program_end, variant, m_limit_check_int32_info.upper_limit);
+            result = parse_int32_by_variant(m_program_next, m_program_end, variant, m_range_check_int32_info.upper_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
             {
                m_program_next = result;
@@ -268,12 +271,12 @@ namespace apx
          return APX_UNEXPECTED_END_ERROR;
       }
 
-      apx::error_t Decoder::decode_limit_check_int64(std::uint8_t variant)
+      apx::error_t Decoder::decode_range_check_int64(std::uint8_t variant)
       {
          std::size_t data_size = variant_to_size_integer(variant);
          if (m_program_next + (data_size * 2) <= m_program_end)
          {
-            std::uint8_t const* result = parse_int64_by_variant(m_program_next, m_program_end, variant, m_limit_check_int64_info.lower_limit);
+            std::uint8_t const* result = parse_int64_by_variant(m_program_next, m_program_end, variant, m_range_check_int64_info.lower_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
             {
                m_program_next = result;
@@ -282,7 +285,7 @@ namespace apx
             {
                APX_INVALID_INSTRUCTION_ERROR;
             }
-            result = parse_int64_by_variant(m_program_next, m_program_end, variant, m_limit_check_int64_info.upper_limit);
+            result = parse_int64_by_variant(m_program_next, m_program_end, variant, m_range_check_int64_info.upper_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
             {
                m_program_next = result;
@@ -294,6 +297,19 @@ namespace apx
             return APX_NO_ERROR;
          }
          return APX_UNEXPECTED_END_ERROR;
+      }
+      apx::error_t Decoder::decode_record_select(bool is_last_field)
+      {
+         m_operation_type = OperationType::RecordSelect;
+         std::uint8_t const* result = bstr::while_predicate(m_program_next, m_program_end, not_zero_predicate);
+         if ((result > m_program_next) && (m_program_next <= m_program_end))
+         {
+            m_field_name.assign(m_program_next, result);
+            m_program_next = result + UINT8_SIZE; //Skip past null-terminator
+            m_is_last_field = is_last_field;
+            return APX_NO_ERROR;
+         }
+         return APX_INVALID_INSTRUCTION_ERROR;
       }
    }
 }

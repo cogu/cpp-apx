@@ -355,6 +355,43 @@ namespace apx_test
       EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Char);
    }
 
+   TEST(ApxParser, ParseCharArray)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "P\"CharSignal\"a[10]\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_last_provide_port();
+      ASSERT_NE(port, nullptr);
+      auto data_element = port->get_data_element();
+      EXPECT_NE(data_element, nullptr);
+      EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Char);
+      EXPECT_TRUE(data_element->is_array());
+      EXPECT_EQ(data_element->get_array_length(), 10u);
+   }
+
+   TEST(ApxParser, ParseCharArrayWithEmptyInitializer)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "P\"CharSignal\"a[10]:=\"\"\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_last_provide_port();
+      ASSERT_NE(port, nullptr);
+      auto data_element = port->get_data_element();
+      EXPECT_NE(data_element, nullptr);
+      EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Char);
+      EXPECT_TRUE(data_element->is_array());
+      EXPECT_EQ(data_element->get_array_length(), 10u);
+   }
+
+
    TEST(ApxParser, ParseChar8)
    {
       const char* apx_text =

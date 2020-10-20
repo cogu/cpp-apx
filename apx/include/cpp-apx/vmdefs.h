@@ -256,24 +256,24 @@ namespace apx
          bool is_dynamic_array;
       };
 
-      struct LimitCheckUInt32OperationInfo
+      struct RangeCheckUInt32OperationInfo
       {
          std::uint32_t lower_limit;
          std::uint32_t upper_limit;
       };
 
-      struct LimitCheckUInt64OperationInfo
+      struct RangeCheckUInt64OperationInfo
       {
          std::uint64_t lower_limit;
          std::uint64_t upper_limit;
       };
-      struct LimitCheckInt32OperationInfo
+      struct RangeCheckInt32OperationInfo
       {
          std::int32_t lower_limit;
          std::int32_t upper_limit;
       };
 
-      struct LimitCheckInt64OperationInfo
+      struct RangeCheckInt64OperationInfo
       {
          std::int64_t lower_limit;
          std::int64_t upper_limit;
