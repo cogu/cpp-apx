@@ -245,8 +245,22 @@ namespace apx
                }
                else
                {
-                  return APX_LENGTH_ERROR;
+                  return APX_VALUE_LENGTH_ERROR;
                }
+            }
+         }
+         else if ( (parsed_init_value->dv_type() == dtl::ValueType::Scalar) &&
+            ((type_code == apx::TypeCode::Char) || (type_code == apx::TypeCode::Char8)) )
+         {
+            auto parsed_sv = dynamic_cast<dtl::Scalar*>(parsed_init_value.get());
+            assert(parsed_sv != nullptr);
+            if (parsed_sv->sv_type() == dtl::ScalarType::String)
+            {
+               derived_value = parsed_init_value;
+            }
+            else
+            {
+               return APX_VALUE_TYPE_ERROR;
             }
          }
          else
@@ -280,7 +294,7 @@ namespace apx
       std::size_t num_children = get_num_child_elements();
       if (num_children != parsed_av->length())
       {
-         return APX_LENGTH_ERROR;
+         return APX_VALUE_LENGTH_ERROR;
       }
       for (std::size_t i = 0u; i < num_children; i++)
       {

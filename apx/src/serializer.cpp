@@ -461,7 +461,23 @@ namespace apx
          return pack_value();
       }
 
-      apx::error_t Serializer::check_value_range_i32(std::int32_t lower_limit, std::int32_t upper_limit)
+      apx::error_t Serializer::pack_record(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         if ( (array_len == 0) && (dynamic_size_type == apx::SizeType::None) )
+         {
+            if (m_state->value_type != dtl::ValueType::Hash)
+            {
+               return APX_VALUE_TYPE_ERROR;
+            }
+         }
+         else
+         {
+            return APX_NOT_IMPLEMENTED_ERROR;
+         }
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Serializer::check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit)
       {
          apx::error_t retval = APX_NO_ERROR;
          if (m_state->value_type == dtl::ValueType::Scalar)
@@ -516,7 +532,7 @@ namespace apx
          return retval;
       }
 
-      apx::error_t Serializer::check_value_range_u32(std::uint32_t lower_limit, std::uint32_t upper_limit)
+      apx::error_t Serializer::check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit)
       {
          apx::error_t retval = APX_NO_ERROR;
          if ( m_state->value_type == dtl::ValueType::Scalar )
@@ -571,7 +587,7 @@ namespace apx
          return retval;
       }
 
-      apx::error_t Serializer::check_value_range_i64(std::int64_t lower_limit, std::int64_t upper_limit)
+      apx::error_t Serializer::check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit)
       {
          apx::error_t retval = APX_NO_ERROR;
          TypeCode const type_code = TypeCode::Int64;
@@ -627,7 +643,7 @@ namespace apx
          return retval;
       }
 
-      apx::error_t Serializer::check_value_range_u64(std::uint64_t lower_limit, std::uint64_t upper_limit)
+      apx::error_t Serializer::check_value_range_uint64(std::uint64_t lower_limit, std::uint64_t upper_limit)
       {
          apx::error_t retval = APX_NO_ERROR;
          TypeCode const type_code = TypeCode::UInt64;

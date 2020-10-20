@@ -213,13 +213,13 @@ namespace apx_test
                                {"Third", dtl::make_sv<std::uint8_t>(3)} });
       ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
       ASSERT_EQ(serializer.record_select("First", false), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 7u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_NO_ERROR);
       ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
       ASSERT_EQ(serializer.record_select("Second", false), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 3u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 3u), APX_NO_ERROR);
       ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
       ASSERT_EQ(serializer.record_select("Third", false), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 3u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 3u), APX_NO_ERROR);
       ASSERT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
       ASSERT_EQ(serializer.bytes_written(), 3u);
       ASSERT_EQ(buf[0], 7u);
@@ -290,7 +290,7 @@ namespace apx_test
          dtl::make_sv<std::uint32_t>(999),
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0, 999), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0, 999), APX_NO_ERROR);
       ASSERT_EQ(serializer.pack_uint16(2u, apx::SizeType::None), APX_NO_ERROR);
       ASSERT_EQ(serializer.bytes_written(), UINT16_SIZE * 2);
       ASSERT_EQ(buf[0], 0xe7u);
@@ -346,7 +346,7 @@ namespace apx_test
          dtl::make_sv<std::uint32_t>(99998),
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0, 99999UL), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0, 99999UL), APX_NO_ERROR);
       ASSERT_EQ(serializer.pack_uint32(2u, apx::SizeType::None), APX_NO_ERROR);
       ASSERT_EQ(serializer.bytes_written(), buf.size());
       ASSERT_EQ(buf[0], 0x9fu);
@@ -364,11 +364,11 @@ namespace apx_test
       Serializer serializer;
       auto sv = dtl::make_sv<std::uint32_t>(0);
       ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 7u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_NO_ERROR);
       sv->set((uint32_t)7);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 7u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_NO_ERROR);
       sv->set((uint32_t)8);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 7u), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_VALUE_RANGE_ERROR);
    }
 
    TEST(Serializer, RangeCheckUInt32ArrayWithMixedValueTypes)
@@ -379,7 +379,7 @@ namespace apx_test
       av->push(dtl::make_sv<std::int32_t>(7));
       av->push(dtl::make_sv<std::uint32_t>(3));
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 7u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_NO_ERROR);
    }
 
    TEST(Serializer, RangeCheckUInt32ArrayWithOutOfRangeValue)
@@ -392,7 +392,7 @@ namespace apx_test
       av->push(dtl::make_sv<std::int32_t>(8));
       av->push(dtl::make_sv<std::int32_t>(7));
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 7u), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_VALUE_RANGE_ERROR);
    }
 
    TEST(Serializer, RangeCheckUInt8ArrayWithBadValueType)
@@ -405,7 +405,7 @@ namespace apx_test
       av->push(dtl::make_sv<std::uint32_t>(7));
       av->push(dtl::make_sv<std::int32_t>(-1));
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u32(0u, 7u), APX_VALUE_CONVERSION_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint32(0u, 7u), APX_VALUE_CONVERSION_ERROR);
    }
 
    TEST(Serializer, RangeCheckInt32Value)
@@ -413,15 +413,15 @@ namespace apx_test
       Serializer serializer;
       auto sv = dtl::make_sv<std::int32_t>(11);
       ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_i32(-10, 10), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int32(-10, 10), APX_VALUE_RANGE_ERROR);
       sv->set((int32_t)10);
-      ASSERT_EQ(serializer.check_value_range_i32(-10, 10), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int32(-10, 10), APX_NO_ERROR);
       sv->set((int32_t)0);
-      ASSERT_EQ(serializer.check_value_range_i32(-10, 10), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int32(-10, 10), APX_NO_ERROR);
       sv->set((int32_t)-10);
-      ASSERT_EQ(serializer.check_value_range_i32(-10, 10), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int32(-10, 10), APX_NO_ERROR);
       sv->set((int32_t)-11);
-      ASSERT_EQ(serializer.check_value_range_i32(-10, 10), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int32(-10, 10), APX_VALUE_RANGE_ERROR);
    }
 
    TEST(Serializer, RangeCheckInt32ArrayWithMixedValueTypes)
@@ -433,7 +433,7 @@ namespace apx_test
          dtl::make_sv<std::uint32_t>(3)
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_i32(-10, 10), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int32(-10, 10), APX_NO_ERROR);
    }
 
    TEST(Serializer, RangeCheckInt32ArrayWithOutOfRangeValue)
@@ -445,7 +445,7 @@ namespace apx_test
          dtl::make_sv<std::int32_t>(11)
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_i32(-10, 10), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int32(-10, 10), APX_VALUE_RANGE_ERROR);
    }
 
    TEST(Serializer, RangeCheckUInt64Value)
@@ -453,15 +453,15 @@ namespace apx_test
       Serializer serializer;
       auto sv = dtl::make_sv<std::uint64_t>(250000001ULL);
       ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u64(0u, 250000000u), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_VALUE_RANGE_ERROR);
       sv->set(250000000ULL);
-      ASSERT_EQ(serializer.check_value_range_u64(0u, 250000000u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_NO_ERROR);
       sv->set(0);
-      ASSERT_EQ(serializer.check_value_range_u64(0u, 250000000u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_NO_ERROR);
       sv->set(250000000ULL);
-      ASSERT_EQ(serializer.check_value_range_u64(0u, 250000000u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_NO_ERROR);
       sv->set(250000001ULL);
-      ASSERT_EQ(serializer.check_value_range_u64(0u, 250000000u), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_VALUE_RANGE_ERROR);
    }
 
    TEST(Serializer, RangeCheckUInt64ArrayWithMixedValueTypes)
@@ -473,7 +473,7 @@ namespace apx_test
          dtl::make_sv<std::uint32_t>(100000000ULL)
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u64(0u, 250000000u), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_NO_ERROR);
    }
 
    TEST(Serializer, RangeCheckUInt64ArrayWithOutOfRangeValue)
@@ -485,7 +485,7 @@ namespace apx_test
          dtl::make_sv<std::uint64_t>(250000000ULL)
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_u64(0, 250000000ULL), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_uint64(0, 250000000ULL), APX_VALUE_RANGE_ERROR);
    }
 
    TEST(Serializer, RangeCheckInt64Value)
@@ -493,15 +493,15 @@ namespace apx_test
       Serializer serializer;
       auto sv = dtl::make_sv<std::int64_t>(250000001ULL);
       ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_i64(-250000000, 250000000), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_VALUE_RANGE_ERROR);
       sv->set(250000000LL);
-      ASSERT_EQ(serializer.check_value_range_i64(-250000000, 250000000), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_NO_ERROR);
       sv->set(0);
-      ASSERT_EQ(serializer.check_value_range_i64(-250000000, 250000000), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_NO_ERROR);
       sv->set(-250000000LL);
-      ASSERT_EQ(serializer.check_value_range_i64(-250000000, 250000000), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_NO_ERROR);
       sv->set(-250000001LL);
-      ASSERT_EQ(serializer.check_value_range_i64(-250000000, 250000000), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_VALUE_RANGE_ERROR);
    }
 
    TEST(Serializer, RangeCheckInt64ArrayWithMixedValueTypes)
@@ -513,7 +513,7 @@ namespace apx_test
          dtl::make_sv<std::uint32_t>(10000)
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_i64(-250000000LL, 250000000LL), APX_NO_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int64(-250000000LL, 250000000LL), APX_NO_ERROR);
    }
 
    TEST(Serializer, RangeCheckInt64ArrayWithOutOfRangeValue)
@@ -525,7 +525,7 @@ namespace apx_test
          dtl::make_sv<std::int64_t>(250000000LL)
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
-      ASSERT_EQ(serializer.check_value_range_i64(-250000000LL, 250000000LL), APX_VALUE_RANGE_ERROR);
+      ASSERT_EQ(serializer.check_value_range_int64(-250000000LL, 250000000LL), APX_VALUE_RANGE_ERROR);
    }
 
    TEST(Serializer, PackInt8FromInt32Value)
@@ -1308,6 +1308,20 @@ namespace apx_test
       ASSERT_EQ(buf[1], 7u);
       ASSERT_EQ(buf[2], 8u);
       ASSERT_EQ(buf[3], 9u);
+   }
+
+   TEST(Serializer, PackRecord)
+   {
+      std::array<std::uint8_t, 1> buf = { 0 };
+      Serializer serializer;
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), 1), APX_NO_ERROR);
+      auto hv = dtl::make_hv({
+         std::make_pair("First", dtl::make_sv_dv<std::uint32_t>(7)),
+         std::make_pair("Second", dtl::make_sv_dv<std::uint32_t>(15))
+         });
+      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
+      ASSERT_EQ(serializer.pack_record(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(serializer.bytes_written(), 0u);
    }
 
 }

@@ -76,7 +76,6 @@ namespace apx
       vm::OperationType operation_type = vm::OperationType::ProgramEnd;
       do
       {
-         vm::PackUnpackOperationInfo pack_info;
          apx::error_t result = m_decoder.parse_next_operation(operation_type);
          if (result != APX_NO_ERROR)
          {
@@ -87,23 +86,22 @@ namespace apx
          case vm::OperationType::Unpack:
             return APX_INVALID_INSTRUCTION_ERROR;
          case vm::OperationType::Pack:
-            pack_info = m_decoder.get_pack_unpack_info();
-            result = run_pack_instruction(pack_info.type_code, pack_info.array_length, pack_info.is_dynamic_array);
+            result = run_pack_instruction();
             break;
          case vm::OperationType::LimitCheckInt32:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_range_check_pack_int32();
             break;
          case vm::OperationType::LimitCheckUInt32:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_range_check_pack_uint32();
             break;
          case vm::OperationType::LimitCheckInt64:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_range_check_pack_int64();
             break;
          case vm::OperationType::LimitCheckUInt64:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_range_check_pack_uint64();
             break;
          case vm::OperationType::RecordSelect:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_record_select();
             break;
          case vm::OperationType::ArrayNext:
             result = APX_NOT_IMPLEMENTED_ERROR;
@@ -126,7 +124,6 @@ namespace apx
       vm::OperationType operation_type = vm::OperationType::ProgramEnd;
       do
       {
-         vm::PackUnpackOperationInfo pack_info;
          apx::error_t result = m_decoder.parse_next_operation(operation_type);
          if (result != APX_NO_ERROR)
          {
@@ -135,8 +132,7 @@ namespace apx
          switch (operation_type)
          {
          case vm::OperationType::Unpack:
-            pack_info = m_decoder.get_pack_unpack_info();
-            result = run_unpack_instruction(pack_info.type_code, pack_info.array_length, pack_info.is_dynamic_array);
+            result = run_unpack_instruction();
             break;
          case vm::OperationType::Pack:
             result = APX_INVALID_INSTRUCTION_ERROR;
@@ -170,35 +166,92 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   apx::error_t VirtualMachine::run_pack_instruction(TypeCode type_code, std::size_t array_length, bool is_dynamic_array)
+   apx::error_t VirtualMachine::run_pack_instruction()
    {
       apx::error_t retval = APX_NOT_IMPLEMENTED_ERROR;
-      SizeType dynamic_size_type = is_dynamic_array? vm::size_to_size_type(array_length) : SizeType::None;
-      switch (type_code)
+      vm::PackUnpackOperationInfo const &operation = m_decoder.get_pack_unpack_info();
+      SizeType const dynamic_size_type = operation.is_dynamic_array? vm::size_to_size_type(operation.array_length) : SizeType::None;
+      switch (operation.type_code)
       {
       case TypeCode::UInt8:
-         retval = m_serializer.pack_uint8(array_length, dynamic_size_type);
+         retval = m_serializer.pack_uint8(operation.array_length, dynamic_size_type);
          break;
       case TypeCode::UInt16:
-         retval = m_serializer.pack_uint16(array_length, dynamic_size_type);
+         retval = m_serializer.pack_uint16(operation.array_length, dynamic_size_type);
          break;
       case TypeCode::UInt32:
-         retval = m_serializer.pack_uint32(array_length, dynamic_size_type);
+         retval = m_serializer.pack_uint32(operation.array_length, dynamic_size_type);
+         break;
+      case TypeCode::UInt64:
+         retval = m_serializer.pack_uint64(operation.array_length, dynamic_size_type);
+         break;
+      case TypeCode::Int8:
+         retval = m_serializer.pack_int8(operation.array_length, dynamic_size_type);
+         break;
+      case TypeCode::Int16:
+         retval = m_serializer.pack_int16(operation.array_length, dynamic_size_type);
+         break;
+      case TypeCode::Int32:
+         retval = m_serializer.pack_int32(operation.array_length, dynamic_size_type);
+         break;
+      case TypeCode::Int64:
+         retval = m_serializer.pack_int64(operation.array_length, dynamic_size_type);
+         break;
+      case TypeCode::Char:
+         retval = m_serializer.pack_char(operation.array_length, dynamic_size_type);
+         break;
+      case TypeCode::Char8:
+         retval = m_serializer.pack_char8(operation.array_length, dynamic_size_type);
+         break;
+      case TypeCode::Record:
+         retval = m_serializer.pack_record(operation.array_length, dynamic_size_type);
          break;
       }
       return retval;
    }
 
-   apx::error_t VirtualMachine::run_unpack_instruction(TypeCode type_code, std::size_t array_length, bool is_dynamic_array)
+   apx::error_t VirtualMachine::run_unpack_instruction()
    {
       apx::error_t retval = APX_NOT_IMPLEMENTED_ERROR;
-      SizeType dynamic_size_type = is_dynamic_array ? vm::size_to_size_type(array_length) : SizeType::None;
-      switch (type_code)
+      vm::PackUnpackOperationInfo const& operation = m_decoder.get_pack_unpack_info();
+      SizeType const dynamic_size_type = operation.is_dynamic_array ? vm::size_to_size_type(operation.array_length) : SizeType::None;
+      switch (operation.type_code)
       {
       case TypeCode::UInt8:
-         retval = m_deserializer.unpack_uint8(array_length, dynamic_size_type);
+         retval = m_deserializer.unpack_uint8(operation.array_length, dynamic_size_type);
          break;
       }
       return retval;
    }
+
+   apx::error_t VirtualMachine::run_range_check_pack_int32()
+   {
+      auto const& operation = m_decoder.get_range_check_int32();
+      return m_serializer.check_value_range_int32(operation.lower_limit, operation.upper_limit);
+   }
+
+   apx::error_t VirtualMachine::run_range_check_pack_uint32()
+   {
+      auto const& operation = m_decoder.get_range_check_uint32();
+      return m_serializer.check_value_range_uint32(operation.lower_limit, operation.upper_limit);
+   }
+
+   apx::error_t VirtualMachine::run_range_check_pack_int64()
+   {
+      auto const& operation = m_decoder.get_range_check_int64();
+      return m_serializer.check_value_range_int64(operation.lower_limit, operation.upper_limit);
+   }
+
+   apx::error_t VirtualMachine::run_range_check_pack_uint64()
+   {
+      auto const& operation = m_decoder.get_range_check_uint64();
+      return m_serializer.check_value_range_uint64(operation.lower_limit, operation.upper_limit);
+   }
+
+   apx::error_t VirtualMachine::run_record_select()
+   {
+      auto const& field_name = m_decoder.get_field_name();
+      return m_serializer.record_select(field_name.c_str(), m_decoder.is_last_field());
+   }
+
 }

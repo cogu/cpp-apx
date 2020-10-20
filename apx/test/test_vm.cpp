@@ -30,8 +30,8 @@ namespace apx_test
       ASSERT_EQ(vm.select_program(program), APX_NO_ERROR);
       ASSERT_EQ(vm.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
       ASSERT_EQ(vm.pack_value(sv), APX_NO_ERROR);
-      ASSERT_EQ(buf[0], 0x0);
-      sv->set((uint32_t)0x12u);
+      ASSERT_EQ(buf[0], 0x0u);
+      sv->set((uint32_t) 0x12u);
       ASSERT_EQ(vm.select_program(program), APX_NO_ERROR);
       ASSERT_EQ(vm.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
       ASSERT_EQ(vm.pack_value(sv), APX_NO_ERROR);

@@ -84,7 +84,7 @@ namespace apx
          provide_port_data = m_provide_port_init_data;
          provide_port_data_size = m_provide_port_init_data_size;
       }
-      if (m_num_provide_ports > 0u)
+      if (m_num_require_ports > 0u)
       {
          result = calc_init_data_size(m_require_ports, m_num_require_ports, m_require_port_init_data_size);
          if (result != APX_NO_ERROR)

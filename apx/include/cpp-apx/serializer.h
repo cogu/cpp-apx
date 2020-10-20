@@ -108,10 +108,11 @@ namespace apx
          apx::error_t pack_byte_array(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t pack_char(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t pack_char8(std::size_t array_len, apx::SizeType dynamic_size_type);
-         apx::error_t check_value_range_i32(std::int32_t lower_limit, std::int32_t upper_limit);
-         apx::error_t check_value_range_u32(std::uint32_t lower_limit, std::uint32_t upper_limit);
-         apx::error_t check_value_range_i64(std::int64_t lower_limit, std::int64_t upper_limit);
-         apx::error_t check_value_range_u64(std::uint64_t lower_limit, std::uint64_t upper_limit);
+         apx::error_t pack_record(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit);
+         apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
+         apx::error_t check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit);
+         apx::error_t check_value_range_uint64(std::uint64_t lower_limit, std::uint64_t upper_limit);
          apx::error_t record_select(const char* key, bool is_last_field);
          apx::error_t queued_write_begin(std::uint32_t element_size, std::uint32_t max_length, bool clear_queue);
          apx::error_t queued_write_end();
