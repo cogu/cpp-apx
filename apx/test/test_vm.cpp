@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <array>
+#include <cstring>
 #include "cpp-apx/vm.h"
 
 using namespace apx::vm;
