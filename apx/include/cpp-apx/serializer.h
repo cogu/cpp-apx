@@ -38,7 +38,7 @@ namespace apx
             } value;
 
             State* parent{ nullptr };
-            ScalarStorageType scalar_type;
+            ScalarStorageType scalar_type{ ScalarStorageType::None };
             std::string field_name;
             std::size_t index{ 0u };
             std::size_t array_len{ 0u };
@@ -53,7 +53,7 @@ namespace apx
             void set_value(dtl::Value const* dv);
             void reset(dtl::ValueType vt);
             apx::error_t read_scalar_value(TypeCode type_code_arg);
-            apx::error_t read_scalar_value(std::size_t index, TypeCode type_code_arg);
+            apx::error_t read_scalar_value(std::size_t index_arg, TypeCode type_code_arg);
             bool is_scalar_type() { return ((type_code >= TypeCode::UInt8) && (type_code <= TypeCode::Int64)) || type_code == TypeCode::Bool; }
             bool is_string_type() { return (type_code == TypeCode::Char) ||
                (type_code == TypeCode::Char8) ||

@@ -58,7 +58,7 @@ namespace apx
          bool m_is_last_field{ false };
 
          apx::error_t decode_next_instruction_internal();
-         void Decoder::reset_pack_unpack_info(apx::TypeCode type_code);
+         void reset_pack_unpack_info(apx::TypeCode type_code);
          apx::error_t decode_array_size();
          apx::error_t decode_range_check_uint32(std::uint8_t variant);
          apx::error_t decode_range_check_uint64(std::uint8_t variant);

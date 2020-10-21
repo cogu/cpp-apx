@@ -7,5 +7,6 @@
 **.vs/
 *.VC.db
 *.VC.opendb
+demo/
 projects/visual_studio/cpp-apx/packages/
 cpp_apx-cppcheck-build-dir

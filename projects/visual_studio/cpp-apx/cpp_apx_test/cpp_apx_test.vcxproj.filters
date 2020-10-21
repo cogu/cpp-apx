@@ -108,6 +108,12 @@
     <ClCompile Include="..\..\..\..\apx\test\test_node_data.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_file_client.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\file_client.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -190,6 +196,9 @@
       <Filter>apx\test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_data.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_client.h">
       <Filter>apx\include</Filter>
     </ClInclude>
   </ItemGroup>

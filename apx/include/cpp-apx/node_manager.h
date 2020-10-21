@@ -45,7 +45,6 @@ namespace apx
    protected:
       apx::Parser m_parser;
       apx::Compiler m_compiler;
-      apx::VirtualMachine m_vm;
       std::unordered_map<std::string, std::unique_ptr<apx::NodeInstance>> m_instance_map;
       apx::NodeInstance* m_last_attached{ nullptr };
 
@@ -55,6 +54,6 @@ namespace apx
          std::size_t &expected_provide_port_data_size, std::size_t& expected_require_port_data_size);
       apx::error_t create_init_data_on_node_instance(apx::NodeInstance* node_instance, Node const* node,
          std::size_t expected_provide_port_data_size, std::size_t expected_require_port_data_size);
-      apx::error_t create_port_init_data(apx::PortInstance* port_instance, dtl::Value const* value, std::uint8_t* data, std::size_t data_size);
+      apx::error_t create_port_init_data(apx::VirtualMachine &vm, apx::PortInstance* port_instance, dtl::Value const* value, std::uint8_t* data, std::size_t data_size);
    };
 }
