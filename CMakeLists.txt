@@ -17,15 +17,19 @@ else()
 endif()
 message(STATUS "LIBRARY_TYPE=${LIBRARY_TYPE}")
 
+set(CMAKE_CXX_STANDARD 20)
+
 message(STATUS "QT_API=${QT_API}")
 if (QT_API)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_CXX_STANDARD 20)
 find_package(Qt5Core REQUIRED)
 endif()
+
+# Applications
+add_subdirectory(app/apx_file_demo)
 
 ### Unit Tests
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -46,6 +50,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         apx/test/test_compiler.cpp
         apx/test/test_data_element.cpp
         apx/test/test_decoder.cpp
+        apx/test/test_file_client.cpp
+        apx/test/test_node_data.cpp
+        apx/test/test_node_manager.cpp
         apx/test/test_node.cpp
         apx/test/test_pack.cpp
         apx/test/test_parser.cpp
