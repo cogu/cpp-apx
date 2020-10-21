@@ -59,6 +59,7 @@ namespace apx
       bool has_provide_port_data() { return m_provide_port_init_data != nullptr; }
       bool has_require_port_data() { return m_require_port_init_data != nullptr; }
       NodeData const* get_const_node_data() { return m_node_data.get(); }
+      NodeData* get_node_data() { return m_node_data.get(); }
 
    protected:
       std::string m_name;

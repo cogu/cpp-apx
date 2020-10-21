@@ -52,13 +52,13 @@ namespace apx
    protected:
       std::unique_ptr<std::uint8_t[]> m_definition_data{ nullptr };
       std::unique_ptr<std::uint8_t[]> m_provide_port_data{ nullptr };
-      std::unique_ptr<std::uint8_t[]> m_require_port_data{ nullptr };      
+      std::unique_ptr<std::uint8_t[]> m_require_port_data{ nullptr };
       std::size_t m_definition_data_size{ 0u };
       std::size_t m_provide_port_data_size{ 0u };
-      std::size_t m_require_port_data_size{ 0u };      
+      std::size_t m_require_port_data_size{ 0u };
       std::size_t m_num_provide_ports{ 0u };
       std::size_t m_num_require_ports{ 0u };
-      
+
    };
 }
 

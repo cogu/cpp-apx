@@ -73,6 +73,10 @@ namespace apx
       apx::error_t run_range_check_pack_uint32();
       apx::error_t run_range_check_pack_int64();
       apx::error_t run_range_check_pack_uint64();
+      apx::error_t run_range_check_unpack_int32();
+      apx::error_t run_range_check_unpack_uint32();
+      apx::error_t run_range_check_unpack_int64();
+      apx::error_t run_range_check_unpack_uint64();
       apx::error_t run_record_select();
 
    };

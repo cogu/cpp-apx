@@ -109,7 +109,7 @@ namespace dtl
    {
       auto sv = std::make_shared<Scalar>();
       sv->set(value);
-      return dv_cast(sv);
+      return std::dynamic_pointer_cast<Value>(sv);
    }
 
 

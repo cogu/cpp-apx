@@ -117,8 +117,6 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-
-
    apx::error_t VirtualMachine::run_unpack_program()
    {
       vm::OperationType operation_type = vm::OperationType::ProgramEnd;
@@ -138,16 +136,16 @@ namespace apx
             result = APX_INVALID_INSTRUCTION_ERROR;
             break;
          case vm::OperationType::LimitCheckInt32:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_range_check_unpack_int32();
             break;
          case vm::OperationType::LimitCheckUInt32:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_range_check_unpack_uint32();
             break;
          case vm::OperationType::LimitCheckInt64:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_range_check_unpack_int64();
             break;
          case vm::OperationType::LimitCheckUInt64:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_range_check_unpack_uint64();
             break;
          case vm::OperationType::RecordSelect:
             result = APX_NOT_IMPLEMENTED_ERROR;
@@ -246,6 +244,30 @@ namespace apx
    {
       auto const& operation = m_decoder.get_range_check_uint64();
       return m_serializer.check_value_range_uint64(operation.lower_limit, operation.upper_limit);
+   }
+
+   apx::error_t VirtualMachine::run_range_check_unpack_int32()
+   {
+      auto const& operation = m_decoder.get_range_check_int32();
+      return m_deserializer.check_value_range_int32(operation.lower_limit, operation.upper_limit);
+   }
+
+   apx::error_t VirtualMachine::run_range_check_unpack_uint32()
+   {
+      auto const& operation = m_decoder.get_range_check_uint32();
+      return m_deserializer.check_value_range_uint32(operation.lower_limit, operation.upper_limit);
+   }
+
+   apx::error_t VirtualMachine::run_range_check_unpack_int64()
+   {
+      auto const& operation = m_decoder.get_range_check_int64();
+      return m_deserializer.check_value_range_int64(operation.lower_limit, operation.upper_limit);
+   }
+
+   apx::error_t VirtualMachine::run_range_check_unpack_uint64()
+   {
+      auto const& operation = m_decoder.get_range_check_uint64();
+      return m_deserializer.check_value_range_uint64(operation.lower_limit, operation.upper_limit);
    }
 
    apx::error_t VirtualMachine::run_record_select()

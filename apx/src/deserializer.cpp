@@ -31,6 +31,8 @@ namespace apx
          type_code = TypeCode::None;
          element_size = 0u;
          is_last_field = false;
+         range_check_state = RangeCheckState::NotChecked;
+         scalar_type = ScalarStorageType::None;
       }
 
       void Deserializer::State::init_scalar_value()
@@ -49,6 +51,107 @@ namespace apx
       {
          hv = dtl::make_hv();
          value_type = dtl::ValueType::Hash;
+      }
+
+      apx::error_t Deserializer::State::read_scalar_value(TypeCode type_code_arg)
+      {
+         if (value_type != dtl::ValueType::Scalar)
+         {
+            return APX_VALUE_TYPE_ERROR;
+         }
+         return read_scalar_value(sv.get(), type_code_arg);
+
+      }
+
+      apx::error_t Deserializer::State::read_scalar_value(std::size_t index_arg, TypeCode type_code_arg)
+      {
+         if (value_type != dtl::ValueType::Array)
+         {
+            return APX_VALUE_TYPE_ERROR;
+         }
+         dtl::DynamicValue dv = av->at(index_arg);
+         if (dv->dv_type() != dtl::ValueType::Scalar)
+         {
+            return APX_VALUE_TYPE_ERROR;
+         }
+         dtl::Scalar* child_sv = dynamic_cast<dtl::Scalar*>(dv.get());
+         if (child_sv == nullptr)
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         return read_scalar_value(child_sv, type_code_arg);
+      }
+
+      apx::error_t Deserializer::State::read_scalar_value(dtl::Scalar const* sv_arg, TypeCode type_code_arg)
+      {
+         apx::error_t retval = APX_NO_ERROR;
+         bool ok = false;
+         assert(sv_arg != 0);
+         switch (type_code_arg)
+         {
+         case TypeCode::UInt8:
+         case TypeCode::UInt16:
+         case TypeCode::UInt32:
+            scalar_value = sv_arg->to_u32(ok);
+            if (ok)
+            {
+               scalar_type = ScalarStorageType::UInt32;
+            }
+            else
+            {
+               retval = APX_VALUE_CONVERSION_ERROR;
+            }
+            break;
+         case TypeCode::UInt64:
+            scalar_value = sv_arg->to_u64(ok);
+            if (ok)
+            {
+               scalar_type = ScalarStorageType::UInt64;
+            }
+            else
+            {
+               retval = APX_VALUE_CONVERSION_ERROR;
+            }
+            break;
+         case TypeCode::Int8:
+         case TypeCode::Int16:
+         case TypeCode::Int32:
+            scalar_value = sv_arg->to_i32(ok);
+            if (ok)
+            {
+               scalar_type = ScalarStorageType::Int32;
+            }
+            else
+            {
+               retval = APX_VALUE_CONVERSION_ERROR;
+            }
+            break;
+         case TypeCode::Int64:
+            scalar_value = sv_arg->to_i64(ok);
+            if (ok)
+            {
+               scalar_type = ScalarStorageType::Int64;
+            }
+            else
+            {
+               retval = APX_VALUE_CONVERSION_ERROR;
+            }
+            break;
+         case TypeCode::Bool:
+            scalar_value = sv_arg->to_bool(ok);
+            if (ok)
+            {
+               scalar_type = ScalarStorageType::Bool;
+            }
+            else
+            {
+               retval = APX_VALUE_CONVERSION_ERROR;
+            }
+            break;
+         default:
+            retval = APX_UNSUPPORTED_ERROR;
+         }
+         return retval;
       }
 
       Deserializer::~Deserializer()
@@ -200,6 +303,228 @@ namespace apx
          return result;
       }
 
+      apx::error_t Deserializer::check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit)
+      {
+         apx::error_t retval = APX_NO_ERROR;
+         if (m_state->value_type == dtl::ValueType::Scalar)
+         {
+            retval = m_state->read_scalar_value(TypeCode::Int32);
+            if (retval == APX_NO_ERROR)
+            {
+               std::int32_t value = std::get<std::int32_t>(m_state->scalar_value);
+               retval = value_in_range_i32(value, lower_limit, upper_limit);
+               if (retval == APX_NO_ERROR)
+               {
+                  m_state->range_check_state = RangeCheckState::CheckOK;
+               }
+               else
+               {
+                  m_state->range_check_state = RangeCheckState::CheckFail;
+               }
+            }
+            else
+            {
+               m_state->range_check_state = RangeCheckState::CheckFail;
+            }
+         }
+         else if (m_state->value_type == dtl::ValueType::Array)
+         {
+            std::size_t length = m_state->av->length();
+            m_state->range_check_state = RangeCheckState::CheckOK;
+            for (std::size_t i = 0; i < length; i++)
+            {
+               retval = m_state->read_scalar_value(i, TypeCode::Int32);
+               if (retval == APX_NO_ERROR)
+               {
+                  std::int32_t value = std::get<std::int32_t>(m_state->scalar_value);
+                  retval = value_in_range_i32(value, lower_limit, upper_limit);
+                  if (retval != APX_NO_ERROR)
+                  {
+                     m_state->range_check_state = RangeCheckState::CheckFail;
+                     break;
+                  }
+               }
+               else
+               {
+                  m_state->range_check_state = RangeCheckState::CheckFail;
+                  break;
+               }
+            }
+         }
+         else
+         {
+            retval = APX_UNSUPPORTED_ERROR;
+         }
+         return retval;
+      }
+
+      apx::error_t Deserializer::check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit)
+      {
+         apx::error_t retval = APX_NO_ERROR;
+         if (m_state->value_type == dtl::ValueType::Scalar)
+         {
+            retval = m_state->read_scalar_value(TypeCode::UInt32);
+            if (retval == APX_NO_ERROR)
+            {
+               std::uint32_t value = std::get<std::uint32_t>(m_state->scalar_value);
+               retval = value_in_range_u32(value, lower_limit, upper_limit);
+               if (retval == APX_NO_ERROR)
+               {
+                  m_state->range_check_state = RangeCheckState::CheckOK;
+               }
+               else
+               {
+                  m_state->range_check_state = RangeCheckState::CheckFail;
+               }
+            }
+            else
+            {
+               m_state->range_check_state = RangeCheckState::CheckFail;
+            }
+         }
+         else if (m_state->value_type == dtl::ValueType::Array)
+         {
+            std::size_t length = m_state->av->length();
+            m_state->range_check_state = RangeCheckState::CheckOK;
+            for (std::size_t i = 0; i < length; i++)
+            {
+               retval = m_state->read_scalar_value(i, TypeCode::UInt32);
+               if (retval == APX_NO_ERROR)
+               {
+                  std::uint32_t value = std::get<std::uint32_t>(m_state->scalar_value);
+                  retval = value_in_range_u32(value, lower_limit, upper_limit);
+                  if (retval != APX_NO_ERROR)
+                  {
+                     m_state->range_check_state = RangeCheckState::CheckFail;
+                     break;
+                  }
+               }
+               else
+               {
+                  m_state->range_check_state = RangeCheckState::CheckFail;
+                  break;
+               }
+            }
+         }
+         else
+         {
+            retval = APX_UNSUPPORTED_ERROR;
+         }
+         return retval;
+      }
+
+      apx::error_t Deserializer::check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit)
+      {
+         apx::error_t retval = APX_NO_ERROR;
+         TypeCode const type_code = TypeCode::Int64;
+         if (m_state->value_type == dtl::ValueType::Scalar)
+         {
+            retval = m_state->read_scalar_value(type_code);
+            if (retval == APX_NO_ERROR)
+            {
+               std::int64_t value = std::get<std::int64_t>(m_state->scalar_value);
+               retval = value_in_range_i64(value, lower_limit, upper_limit);
+               if (retval == APX_NO_ERROR)
+               {
+                  m_state->range_check_state = RangeCheckState::CheckOK;
+               }
+               else
+               {
+                  m_state->range_check_state = RangeCheckState::CheckFail;
+               }
+            }
+            else
+            {
+               m_state->range_check_state = RangeCheckState::CheckFail;
+            }
+         }
+         else if (m_state->value_type == dtl::ValueType::Array)
+         {
+            std::size_t length = m_state->av->length();
+            m_state->range_check_state = RangeCheckState::CheckOK;
+            for (std::size_t i = 0; i < length; i++)
+            {
+               retval = m_state->read_scalar_value(i, type_code);
+               if (retval == APX_NO_ERROR)
+               {
+                  std::int64_t value = std::get<std::int64_t>(m_state->scalar_value);
+                  retval = value_in_range_i64(value, lower_limit, upper_limit);
+                  if (retval != APX_NO_ERROR)
+                  {
+                     m_state->range_check_state = RangeCheckState::CheckFail;
+                     break;
+                  }
+               }
+               else
+               {
+                  m_state->range_check_state = RangeCheckState::CheckFail;
+                  break;
+               }
+            }
+         }
+         else
+         {
+            retval = APX_UNSUPPORTED_ERROR;
+         }
+         return retval;
+      }
+
+      apx::error_t Deserializer::check_value_range_uint64(std::uint64_t lower_limit, std::uint64_t upper_limit)
+      {
+         apx::error_t retval = APX_NO_ERROR;
+         TypeCode const type_code = TypeCode::UInt64;
+         if (m_state->value_type == dtl::ValueType::Scalar)
+         {
+            retval = m_state->read_scalar_value(type_code);
+            if (retval == APX_NO_ERROR)
+            {
+               std::uint64_t value = std::get<std::uint64_t>(m_state->scalar_value);
+               retval = value_in_range_u64(value, lower_limit, upper_limit);
+               if (retval == APX_NO_ERROR)
+               {
+                  m_state->range_check_state = RangeCheckState::CheckOK;
+               }
+               else
+               {
+                  m_state->range_check_state = RangeCheckState::CheckFail;
+               }
+            }
+            else
+            {
+               m_state->range_check_state = RangeCheckState::CheckFail;
+            }
+         }
+         else if (m_state->value_type == dtl::ValueType::Array)
+         {
+            std::size_t length = m_state->av->length();
+            m_state->range_check_state = RangeCheckState::CheckOK;
+            for (std::size_t i = 0; i < length; i++)
+            {
+               retval = m_state->read_scalar_value(i, type_code);
+               if (retval == APX_NO_ERROR)
+               {
+                  std::uint64_t value = std::get<std::uint64_t>(m_state->scalar_value);
+                  retval = value_in_range_u64(value, lower_limit, upper_limit);
+                  if (retval != APX_NO_ERROR)
+                  {
+                     m_state->range_check_state = RangeCheckState::CheckFail;
+                     break;
+                  }
+               }
+               else
+               {
+                  m_state->range_check_state = RangeCheckState::CheckFail;
+                  break;
+               }
+            }
+         }
+         else
+         {
+            retval = APX_UNSUPPORTED_ERROR;
+         }
+         return retval;
+      }
+
       void Deserializer::reset_state()
       {
          while (m_stack.size() > 0)
@@ -296,5 +621,46 @@ namespace apx
          }
          return APX_NO_ERROR;
       }
+
+      apx::error_t Deserializer::value_in_range_i32(std::int32_t value, std::int32_t lower_limit, std::int32_t upper_limit)
+      {
+         if (((lower_limit > INT32_MIN) && (value < lower_limit)) ||
+            ((upper_limit < INT32_MAX) && (value > upper_limit)))
+         {
+            return APX_VALUE_RANGE_ERROR;
+         }
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Deserializer::value_in_range_u32(std::uint32_t value, std::uint32_t lower_limit, std::uint32_t upper_limit)
+      {
+         if (((lower_limit > 0u) && (value < lower_limit)) ||
+            ((upper_limit < UINT32_MAX) && (value > upper_limit)))
+         {
+            return APX_VALUE_RANGE_ERROR;
+         }
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Deserializer::value_in_range_i64(std::int64_t value, std::int64_t lower_limit, std::int64_t upper_limit)
+      {
+         if (((lower_limit > INT64_MIN) && (value < lower_limit)) ||
+            ((upper_limit < INT64_MAX) && (value > upper_limit)))
+         {
+            return APX_VALUE_RANGE_ERROR;
+         }
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Deserializer::value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit)
+      {
+         if (((lower_limit > 0u) && (value < lower_limit)) ||
+            ((upper_limit < UINT64_MAX) && (value > upper_limit)))
+         {
+            return APX_VALUE_RANGE_ERROR;
+         }
+         return APX_NO_ERROR;
+      }
+
    }
 }

@@ -137,4 +137,21 @@ namespace apx_test
       EXPECT_TRUE(ok);
    }
 
+   TEST(Deserializer, RangeCheckUInt8Value)
+   {
+      std::array<std::uint8_t, UINT8_SIZE> buf = { 7u };
+      Deserializer deserializer;
+      auto ok = false;
+
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.check_value_range_uint32(0u, 7u), APX_NO_ERROR);
+      auto sv = deserializer.take_sv();
+      EXPECT_NE(sv.get(), nullptr);
+      EXPECT_EQ(sv->to_u32(ok), 7u);
+      EXPECT_TRUE(ok);
+
+   }
+
 }

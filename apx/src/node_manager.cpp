@@ -168,6 +168,7 @@ namespace apx
          return APX_MEM_ERROR;
       }
       std::size_t data_offset{ 0u };
+      VirtualMachine vm;
       for (port_id_t port_id = 0u; port_id < num_provide_ports; port_id++)
       {
          auto parsed_port = node->get_provide_port(port_id);
@@ -181,7 +182,7 @@ namespace apx
          auto const* proper_init_value = parsed_port->proper_init_value.get();
          if (proper_init_value != nullptr)
          {
-            result = create_port_init_data(port_instance, proper_init_value, provide_port_data + data_offset, data_size);
+            result = create_port_init_data(vm, port_instance, proper_init_value, provide_port_data + data_offset, data_size);
             if (result != APX_NO_ERROR)
             {
                return result;
@@ -203,7 +204,7 @@ namespace apx
          auto const* proper_init_value = parsed_port->proper_init_value.get();
          if (proper_init_value != nullptr)
          {
-            result = create_port_init_data(port_instance, proper_init_value, require_port_data + data_offset, data_size);
+            result = create_port_init_data(vm, port_instance, proper_init_value, require_port_data + data_offset, data_size);
             if (result != APX_NO_ERROR)
             {
                return result;
@@ -211,27 +212,26 @@ namespace apx
          }
          data_offset += data_size;
       }
-
       return APX_NO_ERROR;
    }
 
-   apx::error_t NodeManager::create_port_init_data(apx::PortInstance* port_instance, dtl::Value const* value, std::uint8_t* data, std::size_t data_size)
+   apx::error_t NodeManager::create_port_init_data(apx::VirtualMachine& vm, apx::PortInstance* port_instance, dtl::Value const* value, std::uint8_t* data, std::size_t data_size)
    {
       assert(port_instance != nullptr);
       assert(value != nullptr);
       assert(data != nullptr);
       vm::Program const& pack_program = port_instance->get_pack_program();
-      auto result = m_vm.select_program(pack_program);
+      auto result = vm.select_program(pack_program);
       if (result != APX_NO_ERROR)
       {
          return result;
       }
-      result = m_vm.set_write_buffer(data, data_size);
+      result = vm.set_write_buffer(data, data_size);
       if (result != APX_NO_ERROR)
       {
          return result;
       }
-      return m_vm.pack_value(value);
+      return vm.pack_value(value);
    }
 
 }

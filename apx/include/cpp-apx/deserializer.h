@@ -19,8 +19,16 @@ namespace apx
          {
             State() {}
             ~State() {}
-            dtl::ValueType value_type{ dtl::ValueType::NoneType };
 
+            std::variant<
+               std::int32_t,             //index 0
+               std::uint32_t,            //index 1
+               std::int64_t,             //index 2
+               std::uint64_t,            //index 3
+               bool                      //index 4
+            > scalar_value;
+
+            dtl::ValueType value_type{ dtl::ValueType::NoneType };
             dtl::ScalarValue sv; //Valid when value_type==ValueType::Scalar
             dtl::ArrayValue av;  //Valid when value_type==ValueType::Array
             dtl::HashValue hv;   //Valid when value_type==ValueType::Hash
@@ -32,6 +40,8 @@ namespace apx
             TypeCode type_code{ TypeCode::None };
             std::size_t element_size{ 0 };
             bool is_last_field{ false };
+            RangeCheckState range_check_state{ RangeCheckState::NotChecked };
+            ScalarStorageType scalar_type{ ScalarStorageType::None };
 
             void clear();
             bool is_scalar_type() { return ((type_code >= TypeCode::UInt8) && (type_code <= TypeCode::Int64)) || type_code == TypeCode::Bool; }
@@ -46,8 +56,10 @@ namespace apx
             void init_scalar_value();
             void init_array_value();
             void init_record_value();
+            apx::error_t read_scalar_value(TypeCode type_code_arg);
+            apx::error_t read_scalar_value(std::size_t index_arg, TypeCode type_code_arg);
          protected:
-
+            apx::error_t read_scalar_value(dtl::Scalar const* sv_arg, TypeCode type_code_arg);
          };
 
          struct ReadBuffer
@@ -70,6 +82,10 @@ namespace apx
          apx::error_t unpack_uint8(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_uint16(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_uint32(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit);
+         apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
+         apx::error_t check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit);
+         apx::error_t check_value_range_uint64(std::uint64_t lower_limit, std::uint64_t upper_limit);
 #ifdef UNIT_TEST
          dtl::Scalar const* get_sv_ptr() { return m_state->sv.get(); }
          dtl::Array const* get_av_ptr() { return m_state->av.get(); }
@@ -86,6 +102,10 @@ namespace apx
          void reset_state();
          apx::error_t prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size);
          apx::error_t unpack_scalar_value(dtl::Scalar* sv);
+         apx::error_t value_in_range_i32(std::int32_t value, std::int32_t lower_limit, std::int32_t upper_limit);
+         apx::error_t value_in_range_u32(std::uint32_t value, std::uint32_t lower_limit, std::uint32_t upper_limit);
+         apx::error_t value_in_range_i64(std::int64_t value, std::int64_t lower_limit, std::int64_t upper_limit);
+         apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
       };
    }
 }
