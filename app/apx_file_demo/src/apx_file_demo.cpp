@@ -5,6 +5,15 @@
 
 using namespace std::string_literals;
 
+static char const* apx_definition =
+      "APX/1.2\n"
+      "N\"TestNode1\"\n"
+      "P\"WheelBasedVehicleSpeed\"S:=65535\n"
+      "P\"CabTiltLockWarning\"C(0,7):=7\n"
+      "P\"VehicleMode\"C(0,15):=15\n"
+      "R\"GearSelectionMode\"C(0,7):=8\n"
+      "R\"ParkBrakeAlert\"C(0,3):=3\n";
+
 static constexpr apx::port_id_t WheelBasedVehicleSpeed_ID = 0u;
 static constexpr apx::port_id_t CabTiltLockWarning_ID = 1u;
 static constexpr apx::port_id_t VehicleMode_ID = 2u;
@@ -15,14 +24,27 @@ static void print_dtl_value(std::string const& name, dtl::ScalarValue const& sv)
 
 static void set_new_output(apx::FileClient& client)
 {
-   auto new_value = dtl::make_sv<std::uint16_t>(0x1234);
-   auto result = client.write_port(WheelBasedVehicleSpeed_ID, new_value);
+   //auto new_value = ;
+   auto result = client.write_port(WheelBasedVehicleSpeed_ID, dtl::make_sv<std::uint16_t>(0x12));
    if (result != APX_NO_ERROR)
    {
-      std::cerr << "Call to client.write_port() failed with error " << static_cast<int>(result) << std::endl;
+      std::cerr << "Call to client.write_port(WheelBasedVehicleSpeed_ID) failed with error " << static_cast<int>(result) << std::endl;
    }
+   result = client.write_port(CabTiltLockWarning_ID, dtl::make_sv<std::uint8_t>(7));
+   if (result != APX_NO_ERROR)
+   {
+      std::cerr << "Call to client.write_port(CabTiltLockWarning_ID) failed with error " << static_cast<int>(result) << std::endl;
+   }
+   result = client.write_port(VehicleMode_ID, dtl::make_sv<std::uint8_t>(6));
+   if (result != APX_NO_ERROR)
+   {
+      std::cerr << "Call to client.write_port(VehicleMode_ID) failed with error " << static_cast<int>(result) << std::endl;
+   }
+}
 
-   result = client.save_provide_port_data();
+static void save_output(apx::FileClient& client)
+{
+   auto result = client.save_provide_port_data();
    if (result != APX_NO_ERROR)
    {
       std::cerr << "Call to client.save_provide_port_data() failed with error " << static_cast<int>(result) << std::endl;
@@ -35,7 +57,7 @@ static void print_input(apx::FileClient& client)
    auto result = client.read_port(GearSelectionMode_ID, sv);
    if (result != APX_NO_ERROR)
    {
-      std::cerr << "Call to client.read_port() failed with error " << static_cast<int>(result) << std::endl;
+      std::cerr << "Call to client.read_port(GearSelectionMode_ID) failed with error " << static_cast<int>(result) << std::endl;
    }
    else
    {
@@ -45,14 +67,6 @@ static void print_input(apx::FileClient& client)
 
 int main()
 {
-   char const* apx_definition =
-      "APX/1.2\n"
-      "N\"TestNode1\"\n"
-      "P\"WheelBasedVehicleSpeed\"S:=65535\n"
-      "P\"CabTiltLockWarning\"C(0,7):=7\n"
-      "P\"VehicleMode\"C(0,15):=15\n"
-      "R\"GearSelectionMode\"C(0,7):=7\n"
-      "R\"ParkBrakeAlert\"C(0,3):=3\n";
 
    auto current_path = std::filesystem::current_path();
    std::cout << current_path.string() << std::endl;
@@ -71,6 +85,7 @@ int main()
    }
    print_input(client);
    set_new_output(client);
+   save_output(client);
 
    return 0;
 }

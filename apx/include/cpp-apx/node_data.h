@@ -45,10 +45,8 @@ namespace apx
       apx::error_t read_provide_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size) const;
       apx::error_t write_require_port_data(std::size_t offset, std::uint8_t const* src, std::size_t size);
       apx::error_t read_require_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size) const;
-#ifdef UNIT_TEST
       std::uint8_t const* get_provide_port_data() const { return m_provide_port_data.get(); }
       std::uint8_t const* get_require_port_data() const { return m_require_port_data.get(); }
-#endif
    protected:
       std::unique_ptr<std::uint8_t[]> m_definition_data{ nullptr };
       std::unique_ptr<std::uint8_t[]> m_provide_port_data{ nullptr };
