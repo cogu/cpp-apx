@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "cpp-apx/serializer.h"
 #include <array>
+#include <cstring>
 
 using namespace apx::vm;
 
@@ -454,13 +455,13 @@ namespace apx_test
       auto sv = dtl::make_sv<std::uint64_t>(250000001ULL);
       ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
       ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_VALUE_RANGE_ERROR);
-      sv->set(250000000ULL);
+      sv->set((std::uint64_t) 250000000ULL);
       ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_NO_ERROR);
       sv->set(0);
       ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_NO_ERROR);
-      sv->set(250000000ULL);
+      sv->set((std::uint64_t) 250000000ULL);
       ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_NO_ERROR);
-      sv->set(250000001ULL);
+      sv->set((std::uint64_t) 250000001ULL);
       ASSERT_EQ(serializer.check_value_range_uint64(0u, 250000000u), APX_VALUE_RANGE_ERROR);
    }
 
@@ -494,13 +495,13 @@ namespace apx_test
       auto sv = dtl::make_sv<std::int64_t>(250000001ULL);
       ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
       ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_VALUE_RANGE_ERROR);
-      sv->set(250000000LL);
+      sv->set((std::int64_t) 250000000LL);
       ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_NO_ERROR);
       sv->set(0);
       ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_NO_ERROR);
-      sv->set(-250000000LL);
+      sv->set((std::int64_t) -250000000LL);
       ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_NO_ERROR);
-      sv->set(-250000001LL);
+      sv->set((std::int64_t) -250000001LL);
       ASSERT_EQ(serializer.check_value_range_int64(-250000000, 250000000), APX_VALUE_RANGE_ERROR);
    }
 
@@ -508,8 +509,8 @@ namespace apx_test
    {
       Serializer serializer;
       auto av = dtl::make_av({
-         dtl::make_sv<std::int32_t>(-250000000LL),
-         dtl::make_sv<std::uint64_t>(250000000ULL),
+         dtl::make_sv<std::int32_t>((std::int64_t) -250000000LL),
+         dtl::make_sv<std::uint64_t>((std::uint64_t) 250000000ULL),
          dtl::make_sv<std::uint32_t>(10000)
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
@@ -520,9 +521,9 @@ namespace apx_test
    {
       Serializer serializer;
       auto av = dtl::make_av({
-         dtl::make_sv<std::int64_t>(-250000000LL),
-         dtl::make_sv<std::int64_t>(-250000001LL),
-         dtl::make_sv<std::int64_t>(250000000LL)
+         dtl::make_sv<std::int64_t>((std::int64_t) -250000000LL),
+         dtl::make_sv<std::int64_t>((std::int64_t) -250000001LL),
+         dtl::make_sv<std::int64_t>((std::int64_t) 250000000LL)
          });
       ASSERT_EQ(serializer.set_value(av), APX_NO_ERROR);
       ASSERT_EQ(serializer.check_value_range_int64(-250000000LL, 250000000LL), APX_VALUE_RANGE_ERROR);
