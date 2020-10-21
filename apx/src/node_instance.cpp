@@ -1,3 +1,27 @@
+/*****************************************************************************
+* \file      node_instance.cpp
+* \author    Conny Gustafsson
+* \date      2020-10-13
+* \brief     Container for an instantiated APX node
+*
+* Copyright (c) 2020 Conny Gustafsson
+* Permission is hereby granted, free of charge, to any person obtaining a copy of
+* this software and associated documentation files (the "Software"), to deal in
+* the Software without restriction, including without limitation the rights to
+* use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+* the Software, and to permit persons to whom the Software is furnished to do so,
+* subject to the following conditions:
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+* IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+******************************************************************************/
+
 #include <cassert>
 #include "cpp-apx\node_instance.h"
 
@@ -115,6 +139,25 @@ namespace apx
          return m_require_ports[port_id];
       }
       return nullptr;
+   }
+
+   apx::error_t NodeInstance::init_node_data(std::uint8_t const* definition_data, std::size_t definition_size)
+   {
+      std::unique_ptr<NodeData> node_data = std::make_unique<NodeData>();
+      auto retval = node_data->create_definition_data(definition_data, definition_size);
+      if ( (retval == APX_NO_ERROR) && has_provide_port_data())
+      {
+         retval = node_data->create_provide_port_data(m_num_provide_ports, m_provide_port_init_data, m_provide_port_init_data_size);
+      }
+      if ((retval == APX_NO_ERROR) && has_require_port_data())
+      {
+         retval = node_data->create_require_port_data(m_num_require_ports, m_require_port_init_data, m_require_port_init_data_size);
+      }
+      if (retval == APX_NO_ERROR)
+      {
+         m_node_data = std::move(node_data);
+      }
+      return retval;
    }
 
    apx::error_t NodeInstance::calc_init_data_size(PortInstance** port_list, std::size_t num_ports, std::size_t& total_size)
