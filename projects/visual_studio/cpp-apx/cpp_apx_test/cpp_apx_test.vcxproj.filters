@@ -102,6 +102,12 @@
     <ClCompile Include="..\..\..\..\apx\src\deserializer.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\node_data.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_node_data.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -182,6 +188,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\test\sample_nodes.h">
       <Filter>apx\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_data.h">
+      <Filter>apx\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

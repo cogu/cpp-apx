@@ -1,4 +1,29 @@
+/*****************************************************************************
+* \file      node_manager.cpp
+* \author    Conny Gustafsson
+* \date      2020-10-13
+* \brief     Factory for node_instance objects
+*
+* Copyright (c) 2020 Conny Gustafsson
+* Permission is hereby granted, free of charge, to any person obtaining a copy of
+* this software and associated documentation files (the "Software"), to deal in
+* the Software without restriction, including without limitation the rights to
+* use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+* the Software, and to permit persons to whom the Software is furnished to do so,
+* subject to the following conditions:
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+* IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+******************************************************************************/
+
 #include <cassert>
+#include <cstring>
 #include "cpp-apx\node_manager.h"
 #include <iostream> //DEBUG ONLY
 
@@ -7,6 +32,7 @@ namespace apx
 
    apx::error_t NodeManager::build_node(char const* definition_text)
    {
+      std::size_t definition_size = std::strlen(definition_text);
       apx::error_t result = m_parser.parse(definition_text);
       if (result != APX_NO_ERROR)
       {
@@ -14,7 +40,7 @@ namespace apx
       }
       auto node{ m_parser.take_last_node() };
 
-      result = create_node_instance(node.get());
+      result = create_node_instance(node.get(), reinterpret_cast<std::uint8_t const*>(definition_text), definition_size);
       if (result != APX_NO_ERROR)
       {
          return result;
@@ -22,28 +48,33 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   apx::error_t NodeManager::create_node_instance(Node const* node)
+   apx::error_t NodeManager::create_node_instance(Node const* node, std::uint8_t const* definition_data, std::size_t definition_size)
    {
-      if (node == nullptr)
+      if ( (node == nullptr) || (definition_data == nullptr) || (definition_size == 0u) )
       {
          return APX_INVALID_ARGUMENT_ERROR;
       }
       apx::error_t result = APX_NO_ERROR;
-      auto node_instance = std::make_unique<apx::NodeInstance>(node->get_name());
+      auto node_instance_ptr = std::make_unique<apx::NodeInstance>(node->get_name());
       std::size_t expected_provide_port_data_size{ 0u };
       std::size_t expected_require_port_data_size{ 0u };
-      result = create_ports_on_node_instance(node_instance.get(), node, expected_provide_port_data_size, expected_require_port_data_size);
+      auto* node_instance = node_instance_ptr.get();
+      result = create_ports_on_node_instance(node_instance, node, expected_provide_port_data_size, expected_require_port_data_size);
       if (result != APX_NO_ERROR)
       {
          return result;
       }
-
-      result = create_init_data_on_node_instance(node_instance.get(), node, expected_provide_port_data_size, expected_require_port_data_size);
+      result = create_init_data_on_node_instance(node_instance, node, expected_provide_port_data_size, expected_require_port_data_size);
       if (result != APX_NO_ERROR)
       {
          return result;
       }
-      attach_node(node_instance.release());
+      result = node_instance->init_node_data(definition_data, definition_size);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      attach_node(node_instance_ptr.release());
       return APX_NO_ERROR;
    }
 
@@ -202,5 +233,6 @@ namespace apx
       }
       return m_vm.pack_value(value);
    }
+
 }
 
