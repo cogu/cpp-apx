@@ -136,6 +136,11 @@ namespace apx
          return next + unpack_size;
       }
 
+      std::uint8_t const* parse_uint32_by_size_type(std::uint8_t const* begin, std::uint8_t const* end, apx::SizeType size_type, std::uint32_t& number)
+      {
+         std::uint8_t variant = size_type_to_variant(size_type);
+         return parse_uint32_by_variant(begin, end, variant, number);
+      }
 
       apx::error_t create_program_header(apx::vm::Program& header, apx::ProgramType program_type, std::uint32_t element_size, std::uint32_t queue_size, bool is_dynamic)
       {
@@ -511,6 +516,26 @@ namespace apx
             }
          }
          return size_type;
+      }
+
+      std::uint8_t size_type_to_variant(apx::SizeType size_type)
+      {
+         std::uint8_t variant = 0u;
+         switch (size_type)
+         {
+         case apx::SizeType::UInt8:
+            variant = VARIANT_U8;
+            break;
+         case apx::SizeType::UInt16:
+            variant = VARIANT_U16;
+            break;
+         case apx::SizeType::UInt32:
+            variant = VARIANT_U32;
+            break;
+         default:
+            throw std::invalid_argument("size_type");
+         }
+         return variant;
       }
 
    }
