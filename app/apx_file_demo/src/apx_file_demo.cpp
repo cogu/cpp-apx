@@ -7,38 +7,52 @@ using namespace std::string_literals;
 
 static char const* apx_definition =
       "APX/1.2\n"
-      "N\"TestNode1\"\n"
+      "N\"TestNode\"\n"
       "P\"WheelBasedVehicleSpeed\"S:=65535\n"
       "P\"CabTiltLockWarning\"C(0,7):=7\n"
       "P\"VehicleMode\"C(0,15):=15\n"
-      "R\"GearSelectionMode\"C(0,7):=8\n"
+      "R\"GearSelectionMode\"C(0,7):=7\n"
       "R\"ParkBrakeAlert\"C(0,3):=3\n";
 
 static constexpr apx::port_id_t WheelBasedVehicleSpeed_ID = 0u;
 static constexpr apx::port_id_t CabTiltLockWarning_ID = 1u;
 static constexpr apx::port_id_t VehicleMode_ID = 2u;
 static constexpr apx::port_id_t GearSelectionMode_ID = 0u;
-static constexpr apx::port_id_t ParkBrakeAlert = 1u;
+static constexpr apx::port_id_t ParkBrakeAlert_ID = 1u;
 
 static void print_dtl_value(std::string const& name, dtl::ScalarValue const& sv);
 
-static void set_new_output(apx::FileClient& client)
+static void set_new_output_values(apx::FileClient& client)
 {
-   //auto new_value = ;
-   auto result = client.write_port(WheelBasedVehicleSpeed_ID, dtl::make_sv<std::uint16_t>(0x12));
-   if (result != APX_NO_ERROR)
+   bool update_WheelBasedVehicleSpeed = false;
+   bool update_CabTiltLockWarning = false;
+   bool update_VehicleMode = false;
+
+   if (update_WheelBasedVehicleSpeed)
    {
-      std::cerr << "Call to client.write_port(WheelBasedVehicleSpeed_ID) failed with error " << static_cast<int>(result) << std::endl;
+      auto result = client.write_port(WheelBasedVehicleSpeed_ID, dtl::make_sv<std::uint16_t>(0x1234));
+      if (result != APX_NO_ERROR)
+      {
+         std::cerr << "Call to client.write_port(WheelBasedVehicleSpeed_ID) failed with error " << static_cast<int>(result) << std::endl;
+      }
    }
-   result = client.write_port(CabTiltLockWarning_ID, dtl::make_sv<std::uint8_t>(7));
-   if (result != APX_NO_ERROR)
+
+   if (update_CabTiltLockWarning)
    {
-      std::cerr << "Call to client.write_port(CabTiltLockWarning_ID) failed with error " << static_cast<int>(result) << std::endl;
+      auto result = client.write_port(CabTiltLockWarning_ID, dtl::make_sv<std::uint8_t>(1));
+      if (result != APX_NO_ERROR)
+      {
+         std::cerr << "Call to client.write_port(CabTiltLockWarning_ID) failed with error " << static_cast<int>(result) << std::endl;
+      }
    }
-   result = client.write_port(VehicleMode_ID, dtl::make_sv<std::uint8_t>(6));
-   if (result != APX_NO_ERROR)
+
+   if (update_VehicleMode)
    {
-      std::cerr << "Call to client.write_port(VehicleMode_ID) failed with error " << static_cast<int>(result) << std::endl;
+      auto result = client.write_port(VehicleMode_ID, dtl::make_sv<std::uint8_t>(4));
+      if (result != APX_NO_ERROR)
+      {
+         std::cerr << "Call to client.write_port(VehicleMode_ID) failed with error " << static_cast<int>(result) << std::endl;
+      }
    }
 }
 
@@ -63,30 +77,43 @@ static void print_input(apx::FileClient& client)
    {
       print_dtl_value("GearSelectionMode", sv);
    }
+   result = client.read_port(ParkBrakeAlert_ID, sv);
+   if (result != APX_NO_ERROR)
+   {
+      std::cerr << "Call to client.read_port(ParkBrakeAlert_ID) failed with error " << static_cast<int>(result) << std::endl;
+   }
+   else
+   {
+      print_dtl_value("ParkBrakeAlert", sv);
+   }
 }
 
-int main()
+static bool create_node(apx::FileClient& client)
 {
-
-   auto current_path = std::filesystem::current_path();
-   std::cout << current_path.string() << std::endl;
-   apx::FileClient client;
    auto result = client.build_node(apx_definition);
    if (result != APX_NO_ERROR)
    {
       std::cerr << "Call to client.build_node() failed with error " << static_cast<int>(result) << std::endl;
-      return 0;
+      return false;
    }
    result = client.save_if_new();
    if (result != APX_NO_ERROR)
    {
       std::cerr << "Call to client.save_if_new() failed with error " << static_cast<int>(result) << std::endl;
-      return 0;
+      return false;
    }
-   print_input(client);
-   set_new_output(client);
-   save_output(client);
+   return true;
+}
 
+int main()
+{
+   apx::FileClient client;
+   if (create_node(client))
+   {
+      print_input(client);
+      set_new_output_values(client);
+      save_output(client);
+   }
    return 0;
 }
 
