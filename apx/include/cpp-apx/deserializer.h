@@ -42,6 +42,7 @@ namespace apx
             bool is_last_field{ false };
             RangeCheckState range_check_state{ RangeCheckState::NotChecked };
             ScalarStorageType scalar_type{ ScalarStorageType::None };
+            SizeType dynamic_size_type{ SizeType::None };
 
             void clear();
             bool is_scalar_type() { return ((type_code >= TypeCode::UInt8) && (type_code <= TypeCode::Int64)) || type_code == TypeCode::Bool; }
@@ -67,7 +68,7 @@ namespace apx
             std::uint8_t const* begin{ nullptr };
             std::uint8_t const* end{ nullptr };
             std::uint8_t const* next{ nullptr };
-            std::uint8_t const* adjusted_next{ nullptr }; //Needed for dynamic arrays
+            std::uint8_t const* padded_next{ nullptr }; //Needed for dynamic arrays
          };
          Deserializer() { m_state = new State(); }
          ~Deserializer();
@@ -82,16 +83,13 @@ namespace apx
          apx::error_t unpack_uint8(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_uint16(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_uint32(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_int8(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_int16(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_int32(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit);
          apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
          apx::error_t check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit);
          apx::error_t check_value_range_uint64(std::uint64_t lower_limit, std::uint64_t upper_limit);
-#ifdef UNIT_TEST
-         dtl::Scalar const* get_sv_ptr() { return m_state->sv.get(); }
-         dtl::Array const* get_av_ptr() { return m_state->av.get(); }
-         dtl::Hash const* get_hv_ptr() { return m_state->hv.get(); }
-#endif
-
 
       protected:
          ReadBuffer m_buffer;
@@ -100,12 +98,15 @@ namespace apx
          void reset_buffer(std::uint8_t const* buf, std::size_t len);
          bool is_valid_buffer();
          void reset_state();
-         apx::error_t prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size);
+         apx::error_t prepare_for_array(std::size_t array_size, SizeType dynamic_size_type);
          apx::error_t unpack_scalar_value(dtl::Scalar* sv);
+         apx::error_t unpack_array_of_scalar();
          apx::error_t value_in_range_i32(std::int32_t value, std::int32_t lower_limit, std::int32_t upper_limit);
          apx::error_t value_in_range_u32(std::uint32_t value, std::uint32_t lower_limit, std::uint32_t upper_limit);
          apx::error_t value_in_range_i64(std::int64_t value, std::int64_t lower_limit, std::int64_t upper_limit);
          apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
+         apx::error_t prepare_for_buffer_read();
+         apx::error_t read_array_size_from_buffer(SizeType size_type, std::size_t& array_size);
       };
    }
 }

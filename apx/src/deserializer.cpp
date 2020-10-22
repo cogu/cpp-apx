@@ -2,6 +2,7 @@
 #include <typeinfo>
 #include "cpp-apx/deserializer.h"
 #include "cpp-apx/pack.h"
+#include "cpp-apx/program.h"
 
 namespace apx
 {
@@ -33,6 +34,7 @@ namespace apx
          is_last_field = false;
          range_check_state = RangeCheckState::NotChecked;
          scalar_type = ScalarStorageType::None;
+         dynamic_size_type = SizeType::None;
       }
 
       void Deserializer::State::init_scalar_value()
@@ -221,14 +223,14 @@ namespace apx
 
       apx::error_t Deserializer::unpack_uint8(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
-         if (!is_valid_buffer())
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
          {
-            return APX_MISSING_BUFFER_ERROR;
+            return result;
          }
          reset_state();
          m_state->type_code = TypeCode::UInt8;
          m_state->element_size = UINT8_SIZE;
-         apx::error_t result = APX_NO_ERROR;
          if (array_len > 0u)
          {
             result = prepare_for_array(array_len, dynamic_size_type);
@@ -237,7 +239,7 @@ namespace apx
                return result;
             }
             m_state->init_array_value();
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = unpack_array_of_scalar();
          }
          else
          {
@@ -249,14 +251,14 @@ namespace apx
 
       apx::error_t Deserializer::unpack_uint16(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
-         if (!is_valid_buffer())
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
          {
-            return APX_MISSING_BUFFER_ERROR;
+            return result;
          }
          reset_state();
          m_state->type_code = TypeCode::UInt16;
          m_state->element_size = UINT16_SIZE;
-         apx::error_t result = APX_NO_ERROR;
          if (array_len > 0u)
          {
             result = prepare_for_array(array_len, dynamic_size_type);
@@ -277,14 +279,98 @@ namespace apx
 
       apx::error_t Deserializer::unpack_uint32(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
-         if (!is_valid_buffer())
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
          {
-            return APX_MISSING_BUFFER_ERROR;
+            return result;
          }
          reset_state();
          m_state->type_code = TypeCode::UInt32;
          m_state->element_size = UINT32_SIZE;
-         apx::error_t result = APX_NO_ERROR;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_array_value();
+            result = APX_NOT_IMPLEMENTED_ERROR;
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_int8(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::Int8;
+         m_state->element_size = INT8_SIZE;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_array_value();
+            result = APX_NOT_IMPLEMENTED_ERROR;
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_int16(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::Int16;
+         m_state->element_size = INT16_SIZE;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_array_value();
+            result = APX_NOT_IMPLEMENTED_ERROR;
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_int32(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::Int32;
+         m_state->element_size = INT32_SIZE;
          if (array_len > 0u)
          {
             result = prepare_for_array(array_len, dynamic_size_type);
@@ -543,6 +629,7 @@ namespace apx
          if ((buf != nullptr) && (len > 0))
          {
             reset_buffer(buf, len);
+            m_state->clear();
             return APX_NO_ERROR;
          }
          return APX_INVALID_ARGUMENT_ERROR;
@@ -553,7 +640,7 @@ namespace apx
          m_buffer.begin = buf;
          m_buffer.end = buf + len;
          m_buffer.next = buf;
-         m_buffer.adjusted_next = nullptr;
+         m_buffer.padded_next = nullptr;
       }
 
       bool Deserializer::is_valid_buffer()
@@ -561,11 +648,35 @@ namespace apx
          return ((m_buffer.next != nullptr) && (m_buffer.end != nullptr) && (m_buffer.next <= m_buffer.end));
       }
 
-      apx::error_t Deserializer::prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size)
+      apx::error_t Deserializer::prepare_for_array(std::size_t array_size, apx::SizeType dynamic_size_type)
       {
-         (void)array_size;
-         (void)dynamic_size;
-         return APX_NOT_IMPLEMENTED_ERROR;
+         if (array_size > 0)
+         {
+            if (dynamic_size_type != apx::SizeType::None)
+            {
+
+               std::size_t length_size = size_type_to_size(dynamic_size_type);
+               assert(length_size > 0u);
+               m_state->max_array_len = array_size;
+               auto result = read_array_size_from_buffer(dynamic_size_type, m_state->array_len);
+               if (result != APX_NO_ERROR)
+               {
+                  return result;
+               }
+               if (m_state->array_len > m_state->max_array_len)
+               {
+                  return APX_VALUE_LENGTH_ERROR;
+               }
+               m_state->dynamic_size_type = dynamic_size_type;
+               assert(m_state->element_size != 0);
+               m_buffer.padded_next = m_buffer.next + (m_state->max_array_len * m_state->element_size);
+            }
+            else
+            {
+               m_state->array_len = array_size;
+            }
+         }
+         return APX_NO_ERROR;
       }
 
       apx::error_t Deserializer::unpack_scalar_value(dtl::Scalar* sv)
@@ -622,6 +733,25 @@ namespace apx
          return APX_NO_ERROR;
       }
 
+      apx::error_t Deserializer::unpack_array_of_scalar()
+      {
+         if (m_state->value_type != dtl::ValueType::Array)
+         {
+            return APX_VALUE_TYPE_ERROR;
+         }
+         for (std::size_t i = 0; i < m_state->array_len; i++)
+         {
+            auto sv = dtl::make_sv();
+            auto result = unpack_scalar_value(sv.get());
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->av->push(dtl::dv_cast(sv));
+         }
+         return APX_NO_ERROR;
+      }
+
       apx::error_t Deserializer::value_in_range_i32(std::int32_t value, std::int32_t lower_limit, std::int32_t upper_limit)
       {
          if (((lower_limit > INT32_MIN) && (value < lower_limit)) ||
@@ -662,5 +792,45 @@ namespace apx
          return APX_NO_ERROR;
       }
 
+      /*
+      * Perform actions that depends on outcome of previous instruction(s)
+      */
+      apx::error_t Deserializer::prepare_for_buffer_read()
+      {
+         if (!is_valid_buffer())
+         {
+            return APX_MISSING_BUFFER_ERROR;
+         }
+         if (m_buffer.padded_next != nullptr)
+         {
+            if ((m_buffer.padded_next < m_buffer.begin) || (m_buffer.padded_next > m_buffer.end))
+            {
+               return APX_BUFFER_BOUNDARY_ERROR;
+            }
+            m_buffer.next = m_buffer.padded_next;
+            m_buffer.padded_next = nullptr;
+         }
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Deserializer::read_array_size_from_buffer(SizeType size_type, std::size_t& array_size)
+      {
+         if (size_type == SizeType::None)
+         {
+            return APX_INVALID_ARGUMENT_ERROR;
+         }
+         std::uint32_t value{ 0u };
+         std::uint8_t const* result = parse_uint32_by_size_type(m_buffer.next, m_buffer.end, size_type, value);
+         if ((result > m_buffer.next) && (result <= m_buffer.end))
+         {
+            array_size = static_cast<std::uint32_t>(value);
+            m_buffer.next = result;
+         }
+         else
+         {
+            return APX_BUFFER_BOUNDARY_ERROR;
+         }
+         return APX_NO_ERROR;
+      }
    }
 }

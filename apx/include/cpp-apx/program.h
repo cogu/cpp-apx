@@ -48,6 +48,7 @@ namespace apx
       std::uint8_t const* parse_uint64_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::uint64_t& number);
       std::uint8_t const* parse_int32_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::int32_t& number);
       std::uint8_t const* parse_int64_by_variant(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t variant, std::int64_t& number);
+      std::uint8_t const* parse_uint32_by_size_type(std::uint8_t const* begin, std::uint8_t const* end, apx::SizeType size_type, std::uint32_t& number);
       apx::error_t create_program_header(apx::vm::Program& header, apx::ProgramType program_type, std::uint32_t element_size, std::uint32_t queue_size, bool is_dynamic);
       apx::error_t decode_program_header(std::uint8_t const* begin, std::uint8_t const* end, std::uint8_t const*& next, ProgramHeader &header);
       apx::error_t decode_program_header(apx::vm::Program const& program, ProgramHeader& header);
@@ -58,6 +59,7 @@ namespace apx
       TypeCode variant_to_type_code(std::uint8_t variant);
       std::size_t size_type_to_size(apx::SizeType size_type);
       apx::SizeType size_to_size_type(std::size_t size);
+      std::uint8_t size_type_to_variant(apx::SizeType size_type);
    }
 }
 
