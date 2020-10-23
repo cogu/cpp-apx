@@ -267,7 +267,7 @@ namespace apx
                return result;
             }
             m_state->init_array_value();
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = unpack_array_of_scalar();
          }
          else
          {
@@ -295,7 +295,35 @@ namespace apx
                return result;
             }
             m_state->init_array_value();
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = unpack_array_of_scalar();
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_uint64(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::UInt64;
+         m_state->element_size = UINT64_SIZE;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_array_value();
+            result = unpack_array_of_scalar();
          }
          else
          {
@@ -323,7 +351,7 @@ namespace apx
                return result;
             }
             m_state->init_array_value();
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = unpack_array_of_scalar();
          }
          else
          {
@@ -351,7 +379,7 @@ namespace apx
                return result;
             }
             m_state->init_array_value();
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = unpack_array_of_scalar();
          }
          else
          {
@@ -379,7 +407,35 @@ namespace apx
                return result;
             }
             m_state->init_array_value();
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = unpack_array_of_scalar();
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_int64(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::Int64;
+         m_state->element_size = INT64_SIZE;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_array_value();
+            result = unpack_array_of_scalar();
          }
          else
          {
