@@ -190,7 +190,7 @@ namespace apx
       apx::error_t Decoder::decode_range_check_uint32(std::uint8_t variant)
       {
          std::size_t data_size = variant_to_size_integer(variant);
-         if (m_program_next + (data_size * 2) <= m_program_end)
+         if (m_program_next + (data_size * 2u) <= m_program_end) //The numbers always comes in pairs
          {
             std::uint8_t const* result = parse_uint32_by_variant(m_program_next, m_program_end, variant, m_range_check_uint32_info.lower_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
@@ -218,7 +218,7 @@ namespace apx
       apx::error_t Decoder::decode_range_check_uint64(std::uint8_t variant)
       {
          std::size_t data_size = variant_to_size_integer(variant);
-         if (m_program_next + (data_size * 2) <= m_program_end)
+         if (m_program_next + (data_size * 2) <= m_program_end) //The numbers always comes in pairs
          {
             std::uint8_t const* result = parse_uint64_by_variant(m_program_next, m_program_end, variant, m_range_check_uint64_info.lower_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
@@ -246,7 +246,7 @@ namespace apx
       apx::error_t Decoder::decode_range_check_int32(std::uint8_t variant)
       {
          std::size_t data_size = variant_to_size_integer(variant);
-         if (m_program_next + (data_size * 2) <= m_program_end)
+         if (m_program_next + (data_size * 2) <= m_program_end) //The numbers always comes in pairs
          {
             std::uint8_t const* result = parse_int32_by_variant(m_program_next, m_program_end, variant, m_range_check_int32_info.lower_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))
@@ -274,7 +274,7 @@ namespace apx
       apx::error_t Decoder::decode_range_check_int64(std::uint8_t variant)
       {
          std::size_t data_size = variant_to_size_integer(variant);
-         if (m_program_next + (data_size * 2) <= m_program_end)
+         if (m_program_next + (data_size * 2) <= m_program_end) //The numbers always comes in pairs
          {
             std::uint8_t const* result = parse_int64_by_variant(m_program_next, m_program_end, variant, m_range_check_int64_info.lower_limit);
             if ((result > m_program_next) && (m_program_next <= m_program_end))

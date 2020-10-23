@@ -83,9 +83,11 @@ namespace apx
          apx::error_t unpack_uint8(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_uint16(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_uint32(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_uint64(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_int8(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_int16(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_int32(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_int64(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit);
          apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
          apx::error_t check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit);
