@@ -74,8 +74,8 @@ namespace apx
       const char* parse_rational_scaling(const char* begin, const char* end, apx::RationalScaling*& rs);
       const char* parse_value_table_arg(const char* begin, const char* end, ValueTableState& vts);
       const char* parse_rational_scaling_arg(const char* begin, const char* end, RationalScalingState& rss);
-      const char* parse_lower_range(const char* begin, const char* end, bool unary_minus, ComputationState* state);
-      const char* parse_upper_range(const char* begin, const char* end, bool unary_minus, ComputationState* state);
+      const char* parse_lower_limit(const char* begin, const char* end, bool unary_minus, ComputationState* state);
+      const char* parse_upper_limit(const char* begin, const char* end, bool unary_minus, ComputationState* state);
       const char* parse_double(const char* begin, const char* end, double& d);
       const char* parse_i32(const char* begin, const char* end, int32_t& v);
       const char* parse_u32(const char* begin, const char* end, uint32_t& v);

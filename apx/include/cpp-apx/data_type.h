@@ -17,6 +17,7 @@ namespace apx
       apx::error_t derive_data_element(apx::DataElement*& data_element) const;
       apx::error_t derive_data_element(apx::DataElement const*& data_element) const;
       apx::error_t derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
+      bool has_attributes() const { return attr.get() != nullptr; }
 
       std::string name;
       apx::DataSignature dsg;

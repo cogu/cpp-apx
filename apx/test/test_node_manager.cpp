@@ -3,6 +3,7 @@
 #include <iostream>
 
 using namespace apx::vm;
+using namespace std::string_literals;
 
 namespace apx_test
 {
@@ -264,7 +265,42 @@ namespace apx_test
       EXPECT_EQ(provide_port_data[0], 0xabu);
       EXPECT_EQ(provide_port_data[1], 0x34u);
       EXPECT_EQ(provide_port_data[2], 0x12u);
-
    }
 
+   TEST(NodeManager, buildNodeContainingTypeDefinition)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "T\"VehicleSpeed_T\"S:RS(0, 0xFDFF, 0, 1, 64, \"km/h\"), VT(0xFE00, 0xFEFF, \"Error\"), VT(0xFF00, 0xFFFF, \"NotAvailable\")\n"
+         "P\"VehicleSpeed\"T[0]\n";
+      apx::NodeManager manager;
+      EXPECT_EQ(manager.build_node(apx_text), APX_NO_ERROR);
+      auto* node = manager.get_last_attached();
+      EXPECT_NE(node, nullptr);
+      auto port = node->get_provide_port(0u);
+      EXPECT_NE(port, nullptr);
+      EXPECT_EQ(port->get_computation_length(), 3u);
+      auto const* computation = port->get_computation(0u);
+      auto const* scaling = dynamic_cast<apx::RationalScaling const*>(computation);
+      EXPECT_NE(scaling, nullptr);
+      EXPECT_EQ(scaling->lower_limit.u32, 0u);
+      EXPECT_EQ(scaling->upper_limit.u32, 0xFDFFU);
+      EXPECT_EQ(scaling->offset, 0.0);
+      EXPECT_EQ(scaling->numerator, 1);
+      EXPECT_EQ(scaling->denominator, 64);
+      EXPECT_EQ(scaling->unit, "km/h"s);
+      computation = port->get_computation(1u);
+      auto const* vt = dynamic_cast<apx::ValueTable const*>(computation);
+      EXPECT_NE(vt, nullptr);
+      EXPECT_EQ(vt->lower_limit.i32, 0xFE00);
+      EXPECT_EQ(vt->upper_limit.i32, 0xFEFF);
+      EXPECT_EQ(vt->values[0], "Error"s);
+      computation = port->get_computation(2u);
+      vt = dynamic_cast<apx::ValueTable const*>(computation);
+      EXPECT_NE(vt, nullptr);
+      EXPECT_EQ(vt->lower_limit.i32, 0xFF00);
+      EXPECT_EQ(vt->upper_limit.i32, 0xFFFF);
+      EXPECT_EQ(vt->values[0], "NotAvailable"s);
+   }
 }
