@@ -3,6 +3,7 @@
 #include <array>
 
 using namespace apx::vm;
+using namespace std::string_literals;
 
 namespace apx_test
 {
@@ -1042,6 +1043,207 @@ namespace apx_test
       sv = dtl::sv_cast(av->at(1));
       EXPECT_EQ(sv->to_i64(ok), 25000000000ll);
       EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackChar)
+   {
+      std::array<std::uint8_t, CHAR_SIZE> buf = { 'a' };
+      Deserializer deserializer;
+      auto ok = false;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_char(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      EXPECT_NE(sv.get(), nullptr);
+      EXPECT_EQ(sv->to_char(ok), 'a');
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackCharArrayWithTrailingNull)
+   {
+      constexpr std::size_t array_length = 8u;
+      std::array<std::uint8_t, CHAR_SIZE * array_length> buf = { 'a', 'b', 'c', 'd', '\0', '\0', '\0', '\0' };
+      Deserializer deserializer;
+      auto ok = false;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_char(array_length, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      EXPECT_NE(sv.get(), nullptr);
+      EXPECT_EQ(sv->to_string(ok), "abcd"s);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackFilledCharArray)
+   {
+      constexpr std::size_t array_length = 8u;
+      std::array<std::uint8_t, CHAR_SIZE* array_length> buf = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+      Deserializer deserializer;
+      auto ok = false;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_char(array_length, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      EXPECT_NE(sv.get(), nullptr);
+      EXPECT_EQ(sv->to_string(ok), "abcdefgh"s);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackDynamicCharArray)
+   {
+      constexpr std::uint8_t current_array_length = 3u;
+      constexpr std::size_t max_array_length = 10u;
+      std::array<std::uint8_t, UINT8_SIZE + CHAR_SIZE* current_array_length> buf = { current_array_length, 'a', 'b', 'c' };
+      Deserializer deserializer;
+      auto ok = false;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_char(max_array_length, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      EXPECT_NE(sv.get(), nullptr);
+      EXPECT_EQ(sv->to_string(ok), "abc"s);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackDynamicCharArrayWithEmbeddedNull)
+   {
+      constexpr std::uint8_t current_array_length = 5u;
+      constexpr std::size_t max_array_length = 10u;
+      std::array<std::uint8_t, UINT8_SIZE + CHAR_SIZE * current_array_length> buf = { current_array_length, 'a', 'b', '\0','c', 'd' };
+      Deserializer deserializer;
+      auto ok = false;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_char(max_array_length, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      EXPECT_NE(sv.get(), nullptr);
+      EXPECT_EQ(sv->to_string(ok), "ab\0cd"s);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackBoolean)
+   {
+      std::array<std::uint8_t, UINT8_SIZE> buf = { 0u };
+      Deserializer deserializer;
+      auto ok = false;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_bool(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      EXPECT_NE(sv.get(), nullptr);
+      EXPECT_EQ(sv->to_bool(ok), false);
+      EXPECT_TRUE(ok);
+
+      buf[0] = 1u;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_bool(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      sv = deserializer.take_sv();
+      EXPECT_NE(sv.get(), nullptr);
+      EXPECT_EQ(sv->to_bool(ok), true);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackBooleanArray)
+   {
+      constexpr std::size_t array_length = 4u;
+      std::array<std::uint8_t, UINT8_SIZE* array_length> buf = { 0u, 1u, 1u, 0u };
+      Deserializer deserializer;
+      auto ok = false;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_bool(array_length, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Array);
+      auto av = deserializer.take_av();
+      EXPECT_EQ(av->length(), array_length);
+      auto sv = dtl::sv_cast(av->at(0));
+      EXPECT_EQ(sv->to_bool(ok), false);
+      EXPECT_TRUE(ok);
+      sv = dtl::sv_cast(av->at(1));
+      EXPECT_EQ(sv->to_bool(ok), true);
+      EXPECT_TRUE(ok);
+      sv = dtl::sv_cast(av->at(2));
+      EXPECT_EQ(sv->to_bool(ok), true);
+      EXPECT_TRUE(ok);
+      sv = dtl::sv_cast(av->at(3));
+      EXPECT_EQ(sv->to_bool(ok), false);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackBooleanDynamicArray)
+   {
+      constexpr std::uint8_t current_array_length = 3u;
+      constexpr std::size_t max_array_length = 8u;
+      std::array<std::uint8_t, UINT8_SIZE + UINT8_SIZE * current_array_length> buf = { current_array_length,  1u, 1u, 0u };
+      Deserializer deserializer;
+      auto ok = false;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_bool(max_array_length, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Array);
+      auto av = deserializer.take_av();
+      EXPECT_EQ(av->length(), current_array_length);
+      auto sv = dtl::sv_cast(av->at(0));
+      EXPECT_EQ(sv->to_bool(ok), true);
+      EXPECT_TRUE(ok);
+      sv = dtl::sv_cast(av->at(1));
+      EXPECT_EQ(sv->to_bool(ok), true);
+      EXPECT_TRUE(ok);
+      sv = dtl::sv_cast(av->at(2));
+      EXPECT_EQ(sv->to_bool(ok), false);
+      EXPECT_TRUE(ok);
+   }
+
+   TEST(Deserializer, UnpackByte)
+   {
+      std::array<std::uint8_t, UINT8_SIZE> buf = { 0xbau };
+      Deserializer deserializer;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_byte_array(0u, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::ByteArray);
+      dtl::ByteArray expected{ 0xbau };
+      ASSERT_EQ(sv->get_byte_array(), expected);
+   }
+
+   TEST(Deserializer, UnpackByteArray)
+   {
+      constexpr std::size_t array_length = 4u;
+      std::array<std::uint8_t, UINT8_SIZE * array_length> buf = { 0xau,  0xbu , 0xcu, 0xdu };
+      Deserializer deserializer;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_byte_array(array_length, apx::SizeType::None), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::ByteArray);
+      dtl::ByteArray expected{ 0xau,  0xbu , 0xcu, 0xdu };
+      ASSERT_EQ(sv->get_byte_array(), expected);
+   }
+
+   TEST(Deserializer, UnpackDynamicByteArray)
+   {
+      constexpr std::uint8_t current_array_length = 3u;
+      constexpr std::size_t max_array_length = 8u;
+      std::array<std::uint8_t, UINT8_SIZE + UINT8_SIZE * current_array_length> buf = { current_array_length, 0xbu , 0xcu, 0xdu };
+      Deserializer deserializer;
+      ASSERT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.unpack_byte_array(max_array_length, apx::SizeType::UInt8), APX_NO_ERROR);
+      ASSERT_EQ(deserializer.bytes_read(), buf.size());
+      ASSERT_EQ(deserializer.value_type(), dtl::ValueType::Scalar);
+      auto sv = deserializer.take_sv();
+      ASSERT_EQ(sv->sv_type(), dtl::ScalarType::ByteArray);
+      dtl::ByteArray expected{  0xbu , 0xcu, 0xdu };
+      ASSERT_EQ(sv->get_byte_array(), expected);
    }
 
 }

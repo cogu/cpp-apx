@@ -217,5 +217,12 @@ namespace dtl
       EXPECT_EQ(tmp, data);
    }
 
-
+   TEST(ScalarTest, CreateCharValue)
+   {
+      auto sv = dtl::make_sv<char>('b');
+      EXPECT_EQ(sv->sv_type(), dtl::ScalarType::Char);
+      auto ok = false;
+      EXPECT_EQ(sv->to_char(ok), 'b');
+      ASSERT_TRUE(ok);
+   }
 }
