@@ -30,6 +30,7 @@
 #include "cpp-apx/types.h"
 #include "cpp-apx/program.h"
 #include "cpp-apx/data_element.h"
+#include "cpp-apx/computation.h"
 
 namespace apx
 {
@@ -52,7 +53,11 @@ namespace apx
       bool is_dynamic_data() { return m_is_dynamic_data; }
       apx::vm::Program const& get_pack_program() { return *m_pack_program; }
       apx::vm::Program const& get_unpack_program() { return *m_unpack_program; }
+      apx::error_t append_computation(Computation const* computation);
+      std::size_t get_computation_length() { return m_computations.size(); }
+      Computation const* get_computation(std::size_t id);
    protected:
+      std::vector<std::unique_ptr<Computation>> m_computations;
       apx::PortType m_port_type;
       apx::port_id_t m_port_id;
       std::string m_name;

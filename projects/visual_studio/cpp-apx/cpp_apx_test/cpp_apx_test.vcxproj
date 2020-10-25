@@ -38,6 +38,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\attribute_parser.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\compiler.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\computation.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_element.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_signature.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_type.h" />
@@ -116,9 +117,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\signature_parser.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\apx\src\type_attribute.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\vm.cpp">

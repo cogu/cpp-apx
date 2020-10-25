@@ -268,8 +268,8 @@ TEST(AttributeParser, TraditionalValueTable)
    ASSERT_EQ(attr.computations.size(), 1);
    auto vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(0).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.u32, 0u);
-   ASSERT_EQ(vt->upper_range.u32, 3u);
+   ASSERT_EQ(vt->lower_limit.u32, 0u);
+   ASSERT_EQ(vt->upper_limit.u32, 3u);
    EXPECT_EQ(vt->values[0], "OnOff_Off");
    EXPECT_EQ(vt->values[1], "OnOff_On");
    EXPECT_EQ(vt->values[2], "OnOff_Error");
@@ -288,8 +288,8 @@ TEST(AttributeParser, ValueTableWithOffset)
    ASSERT_EQ(attr.computations.size(), 1);
    auto vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(0).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.u32, 4u);
-   ASSERT_EQ(vt->upper_range.u32, 7u);
+   ASSERT_EQ(vt->lower_limit.u32, 4u);
+   ASSERT_EQ(vt->upper_limit.u32, 7u);
 }
 
 TEST(AttributeParser, ValueTableWithNegativeOffset)
@@ -303,8 +303,8 @@ TEST(AttributeParser, ValueTableWithNegativeOffset)
    ASSERT_EQ(attr.computations.size(), 1);
    auto vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(0).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.i32, -3);
-   ASSERT_EQ(vt->upper_range.i32, 0);
+   ASSERT_EQ(vt->lower_limit.i32, -3);
+   ASSERT_EQ(vt->upper_limit.i32, 0);
 }
 
 TEST(AttributeParser, ValueTableWithNegativeOffsetExplicit)
@@ -318,8 +318,8 @@ TEST(AttributeParser, ValueTableWithNegativeOffsetExplicit)
    ASSERT_EQ(attr.computations.size(), 1);
    auto vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(0).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.i32, -3);
-   ASSERT_EQ(vt->upper_range.i32, 0);
+   ASSERT_EQ(vt->lower_limit.i32, -3);
+   ASSERT_EQ(vt->upper_limit.i32, 0);
 }
 
 TEST(AttributeParser, ValueTableRanges)
@@ -333,15 +333,15 @@ TEST(AttributeParser, ValueTableRanges)
    ASSERT_EQ(attr.computations.size(), 2);
    auto vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(0).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.u32, 251u);
-   ASSERT_EQ(vt->upper_range.u32, 254u);
+   ASSERT_EQ(vt->lower_limit.u32, 251u);
+   ASSERT_EQ(vt->upper_limit.u32, 254u);
    ASSERT_EQ(vt->values.size(), 1);
    ASSERT_EQ(vt->values.at(0), "Error");
 
    vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(1).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.u32, 255u);
-   ASSERT_EQ(vt->upper_range.u32, 255u);
+   ASSERT_EQ(vt->lower_limit.u32, 255u);
+   ASSERT_EQ(vt->upper_limit.u32, 255u);
    ASSERT_EQ(vt->values.size(), 1);
    ASSERT_EQ(vt->values.at(0), "NotAvailable");
 }
@@ -357,8 +357,8 @@ TEST(AttributeParser, RationalScaling_VehicleSpeed)
    ASSERT_EQ(attr.computations.size(), 1);
    auto rs = dynamic_cast<apx::RationalScaling*>(attr.computations.at(0).get());
    ASSERT_NE(rs, nullptr);
-   ASSERT_EQ(rs->lower_range.u32, 0u);
-   ASSERT_EQ(rs->upper_range.u32, 65280u);
+   ASSERT_EQ(rs->lower_limit.u32, 0u);
+   ASSERT_EQ(rs->upper_limit.u32, 65280u);
    ASSERT_EQ(rs->offset, 0.0);
    ASSERT_EQ(rs->numerator, 1);
    ASSERT_EQ(rs->denominator, 64);
@@ -376,22 +376,22 @@ TEST(AttributeParser, CombinedTypeAttribute)
    ASSERT_EQ(attr.computations.size(), 3);
    auto rs = dynamic_cast<apx::RationalScaling*>(attr.computations.at(0).get());
    ASSERT_NE(rs, nullptr);
-   ASSERT_EQ(rs->lower_range.u32, 0u);
-   ASSERT_EQ(rs->upper_range.u32, 65023u);
+   ASSERT_EQ(rs->lower_limit.u32, 0u);
+   ASSERT_EQ(rs->upper_limit.u32, 65023u);
    ASSERT_EQ(rs->offset, 0.0);
    ASSERT_EQ(rs->numerator, 1);
    ASSERT_EQ(rs->denominator, 64);
    ASSERT_EQ(rs->unit, "km/h");
    auto vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(1).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.u32, 65024u);
-   ASSERT_EQ(vt->upper_range.u32, 65279u);
+   ASSERT_EQ(vt->lower_limit.u32, 65024u);
+   ASSERT_EQ(vt->upper_limit.u32, 65279u);
    ASSERT_EQ(vt->values.size(), 1u);
    ASSERT_EQ(vt->values[0], "Error");
    vt = dynamic_cast<apx::ValueTable*>(attr.computations.at(2).get());
    ASSERT_NE(vt, nullptr);
-   ASSERT_EQ(vt->lower_range.u32, 65280u);
-   ASSERT_EQ(vt->upper_range.u32, 65535u);
+   ASSERT_EQ(vt->lower_limit.u32, 65280u);
+   ASSERT_EQ(vt->upper_limit.u32, 65535u);
    ASSERT_EQ(vt->values.size(), 1u);
    ASSERT_EQ(vt->values[0], "NotAvailable");
 }

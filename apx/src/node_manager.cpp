@@ -109,6 +109,13 @@ namespace apx
             return result;
          }
          data_offset += data_size;
+         auto* port_instance = node_instance->get_provide_port(port_id);
+         assert(port_instance != nullptr);
+         result = finalize_port_instance(port_instance, port);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
       }
       expected_provide_port_data_size = static_cast<std::size_t>(data_offset);
       data_offset = 0u;
@@ -133,6 +140,13 @@ namespace apx
             return result;
          }
          data_offset += data_size;
+         auto* port_instance = node_instance->get_require_port(port_id);
+         assert(port_instance != nullptr);
+         result = finalize_port_instance(port_instance, port);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
       }
       expected_require_port_data_size = static_cast<std::size_t>(data_offset);
       return APX_NO_ERROR;
@@ -234,5 +248,31 @@ namespace apx
       return vm.pack_value(value);
    }
 
+   apx::error_t NodeManager::finalize_port_instance(apx::PortInstance* port_instance, apx::Port const* parsed_port)
+   {
+      auto const* parsed_data_element = parsed_port->get_data_element();
+      assert(parsed_data_element != nullptr);
+      auto const type_code = parsed_data_element->get_type_code();
+      assert(type_code != apx::TypeCode::TypeRefId && type_code != apx::TypeCode::TypeRefName);
+      if (type_code == apx::TypeCode::TypeRefPtr)
+      {
+         auto const* data_type = parsed_data_element->get_typeref_ptr();
+         assert(data_type != nullptr);
+         if (data_type->has_attributes())
+         {
+            auto const* attributes = data_type->get_attributes();
+            std::vector<std::unique_ptr<Computation>> computations;
+            for (auto &it : attributes->computations)
+            {
+               auto result = port_instance->append_computation(it.get());
+               if (result != APX_NO_ERROR)
+               {
+                  return result;
+               }
+            }
+         }
+      }
+      return APX_NO_ERROR;
+   }
 }
 

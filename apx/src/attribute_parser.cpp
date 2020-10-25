@@ -186,11 +186,6 @@ namespace apx
          attr_type = TypeAttributeType::RationalScaling;
          next += 2;
       }
-      else if (*next == 'D')
-      {
-         attr_type = TypeAttributeType::DynamicLength;
-         next++;
-      }
       switch (attr_type)
       {
       case TypeAttributeType::None:
@@ -209,9 +204,6 @@ namespace apx
          {
             computation = dynamic_cast<apx::Computation*>(rs);
          }
-         break;
-      case TypeAttributeType::DynamicLength:
-         result = parse_array_length(next, end, attr.dynamic_length);
          break;
       }
       if (result > next)
@@ -598,11 +590,11 @@ namespace apx
          case ValueTableArgType::Integer:
             if (vts.num_count == 0)
             {
-               result = parse_lower_range(next, end, unary_minus, dynamic_cast<ComputationState*>(&vts));
+               result = parse_lower_limit(next, end, unary_minus, dynamic_cast<ComputationState*>(&vts));
             }
             else if (vts.num_count == 1)
             {
-               result = parse_upper_range(next, end, unary_minus, dynamic_cast<ComputationState*>(&vts));
+               result = parse_upper_limit(next, end, unary_minus, dynamic_cast<ComputationState*>(&vts));
             }
             else
             {
@@ -647,7 +639,7 @@ namespace apx
                unary_minus = true;
                next++;
             }
-            result = parse_lower_range(next, end, unary_minus, dynamic_cast<ComputationState*>(&rss));
+            result = parse_lower_limit(next, end, unary_minus, dynamic_cast<ComputationState*>(&rss));
             break;
          case 1: //UPPER RANGE LIMIT (integer)
             if (*next == '-')
@@ -655,7 +647,7 @@ namespace apx
                unary_minus = true;
                next++;
             }
-            result = parse_upper_range(next, end, unary_minus, dynamic_cast<ComputationState*>(&rss));
+            result = parse_upper_limit(next, end, unary_minus, dynamic_cast<ComputationState*>(&rss));
             break;
          case 2: //OFFSET (double)
             result = parse_double(next, end, d);
@@ -695,7 +687,7 @@ namespace apx
       return next;
    }
 
-   const char* AttributeParser::parse_lower_range(const char* begin, const char* end, bool unary_minus, ComputationState* state)
+   const char* AttributeParser::parse_lower_limit(const char* begin, const char* end, bool unary_minus, ComputationState* state)
    {
       const char* next = begin;
       char* end_ptr;
@@ -724,7 +716,7 @@ namespace apx
       return next;
    }
 
-   const char* AttributeParser::parse_upper_range(const char* begin, const char* end, bool unary_minus, ComputationState* state)
+   const char* AttributeParser::parse_upper_limit(const char* begin, const char* end, bool unary_minus, ComputationState* state)
    {
       const char* next = begin;
       char* end_ptr;
@@ -807,44 +799,44 @@ namespace apx
    apx::ValueTable* AttributeParser::create_value_table_from_state(ValueTableState& vts)
    {
       auto vt = std::make_unique<apx::ValueTable>();
-      bool auto_upper_range = false;
+      bool auto_upper_limit = false;
       if (vts.num_count > 0)
       {
          if (vts.num_count == 1)
          {
-            auto_upper_range = true;
+            auto_upper_limit = true;
          }
          if (vts.is_signed_range)
          {
-            vt->set_range(vts.i32_range.first, auto_upper_range ? vts.i32_range.first : vts.i32_range.second);
+            vt->set_range(vts.i32_range.first, auto_upper_limit ? vts.i32_range.first : vts.i32_range.second);
          }
          else
          {
-            vt->set_range(vts.u32_range.first, auto_upper_range ? vts.u32_range.first : vts.u32_range.second);
+            vt->set_range(vts.u32_range.first, auto_upper_limit ? vts.u32_range.first : vts.u32_range.second);
          }
       }
       else
       {
-         auto_upper_range = true;
+         auto_upper_limit = true;
       }
-      int32_t i32_index = vt->lower_range.i32;
-      uint32_t u32_index = vt->lower_range.i32;
+      int32_t i32_index = vt->lower_limit.i32;
+      uint32_t u32_index = vt->lower_limit.i32;
       for (auto it = vts.values.begin(); it != vts.values.end(); it++)
       {
          vt->values.push_back(*it);
          if (vt->is_signed_range)
          {
-            if (auto_upper_range && (vt->upper_range.i32 < i32_index))
+            if (auto_upper_limit && (vt->upper_limit.i32 < i32_index))
             {
-               vt->upper_range.i32 = i32_index;
+               vt->upper_limit.i32 = i32_index;
             }
             i32_index++;
          }
          else
          {
-            if (auto_upper_range && (vt->upper_range.u32 < u32_index))
+            if (auto_upper_limit && (vt->upper_limit.u32 < u32_index))
             {
-               vt->upper_range.u32 = u32_index;
+               vt->upper_limit.u32 = u32_index;
             }
             u32_index++;
          }
