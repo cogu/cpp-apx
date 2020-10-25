@@ -445,6 +445,91 @@ namespace apx
          return result;
       }
 
+      apx::error_t Deserializer::unpack_char(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::Char;
+         m_state->element_size = CHAR_SIZE;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_scalar_value();
+            result = unpack_char_string(m_state->sv.get());
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_bool(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::Bool;
+         m_state->element_size = UINT8_SIZE;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_array_value();
+            result = unpack_array_of_scalar();
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            result = unpack_scalar_value(m_state->sv.get());
+         }
+         return result;
+      }
+
+      apx::error_t Deserializer::unpack_byte_array(std::size_t array_len, apx::SizeType dynamic_size_type)
+      {
+         auto result = prepare_for_buffer_read();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         reset_state();
+         m_state->type_code = TypeCode::Byte;
+         m_state->element_size = UINT8_SIZE;
+         if (array_len > 0u)
+         {
+            result = prepare_for_array(array_len, dynamic_size_type);
+            if (result != APX_NO_ERROR)
+            {
+               return result;
+            }
+            m_state->init_scalar_value();
+            result = unpack_byte_array_internal(m_state->sv.get());
+         }
+         else
+         {
+            m_state->init_scalar_value();
+            m_state->array_len = 1u; //A single byte is still treated as an array of length 1
+            result = unpack_byte_array_internal(m_state->sv.get());
+         }
+         return result;
+      }
+
       apx::error_t Deserializer::check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit)
       {
          apx::error_t retval = APX_NO_ERROR;
@@ -743,6 +828,8 @@ namespace apx
             std::uint32_t u32;
             std::int64_t i64;
             std::uint64_t u64;
+            char char_value;
+            bool bool_value;
             switch (m_state->type_code)
             {
             case apx::TypeCode::UInt8:
@@ -777,6 +864,14 @@ namespace apx
                i64 = static_cast<std::int64_t>(apx::unpackLE<std::int64_t>(m_buffer.next));
                sv->set(i64);
                break;
+            case apx::TypeCode::Char:
+               char_value = static_cast<char>(*m_buffer.next);
+               sv->set(char_value);
+               break;
+            case apx::TypeCode::Bool:
+               bool_value = static_cast<bool>(*m_buffer.next);
+               sv->set(bool_value);
+               break;
             default:
                return APX_UNSUPPORTED_ERROR;
             }
@@ -804,6 +899,52 @@ namespace apx
                return result;
             }
             m_state->av->push(dtl::dv_cast(sv));
+         }
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Deserializer::unpack_char_string(dtl::Scalar* sv)
+      {
+         bool is_dynamic = (m_state->dynamic_size_type != apx::SizeType::None);
+         std::string s;
+         std::uint8_t const* adjusted_next = m_buffer.next + CHAR_SIZE * m_state->array_len;
+         for (std::size_t i = 0u; i < m_state->array_len; i++)
+         {
+            if (m_buffer.next + CHAR_SIZE <= m_buffer.end)
+            {
+               char c = static_cast<char>(*m_buffer.next++);
+               if (!is_dynamic && c == '\0')
+               {
+                  m_buffer.next = adjusted_next;
+                  break;
+               }
+               else
+               {
+                  s.push_back(c);
+               }
+            }
+            else
+            {
+               return APX_BUFFER_BOUNDARY_ERROR;
+            }
+         }
+         sv->set(s);
+         return APX_NO_ERROR;
+      }
+
+      apx::error_t Deserializer::unpack_byte_array_internal(dtl::Scalar* sv)
+      {
+         if (m_buffer.next + m_state->array_len <= m_buffer.end)
+         {
+            dtl::ByteArray array;
+            array.resize(m_state->array_len);
+            std::memcpy(array.data(), m_buffer.next, m_state->array_len);
+            m_buffer.next += m_state->array_len;
+            sv->set(array);
+         }
+         else
+         {
+            return APX_BUFFER_BOUNDARY_ERROR;
          }
          return APX_NO_ERROR;
       }

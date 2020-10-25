@@ -88,6 +88,9 @@ namespace apx
          apx::error_t unpack_int16(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_int32(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_int64(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_char(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_bool(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_byte_array(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit);
          apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
          apx::error_t check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit);
@@ -103,12 +106,15 @@ namespace apx
          apx::error_t prepare_for_array(std::size_t array_size, SizeType dynamic_size_type);
          apx::error_t unpack_scalar_value(dtl::Scalar* sv);
          apx::error_t unpack_array_of_scalar();
+         apx::error_t unpack_char_string(dtl::Scalar* sv);
+         apx::error_t unpack_byte_array_internal(dtl::Scalar* sv);
          apx::error_t value_in_range_i32(std::int32_t value, std::int32_t lower_limit, std::int32_t upper_limit);
          apx::error_t value_in_range_u32(std::uint32_t value, std::uint32_t lower_limit, std::uint32_t upper_limit);
          apx::error_t value_in_range_i64(std::int64_t value, std::int64_t lower_limit, std::int64_t upper_limit);
          apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
          apx::error_t prepare_for_buffer_read();
          apx::error_t read_array_size_from_buffer(SizeType size_type, std::size_t& array_size);
+
       };
    }
 }

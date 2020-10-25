@@ -10,9 +10,10 @@ namespace dtl
    constexpr std::size_t U32_STORAGE_ID = 1;
    constexpr std::size_t I64_STORAGE_ID = 2;
    constexpr std::size_t U64_STORAGE_ID = 3;
-   constexpr std::size_t STR_STORAGE_ID = 4;
-   constexpr std::size_t BOOL_STORAGE_ID = 5;
-   constexpr std::size_t BYTEARRAY_STORAGE_ID = 6;
+   constexpr std::size_t CHAR_STORAGE_ID = 4;
+   constexpr std::size_t STR_STORAGE_ID = 5;
+   constexpr std::size_t BOOL_STORAGE_ID = 6;
+   constexpr std::size_t BYTEARRAY_STORAGE_ID = 7;
 
    static bool string_iequals(std::string const& a, std::string const& b)
    {
@@ -45,6 +46,9 @@ namespace dtl
             break;
          case U64_STORAGE_ID:
             retval = dtl::ScalarType::UInt64;
+            break;
+         case CHAR_STORAGE_ID:
+            retval = dtl::ScalarType::Char;
             break;
          case STR_STORAGE_ID:
             retval = dtl::ScalarType::String;
@@ -115,6 +119,11 @@ namespace dtl
        tmp.assign(value.begin(), value.end());
    }
 
+   void Scalar::set(char value)
+   {
+      m_sv_data = value;
+   }
+
    int32_t Scalar::to_i32(bool& ok) const
    {
       ok = false;
@@ -148,7 +157,17 @@ namespace dtl
             break;
          }
          case U64_STORAGE_ID:
-            retval = static_cast<std::int32_t>(std::get<std::uint64_t>(m_sv_data.value()));
+         {
+            uint64_t value = std::get<std::uint64_t>(m_sv_data.value());
+            if (value <= INT32_MAX)
+            {
+               retval = static_cast<int32_t>(value);
+               ok = true;
+            }
+            break;
+         }
+         case CHAR_STORAGE_ID:
+            retval = static_cast<std::int32_t>(std::get<char>(m_sv_data.value()));
             ok = true;
             break;
          case STR_STORAGE_ID:
@@ -218,6 +237,16 @@ namespace dtl
             retval = static_cast<uint32_t>(std::get<std::uint64_t>(m_sv_data.value()));
             ok = true;
             break;
+         case CHAR_STORAGE_ID:
+         {
+            char value = std::get<char>(m_sv_data.value());
+            if ( value >= 0)
+            {
+               retval = static_cast<std::uint32_t>(value);
+               ok = true;
+            }
+            break;
+         }
          case STR_STORAGE_ID:
             try
             {
@@ -277,6 +306,10 @@ namespace dtl
                   ok = true;
                }
             }
+            break;
+         case CHAR_STORAGE_ID:
+            retval = static_cast<std::int32_t>(std::get<char>(m_sv_data.value()));
+            ok = true;
             break;
          case STR_STORAGE_ID:
             try
@@ -344,6 +377,16 @@ namespace dtl
             retval = std::get<uint64_t>(m_sv_data.value());
             ok = true;
             break;
+         case CHAR_STORAGE_ID:
+         {
+            char value = std::get<char>(m_sv_data.value());
+            if (value >= 0)
+            {
+               retval = static_cast<std::uint64_t>(value);
+               ok = true;
+            }
+            break;
+         }
          case STR_STORAGE_ID:
             try
             {
@@ -372,6 +415,84 @@ namespace dtl
          ok = false;
       }
       return retval;
+   }
+
+   char Scalar::to_char(bool& ok) const
+   {
+      ok = false;
+      char retval = 0;
+      if (m_sv_data.has_value())
+      {
+         switch (m_sv_data.value().index())
+         {
+         case I32_STORAGE_ID:
+         {
+            int32_t value = std::get<std::int32_t>(m_sv_data.value());
+            if ((value >= CHAR_MIN) && (value <= CHAR_MAX))
+            {
+               retval = static_cast<char>(value);
+               ok = true;
+            }            
+            break;
+         }
+         case U32_STORAGE_ID:
+         {
+            uint32_t value = std::get<std::uint32_t>(m_sv_data.value());
+            if (value <= CHAR_MAX)
+            {
+               retval = static_cast<char>(value);
+               ok = true;
+            }
+            break;
+         }
+         case I64_STORAGE_ID:
+         {
+            int64_t value = std::get<std::int64_t>(m_sv_data.value());
+            if ((value >= CHAR_MIN) && (value <= CHAR_MAX))
+            {
+               retval = static_cast<char>(value);
+               ok = true;
+            }
+            break;
+         }
+         case U64_STORAGE_ID:
+         {
+            uint64_t value = std::get<std::uint64_t>(m_sv_data.value());
+            if (value <= CHAR_MAX)
+            {
+               retval = static_cast<char>(value);
+               ok = true;
+            }
+            break;
+         }
+         case CHAR_STORAGE_ID:            
+            retval = std::get<char>(m_sv_data.value());
+            ok = true;
+            break;         
+         case STR_STORAGE_ID:
+         {
+            std::string value = std::get<std::string>(m_sv_data.value());
+            if ( (value.size() == 1u) )
+            {
+               retval = value[0];
+               ok = true;
+            }
+            break;
+         }
+         case BOOL_STORAGE_ID:
+            //NO CONVERSION ALLOWED
+            break;
+         case BYTEARRAY_STORAGE_ID:
+            //NO CONVERSION ALLOWED
+            break;
+         }
+      }
+      else
+      {
+         ok = false;
+      }
+      return retval;
+
    }
 
    std::string Scalar::to_string(bool& ok) const

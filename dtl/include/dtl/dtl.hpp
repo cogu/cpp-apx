@@ -52,6 +52,7 @@ namespace dtl
       UInt64,
       Float,
       Double,
+      Char,
       String,
       Bool,
       ByteArray
@@ -61,14 +62,15 @@ namespace dtl
    class Scalar : public dtl::Value
    {
    public:
-      using ScalarData = std::optional<std::variant<
+      using ScalarData = std::optional < std::variant <
          int32_t,             //storage id 0
          uint32_t,            //storage id 1
          int64_t,             //storage id 2
          uint64_t,            //storage id 3
-         std::string,         //storage id 4
-         bool,                //storage id 5
-         ByteArray            //storage id 6
+         char,                //storage id 4
+         std::string,         //storage id 5
+         bool,                //storage id 6
+         ByteArray            //storage id 7
       > >;
       Scalar() : Value{ dtl::ValueType::Scalar } {}
       ~Scalar() {}
@@ -84,10 +86,12 @@ namespace dtl
       void set(const char* begin, const char* end);
       void set(bool value);
       void set(const ByteArray&value);
+      void set(char value);
       int32_t to_i32(bool& ok) const;
       uint32_t to_u32(bool& ok) const;
       int64_t to_i64(bool& ok) const;
       uint64_t to_u64(bool& ok) const;
+      char to_char(bool& ok) const;
       std::string to_string(bool& ok) const;
       bool to_bool(bool& ok) const;
       ByteArray const& get_byte_array() const;
