@@ -56,9 +56,10 @@ namespace apx
             void set_field_name(const char* name, bool is_last) { field_name = name;  is_last_field = is_last; }
             void init_scalar_value();
             void init_array_value();
-            void init_record_value();
+            void init_hash_value();
             apx::error_t read_scalar_value(TypeCode type_code_arg);
             apx::error_t read_scalar_value(std::size_t index_arg, TypeCode type_code_arg);
+            apx::error_t create_child_value_from_state(State* child_state);
          protected:
             apx::error_t read_scalar_value(dtl::Scalar const* sv_arg, TypeCode type_code_arg);
          };
@@ -91,10 +92,12 @@ namespace apx
          apx::error_t unpack_char(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_bool(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_byte_array(std::size_t array_len, apx::SizeType dynamic_size_type);
+         apx::error_t unpack_record(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit);
          apx::error_t check_value_range_uint32(std::uint32_t lower_limit, std::uint32_t upper_limit);
          apx::error_t check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit);
          apx::error_t check_value_range_uint64(std::uint64_t lower_limit, std::uint64_t upper_limit);
+         apx::error_t record_select(const char* key, bool is_last_field);
 
       protected:
          ReadBuffer m_buffer;
@@ -103,7 +106,9 @@ namespace apx
          void reset_buffer(std::uint8_t const* buf, std::size_t len);
          bool is_valid_buffer();
          void reset_state();
+         void clear_state();
          apx::error_t prepare_for_array(std::size_t array_size, SizeType dynamic_size_type);
+         apx::error_t unpack_value(std::size_t array_len, apx::SizeType dynamic_size_type);
          apx::error_t unpack_scalar_value(dtl::Scalar* sv);
          apx::error_t unpack_array_of_scalar();
          apx::error_t unpack_char_string(dtl::Scalar* sv);
@@ -114,7 +119,7 @@ namespace apx
          apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
          apx::error_t prepare_for_buffer_read();
          apx::error_t read_array_size_from_buffer(SizeType size_type, std::size_t& array_size);
-
+         apx::error_t pop_state();
       };
    }
 }

@@ -1039,7 +1039,6 @@ namespace apx_test
       ASSERT_EQ(buf[2], 0x64U);
    }
 
-
    TEST(Serializer, PackDynamicInt16ArrayWithUint8Length)
    {
       std::size_t const element_size{ INT16_SIZE };
@@ -1310,19 +1309,4 @@ namespace apx_test
       ASSERT_EQ(buf[2], 8u);
       ASSERT_EQ(buf[3], 9u);
    }
-
-   TEST(Serializer, PackRecord)
-   {
-      std::array<std::uint8_t, 1> buf = { 0 };
-      Serializer serializer;
-      ASSERT_EQ(serializer.set_write_buffer(buf.data(), 1), APX_NO_ERROR);
-      auto hv = dtl::make_hv({
-         std::make_pair("First", dtl::make_sv_dv<std::uint32_t>(7)),
-         std::make_pair("Second", dtl::make_sv_dv<std::uint32_t>(15))
-         });
-      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
-      ASSERT_EQ(serializer.pack_record(0u, apx::SizeType::None), APX_NO_ERROR);
-      ASSERT_EQ(serializer.bytes_written(), 0u);
-   }
-
 }
