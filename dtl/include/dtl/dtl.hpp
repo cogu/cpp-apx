@@ -116,7 +116,6 @@ namespace dtl
       return std::dynamic_pointer_cast<Value>(sv);
    }
 
-
    ScalarValue make_sv(const char* begin, const char* end);
 
    /* Array */
@@ -126,8 +125,9 @@ namespace dtl
       Array(std::size_t initial_length = 0u);
       std::size_t length() const { return m_av_data.size(); }
       void push(std::shared_ptr<dtl::Value> dv) { m_av_data.push_back(dv); }
-      std::shared_ptr<dtl::Value>& at(std::size_t pos) { return m_av_data.at(pos); }
-      std::shared_ptr<dtl::Value>const & at(std::size_t pos) const { return m_av_data.at(pos); }
+      DynamicValue at(std::size_t pos) { return m_av_data.at(pos); }
+      DynamicValue const at(std::size_t pos) const { return m_av_data.at(pos); }
+      dtl::Value const* const_get(std::size_t pos);
       bool is_empty() const { return m_av_data.empty(); }
    protected:
       std::vector<std::shared_ptr<dtl::Value>> m_av_data;
@@ -149,10 +149,10 @@ namespace dtl
       void insert(value_type& v);
       void insert(value_type&& v);
       void set(std::string const& key, DynamicValue value);
-      DynamicValue& at(std::string const& key) { return m_hv_data.at(key); }
-      DynamicValue& at(char const* key) { return m_hv_data.at(key); }
-      dtl::Value const* cget(std::string const& key) const;
-      dtl::Value const* cget(char const* key) const;
+      DynamicValue at(std::string const& key) { return m_hv_data.at(key); }
+      dtl::Value const* const_get(std::string const& key) const;
+      dtl::Value const* const_get(char const* key) const;
+
       bool is_empty() const { return m_hv_data.empty(); }
       std::unordered_map<std::string, DynamicValue>::iterator begin() { return m_hv_data.begin(); }
       std::unordered_map<std::string, DynamicValue>::const_iterator cbegin() { return m_hv_data.cbegin(); }
@@ -168,25 +168,34 @@ namespace dtl
    HashValue make_hv(std::initializer_list<std::pair<std::string, DynamicValue>> initializer);
    DynamicValue make_hv_dv(std::initializer_list<std::pair<std::string, DynamicValue>> initializer);
 
-
    /* Helper functions */
 
-   inline ScalarValue sv_cast(DynamicValue& dv)
+   inline ScalarValue sv_cast(DynamicValue const & dv)
    {
       return std::dynamic_pointer_cast<Scalar>(dv);
    }
 
-   inline DynamicValue dv_cast(ScalarValue& sv)
+   inline ArrayValue av_cast(DynamicValue const& dv)
+   {
+      return std::dynamic_pointer_cast<Array>(dv);
+   }
+
+   inline HashValue hv_cast(DynamicValue const& dv)
+   {
+      return std::dynamic_pointer_cast<Hash>(dv);
+   }
+
+   inline DynamicValue dv_cast(ScalarValue const& sv)
    {
       return std::dynamic_pointer_cast<Value>(sv);
    }
 
-   inline DynamicValue dv_cast(ArrayValue& av)
+   inline DynamicValue dv_cast(ArrayValue const& av)
    {
       return std::dynamic_pointer_cast<Value>(av);
    }
 
-   inline DynamicValue dv_cast(HashValue& hv)
+   inline DynamicValue dv_cast(HashValue const& hv)
    {
       return std::dynamic_pointer_cast<Value>(hv);
    }

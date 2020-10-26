@@ -432,7 +432,7 @@ namespace dtl
             {
                retval = static_cast<char>(value);
                ok = true;
-            }            
+            }
             break;
          }
          case U32_STORAGE_ID:
@@ -465,10 +465,10 @@ namespace dtl
             }
             break;
          }
-         case CHAR_STORAGE_ID:            
+         case CHAR_STORAGE_ID:
             retval = std::get<char>(m_sv_data.value());
             ok = true;
-            break;         
+            break;
          case STR_STORAGE_ID:
          {
             std::string value = std::get<std::string>(m_sv_data.value());
@@ -623,6 +623,15 @@ namespace dtl
       }
    }
 
+   dtl::Value const* Array::const_get(std::size_t pos)
+   {
+      if (pos < m_av_data.size())
+      {
+         return m_av_data.at(pos).get();
+      }
+      return nullptr;
+   }
+
    std::shared_ptr<Array> make_av(std::size_t length)
    {
       return std::make_shared<Array>(length);
@@ -663,7 +672,7 @@ namespace dtl
       insert(std::make_pair(key, value));
    }
 
-   dtl::Value const* Hash::cget(std::string const& key) const
+   dtl::Value const* Hash::const_get(std::string const& key) const
    {
       auto it = m_hv_data.find(key);
       if (it != m_hv_data.end())
@@ -673,8 +682,7 @@ namespace dtl
       return nullptr;
    }
 
-
-   dtl::Value const* Hash::cget(char const* key) const
+   dtl::Value const* Hash::const_get(char const* key) const
    {
       auto it = m_hv_data.find(key);
       if (it != m_hv_data.end())

@@ -77,7 +77,7 @@ namespace apx
       {
          if (value_type == dtl::ValueType::Hash)
          {
-            return value.hv->cget(key);
+            return value.hv->const_get(key);
          }
          return nullptr;
       }
