@@ -60,6 +60,7 @@ namespace apx
             apx::error_t read_scalar_value(TypeCode type_code_arg);
             apx::error_t read_scalar_value(std::size_t index_arg, TypeCode type_code_arg);
             apx::error_t create_child_value_from_state(State* child_state);
+            apx::error_t push_value_from_state(State* child_state);
          protected:
             apx::error_t read_scalar_value(dtl::Scalar const* sv_arg, TypeCode type_code_arg);
          };
@@ -98,6 +99,7 @@ namespace apx
          apx::error_t check_value_range_int64(std::int64_t lower_limit, std::int64_t upper_limit);
          apx::error_t check_value_range_uint64(std::uint64_t lower_limit, std::uint64_t upper_limit);
          apx::error_t record_select(const char* key, bool is_last_field);
+         apx::error_t array_next(bool &is_last);
 
       protected:
          ReadBuffer m_buffer;
@@ -119,6 +121,7 @@ namespace apx
          apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
          apx::error_t prepare_for_buffer_read();
          apx::error_t read_array_size_from_buffer(SizeType size_type, std::size_t& array_size);
+         void enter_new_child_state();
          apx::error_t pop_state();
       };
    }
