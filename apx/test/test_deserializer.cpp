@@ -1443,4 +1443,77 @@ namespace apx_test
       EXPECT_TRUE(ok);
    }
 
+   TEST(Deserializer, UnpackArrayOfRecord_UInt16UInt8)
+   {
+      constexpr std::size_t array_length = 3u;
+      std::array < std::uint8_t, (UINT16_SIZE + UINT8_SIZE) * array_length> buf = {
+         0xE8, 0x03, 0x01,
+         0xd0, 0x07, 0x00,
+         0xA0, 0x0F, 0x01,
+      };
+      Deserializer deserializer;
+      EXPECT_EQ(deserializer.set_read_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.unpack_record(3u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.value_type(), dtl::ValueType::Hash);
+      EXPECT_EQ(deserializer.record_select("Id", false), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.unpack_uint16(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.record_select("Value", true), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.unpack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      auto is_last{ false };
+      EXPECT_EQ(deserializer.array_next(is_last), APX_NO_ERROR);
+      EXPECT_FALSE(is_last);
+      EXPECT_EQ(deserializer.value_type(), dtl::ValueType::Hash);
+      EXPECT_EQ(deserializer.record_select("Id", false), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.unpack_uint16(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.record_select("Value", true), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.unpack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.array_next(is_last), APX_NO_ERROR);
+      EXPECT_FALSE(is_last);
+      EXPECT_EQ(deserializer.value_type(), dtl::ValueType::Hash);
+      EXPECT_EQ(deserializer.value_type(), dtl::ValueType::Hash);
+      EXPECT_EQ(deserializer.record_select("Id", false), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.unpack_uint16(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.record_select("Value", true), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.unpack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(deserializer.array_next(is_last), APX_NO_ERROR);
+      EXPECT_TRUE(is_last);
+      EXPECT_EQ(deserializer.bytes_read(), buf.size());
+      EXPECT_EQ(deserializer.value_type(), dtl::ValueType::Array);
+      auto av = deserializer.take_av();
+      EXPECT_TRUE(av.get());
+      EXPECT_EQ(av->length(), array_length);
+      auto child_hv = dtl::hv_cast(av->at(0u));
+      EXPECT_TRUE(child_hv.get());
+      auto child_sv = dtl::sv_cast(child_hv->at("Id"));
+      EXPECT_TRUE(child_sv.get());
+      bool ok{ false };
+      EXPECT_EQ(child_sv->to_u32(ok), 1000u);
+      EXPECT_TRUE(ok);
+      child_sv = dtl::sv_cast(child_hv->at("Value"));
+      EXPECT_TRUE(child_sv.get());
+      EXPECT_EQ(child_sv->to_u32(ok), 1u);
+      EXPECT_TRUE(ok);
+
+      child_hv = dtl::hv_cast(av->at(1u));
+      EXPECT_TRUE(child_hv.get());
+      child_sv = dtl::sv_cast(child_hv->at("Id"));
+      EXPECT_TRUE(child_sv.get());
+      EXPECT_EQ(child_sv->to_u32(ok), 2000u);
+      EXPECT_TRUE(ok);
+      child_sv = dtl::sv_cast(child_hv->at("Value"));
+      EXPECT_TRUE(child_sv.get());
+      EXPECT_EQ(child_sv->to_u32(ok), 0u);
+      EXPECT_TRUE(ok);
+
+      child_hv = dtl::hv_cast(av->at(2u));
+      EXPECT_TRUE(child_hv.get());
+      child_sv = dtl::sv_cast(child_hv->at("Id"));
+      EXPECT_TRUE(child_sv.get());
+      EXPECT_EQ(child_sv->to_u32(ok), 4000u);
+      EXPECT_TRUE(ok);
+      child_sv = dtl::sv_cast(child_hv->at("Value"));
+      EXPECT_TRUE(child_sv.get());
+      EXPECT_EQ(child_sv->to_u32(ok), 1u);
+      EXPECT_TRUE(ok);
+   }
 }

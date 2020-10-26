@@ -144,7 +144,7 @@ namespace apx
               When false: More record fields to follow
          FLAG (variant 1..8): When true, the limit check applies to non-scalar value (such as array of u8, u16 etc.)
       4: FLOW_CTRL     : 1 variant
-         1: ARRAY_NEXT
+         0: ARRAY_NEXT
       5: UNPACK2 (reserved for 16 additional data types)
       6: PACK2 (reserved for 16 additional data types)
       7: RESERVED

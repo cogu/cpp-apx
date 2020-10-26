@@ -108,6 +108,27 @@ namespace apx
          return APX_NO_ERROR;
       }
 
+      apx::error_t Deserializer::State::push_value_from_state(State* child_state)
+      {
+         assert(value_type == dtl::ValueType::Array);
+         switch (child_state->value_type)
+         {
+         case dtl::ValueType::NoneType:
+            return APX_VALUE_TYPE_ERROR;
+         case dtl::ValueType::Scalar:
+            av->push(dtl::dv_cast(child_state->sv));
+            break;
+         case dtl::ValueType::Array:
+            av->push(dtl::dv_cast(child_state->av));
+            break;
+         case dtl::ValueType::Hash:
+            av->push(dtl::dv_cast(child_state->hv));
+            break;
+         }
+         return APX_NO_ERROR;
+
+      }
+
       apx::error_t Deserializer::State::read_scalar_value(dtl::Scalar const* sv_arg, TypeCode type_code_arg)
       {
          apx::error_t retval = APX_NO_ERROR;
@@ -394,6 +415,12 @@ namespace apx
                return result;
             }
             m_state->init_array_value();
+            if (m_state->array_len > 0u)
+            {
+               enter_new_child_state();
+               m_state->init_hash_value();
+               m_state->type_code = TypeCode::Record;
+            }
          }
          else
          {
@@ -631,15 +658,49 @@ namespace apx
             if (m_state->value_type == dtl::ValueType::Hash)
             {
                m_state->set_field_name(key, is_last_field);
-               auto child_state = new Deserializer::State();
-               child_state->parent = m_state;
-               m_stack.push(m_state);
-               m_state = child_state;
+               enter_new_child_state();
                return APX_NO_ERROR;
             }
             return APX_VALUE_TYPE_ERROR;
          }
          return APX_INVALID_ARGUMENT_ERROR;
+      }
+
+      apx::error_t Deserializer::array_next(bool& is_last)
+      {
+         is_last = false;
+         if (m_state->value_type == dtl::ValueType::Array)
+         {
+            if (m_state->array_len > 0)
+            {
+               if (++m_state->index == m_state->array_len)
+               {
+                  is_last = true;
+               }
+               else
+               {
+                  if (m_state->type_code == apx::TypeCode::Record)
+                  {
+                     enter_new_child_state();
+                     m_state->init_hash_value();
+                     m_state->type_code = TypeCode::Record;
+                  }
+                  else
+                  {
+                     return APX_NOT_IMPLEMENTED_ERROR;
+                  }
+               }
+            }
+            else
+            {
+               return APX_INTERNAL_ERROR;
+            }
+         }
+         else
+         {
+            return APX_VALUE_TYPE_ERROR;
+         }
+         return APX_NO_ERROR;
       }
 
       void Deserializer::reset_state()
@@ -876,9 +937,12 @@ namespace apx
          if (m_buffer.next + m_state->array_len <= m_buffer.end)
          {
             dtl::ByteArray array;
-            array.resize(m_state->array_len);
-            std::memcpy(array.data(), m_buffer.next, m_state->array_len);
-            m_buffer.next += m_state->array_len;
+            if (m_state->array_len > 0u)
+            {
+               array.resize(m_state->array_len);
+               std::memcpy(array.data(), m_buffer.next, m_state->array_len);
+               m_buffer.next += m_state->array_len;
+            }
             sv->set(array);
          }
          else
@@ -970,6 +1034,14 @@ namespace apx
          return APX_NO_ERROR;
       }
 
+      void Deserializer::enter_new_child_state()
+      {
+         auto child_state = new Deserializer::State();
+         child_state->parent = m_state;
+         m_stack.push(m_state);
+         m_state = child_state;
+      }
+
       apx::error_t Deserializer::pop_state()
       {
          assert(m_state != nullptr);
@@ -981,7 +1053,19 @@ namespace apx
             m_stack.pop();
             if (m_state->type_code == apx::TypeCode::Record)
             {
-               auto result = m_state->create_child_value_from_state(child_state.get());
+               apx::error_t result = APX_NO_ERROR;
+               if (m_state->value_type == dtl::ValueType::Hash)
+               {
+                  result = m_state->create_child_value_from_state(child_state.get());
+               }
+               else if (m_state->value_type == dtl::ValueType::Array)
+               {
+                  result = m_state->push_value_from_state(child_state.get());
+               }
+               else
+               {
+                  result = APX_NOT_IMPLEMENTED_ERROR;
+               }
                if (result != APX_NO_ERROR)
                {
                   return result;
