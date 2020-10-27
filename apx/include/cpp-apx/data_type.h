@@ -14,8 +14,8 @@ namespace apx
       apx::DataElement* get_data_element() const { return dsg.element.get(); }
       apx::DataElement const* get_const_data_element() const { return dsg.element.get(); }
       apx::TypeAttributes* get_attributes() const { return attr.get(); }
-      apx::error_t derive_data_element(apx::DataElement*& data_element) const;
-      apx::error_t derive_data_element(apx::DataElement const*& data_element) const;
+      apx::error_t derive_data_element(apx::DataElement*& data_element, apx::DataElement** parent) const;
+      apx::error_t derive_data_element(apx::DataElement const*& data_element, apx::DataElement const** parent) const;
       apx::error_t derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
       bool has_attributes() const { return attr.get() != nullptr; }
 

@@ -8,6 +8,28 @@ using namespace std;
 
 namespace apx
 {
+   DataElement::DataElement(DataElement const& other) :
+      m_name{other.m_name},
+      m_type_code{other.m_type_code},
+      m_array_len{other.m_array_len},
+      m_dynamic_array{other.m_dynamic_array}
+   {
+      m_type_ref = other.m_type_ref;
+      if (other.has_limits())
+      {
+         m_lower_limit = other.m_lower_limit;
+         m_upper_limit = other.m_upper_limit;
+      }
+      if ( (other.m_elements.get() != nullptr) && (other.m_elements->size() > 0) )
+      {
+         m_elements = std::make_unique<std::vector<std::unique_ptr<DataElement>>>();
+         for (auto& it : *other.m_elements)
+         {
+            assert(it.get() != nullptr);
+            m_elements->push_back(std::make_unique<DataElement>(*it));
+         }
+      }
+   }
 
    DataElement::DataElement(apx::TypeCode type_code, uint32_t array_length) :
       m_type_code{ type_code }, m_array_len { array_length }
@@ -175,7 +197,7 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   apx::error_t DataElement::derive_proper_init_value(dtl::DynamicValue const & parsed_init_value, dtl::DynamicValue& derived_value)
+   apx::error_t DataElement::derive_proper_init_value(dtl::DynamicValue const & parsed_init_value, dtl::DynamicValue& derived_value) const
    {
       apx::TypeCode type_code = get_type_code();
       assert(  (type_code != apx::TypeCode::None) &&
@@ -187,9 +209,57 @@ namespace apx
       {
          if (is_array())
          {
-            return APX_NOT_IMPLEMENTED_ERROR; //Array of records
+            if (parsed_init_value->dv_type() == dtl::ValueType::Array)
+            {
+               auto parsed_av = dynamic_cast<dtl::Array*>(parsed_init_value.get());
+               if (is_dynamic_array())
+               {
+                  if (parsed_av->length() != 0)
+                  {
+                     return APX_NOT_IMPLEMENTED_ERROR;
+                  }
+                  else
+                  {
+                     derived_value = dtl::make_av();
+                  }
+               }
+               else
+               {
+                  auto derived_av = dtl::make_av();
+                  if (parsed_av->length() != m_array_len)
+                  {
+                     return APX_VALUE_LENGTH_ERROR;
+                  }
+                  for (std::uint32_t i = 0u; i < m_array_len; i++)
+                  {
+                     auto const parsed_child_dv = parsed_av->at(i);
+                     if (parsed_child_dv->dv_type() == dtl::ValueType::Array)
+                     {
+                        auto parsed_child_av = dynamic_cast<dtl::Array*>(parsed_child_dv.get());
+                        assert(parsed_child_av != nullptr);
+                        dtl::Hash* derived_hv = nullptr;
+                        apx::error_t result = derive_hash_init_value(parsed_child_av, derived_hv);
+                        if (result == APX_NO_ERROR)
+                        {
+                           assert(derived_hv != nullptr);
+                           derived_av->push(std::shared_ptr<dtl::Value>(derived_hv));
+                        }
+                        else
+                        {
+                           return result;
+                        }
+                     }
+                  }
+                  derived_value = std::dynamic_pointer_cast<dtl::Value>(derived_av);
+                  derived_av.reset();
+               }
+            }
+            else
+            {
+               return APX_VALUE_TYPE_ERROR;
+            }
          }
-         if (parsed_init_value->dv_type() == dtl::ValueType::Array)
+         else if (parsed_init_value->dv_type() == dtl::ValueType::Array)
          {
             auto parsed_av = dynamic_cast<dtl::Array*>(parsed_init_value.get());
             assert(parsed_av != nullptr);
@@ -204,6 +274,10 @@ namespace apx
             {
                assert(derived_hv == nullptr);
             }
+         }
+         else
+         {
+            return APX_UNSUPPORTED_ERROR;
          }
       }
       else if (is_array())
@@ -282,13 +356,13 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   apx::error_t DataElement::create_default_init_value(dtl::DynamicValue& derived_value)
+   apx::error_t DataElement::create_default_init_value(dtl::DynamicValue& derived_value) const
    {
       (void)derived_value;
       return APX_NO_ERROR;
    }
 
-   apx::error_t DataElement::derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv)
+   apx::error_t DataElement::derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv) const
    {
       unique_ptr<dtl::Hash> hv = std::make_unique<dtl::Hash>();
       std::size_t num_children = get_num_child_elements();
@@ -299,7 +373,7 @@ namespace apx
       for (std::size_t i = 0u; i < num_children; i++)
       {
          DataElement* child_element = get_child_at(i);
-         apx::error_t result = derive_data_element(child_element);
+         apx::error_t result = derive_data_element(child_element, nullptr);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -317,7 +391,7 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   apx::error_t DataElement::derive_data_element(apx::DataElement*& data_element) const
+   apx::error_t DataElement::derive_data_element(apx::DataElement*& data_element, apx::DataElement** parent) const
    {
       apx::error_t retval = APX_NO_ERROR;
       assert(data_element != nullptr);
@@ -328,7 +402,7 @@ namespace apx
          auto data_type = data_element->get_typeref_ptr();
          if (data_type != nullptr)
          {
-            retval = data_type->derive_data_element(data_element);
+            retval = data_type->derive_data_element(data_element, parent);
             assert(data_element != nullptr);
          }
          else
@@ -339,7 +413,7 @@ namespace apx
       return retval;
    }
 
-   apx::error_t DataElement::derive_data_element(apx::DataElement const*& data_element) const
+   apx::error_t DataElement::derive_data_element(apx::DataElement const*& data_element, apx::DataElement const** parent) const
    {
       apx::error_t retval = APX_NO_ERROR;
       assert(data_element != nullptr);
@@ -350,7 +424,7 @@ namespace apx
          auto data_type = data_element->get_typeref_ptr();
          if (data_type != nullptr)
          {
-            retval = data_type->derive_data_element(data_element);
+            retval = data_type->derive_data_element(data_element, parent);
             assert(data_element != nullptr);
          }
          else

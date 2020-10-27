@@ -1399,7 +1399,7 @@ namespace apx_test
       EXPECT_EQ(sv->to_string(ok), "Data"s);
    }
 
-   TEST(Deserializer, UnpackRecord_Record_Uint8Uint16__Record_Uint16_Uint32)
+   TEST(Deserializer, UnpackRecordOfRecord_Uint8Uint16__Uint16Uint32)
    {
       std::array<std::uint8_t, UINT8_SIZE + UINT16_SIZE + UINT16_SIZE + UINT32_SIZE> buf = { 0x12, 0x34, 0x12, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12 };
       Deserializer deserializer;

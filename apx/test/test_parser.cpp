@@ -7,7 +7,7 @@ using namespace std::string_literals;
 
 namespace apx_test
 {
-   TEST(ApxParser, ParseEmptyString)
+   TEST(Parser, ParseEmptyString)
    {
       const char* apx_text = "";
       apx::Parser parser;
@@ -16,7 +16,7 @@ namespace apx_test
       EXPECT_FALSE(parser.parse(ss));
    }
 
-   TEST(ApxParser, ParseEmptyNode)
+   TEST(Parser, ParseEmptyNode)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -29,7 +29,7 @@ namespace apx_test
       EXPECT_EQ(node->get_name(), "EmptyNode"s);
    }
 
-   TEST(ApxParser, ParseTypeDeclaration_U8Type)
+   TEST(Parser, ParseTypeDeclaration_U8Type)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -48,7 +48,7 @@ namespace apx_test
       EXPECT_FALSE(data_element->has_limits());
    }
 
-   TEST(ApxParser, ParseTypeDeclaration_U8Type_WithAttribute)
+   TEST(Parser, ParseTypeDeclaration_U8Type_WithAttribute)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -79,7 +79,7 @@ namespace apx_test
       EXPECT_EQ(vt->values[3], "OnOff_NotAvailable");
    }
 
-   TEST(ApxParser, ParseRequirePortDeclaration_U8_NoInit)
+   TEST(Parser, ParseRequirePortDeclaration_U8_NoInit)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -98,7 +98,7 @@ namespace apx_test
       EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::UInt8);
    }
 
-   TEST(ApxParser, ParseRequirePortDeclaration_U8Array)
+   TEST(Parser, ParseRequirePortDeclaration_U8Array)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -119,7 +119,7 @@ namespace apx_test
       EXPECT_EQ(data_element->get_array_length(), 8u);
    }
 
-   TEST(ApxParser, ParseRequirePortDeclaration_U8_Init)
+   TEST(Parser, ParseRequirePortDeclaration_U8_Init)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -147,7 +147,7 @@ namespace apx_test
       ASSERT_TRUE(ok);
    }
 
-   TEST(ApxParser, ParseRequirePortDeclaration_U8_WithRange)
+   TEST(Parser, ParseRequirePortDeclaration_U8_WithRange)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -178,7 +178,7 @@ namespace apx_test
    }
 
 
-   TEST(ApxParser, ParseRequirePortDeclaration_U8Ref_NoInit) {
+   TEST(Parser, ParseRequirePortDeclaration_U8Ref_NoInit) {
       const char* apx_text =
          "APX/1.3\n"
          "N\"TestNode\"\n"
@@ -208,7 +208,7 @@ namespace apx_test
       EXPECT_NE(data_element->get_typeref_ptr(), nullptr);
    }
 
-   TEST(ApxParser, ParseRequirePortDeclaration_U8Ref)
+   TEST(Parser, ParseRequirePortDeclaration_U8Ref)
    {
 
       const char* apx_text =
@@ -228,7 +228,7 @@ namespace apx_test
       EXPECT_NE(data_element->get_typeref_ptr(), nullptr);
    }
 
-   TEST(ApxParser, RecordTypeRefsContainingElementTypeRefsById)
+   TEST(Parser, RecordTypeRefsContainingElementTypeRefsById)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -274,7 +274,7 @@ namespace apx_test
 
    }
 
-   TEST(ApxParser, Record_Notification_T)
+   TEST(Parser, Record_Notification_T)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -302,7 +302,7 @@ namespace apx_test
       ASSERT_EQ(child_element->get_name(), "Type"s);
    }
 
-   TEST(ApxParser, ParseErrorInRecord)
+   TEST(Parser, ParseErrorInRecord)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -320,7 +320,7 @@ namespace apx_test
       EXPECT_EQ(error_line, 3);
    }
 
-   TEST(ApxParser, ParseQueuedProvidePortWithUint8DataAndUint8QueueSize)
+   TEST(Parser, ParseQueuedProvidePortWithUint8DataAndUint8QueueSize)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -339,7 +339,7 @@ namespace apx_test
       EXPECT_EQ(attr->queue_length, 10u);
    }
 
-   TEST(ApxParser, ParseChar)
+   TEST(Parser, ParseChar)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -355,7 +355,7 @@ namespace apx_test
       EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Char);
    }
 
-   TEST(ApxParser, ParseCharArray)
+   TEST(Parser, ParseCharArray)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -373,7 +373,7 @@ namespace apx_test
       EXPECT_EQ(data_element->get_array_length(), 10u);
    }
 
-   TEST(ApxParser, ParseCharArrayWithEmptyInitializer)
+   TEST(Parser, ParseCharArrayWithEmptyInitializer)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -392,7 +392,7 @@ namespace apx_test
    }
 
 
-   TEST(ApxParser, ParseChar8)
+   TEST(Parser, ParseChar8)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -406,6 +406,88 @@ namespace apx_test
       auto data_element = port->get_data_element();
       EXPECT_NE(data_element, nullptr);
       EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::Char8);
+   }
+
+   TEST(Parser, RecordOfRecords)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "T\"FirstType_T\"{\"Inner1\"C\"Inner2\"S}\n"
+         "T\"SecondType_T\"{\"Inner3\"S\"Inner4\"L}\n"
+         "T\"RecordOfRecordType_T\"{\"First\"T[0]\"Second\"T[1]}\n"
+         "R\"RecordPort\"T[2]:={ {3,0xFFFF}, {0xFFFF, 0xFFFFFFFF} }\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      ASSERT_EQ(node->get_num_require_ports(), 1u);
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      auto data_element = port->get_data_element();
+      EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+      auto data_type = data_element->get_typeref_ptr();
+      EXPECT_NE(data_type, nullptr);
+      auto record_element = data_type->get_data_element();
+      EXPECT_EQ(record_element->get_type_code(), apx::TypeCode::Record);
+      {
+         auto child_type_element = record_element->get_child_at(0);
+         EXPECT_NE(child_type_element, nullptr);
+         EXPECT_EQ(child_type_element->get_name(), "First");
+         EXPECT_EQ(child_type_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+         auto child_data_type = child_type_element->get_typeref_ptr();
+         EXPECT_NE(child_data_type, nullptr);
+         auto child_data_element = child_data_type->get_data_element();
+         EXPECT_NE(child_data_element, nullptr);
+         EXPECT_EQ(child_data_element->get_type_code(), apx::TypeCode::Record);
+         auto grand_child_type_element = child_data_element->get_child_at(0);
+         EXPECT_EQ(grand_child_type_element->get_name(), "Inner1");
+         EXPECT_EQ(grand_child_type_element->get_type_code(), apx::TypeCode::UInt8);
+         grand_child_type_element = child_data_element->get_child_at(1);
+         EXPECT_EQ(grand_child_type_element->get_name(), "Inner2");
+         EXPECT_EQ(grand_child_type_element->get_type_code(), apx::TypeCode::UInt16);
+      }
+      {
+         auto child_type_element = record_element->get_child_at(1);
+         EXPECT_NE(child_type_element, nullptr);
+         EXPECT_EQ(child_type_element->get_name(), "Second");
+         EXPECT_EQ(child_type_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+         auto child_data_type = child_type_element->get_typeref_ptr();
+         EXPECT_NE(child_data_type, nullptr);
+         auto child_data_element = child_data_type->get_data_element();
+         EXPECT_NE(child_data_element, nullptr);
+         EXPECT_EQ(child_data_element->get_type_code(), apx::TypeCode::Record);
+         auto grand_child_type_element = child_data_element->get_child_at(0);
+         EXPECT_EQ(grand_child_type_element->get_name(), "Inner3");
+         EXPECT_EQ(grand_child_type_element->get_type_code(), apx::TypeCode::UInt16);
+         grand_child_type_element = child_data_element->get_child_at(1);
+         EXPECT_EQ(grand_child_type_element->get_name(), "Inner4");
+         EXPECT_EQ(grand_child_type_element->get_type_code(), apx::TypeCode::UInt32);
+
+      }
+   }
+
+   TEST(Parser, ArrayOfRecordsUsingTypeRef)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "T\"RecordType_T\"{\"Id\"S\"Value\"C}\n"
+         "R\"RecordPort\"T[0][2]:={ {0xFFFF, 0}, {0xFFFF, 0} }\n";
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      ASSERT_EQ(node->get_num_require_ports(), 1u);
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      auto data_element = port->get_data_element();
+      EXPECT_EQ(data_element->get_type_code(), apx::TypeCode::TypeRefPtr);
+      EXPECT_TRUE(data_element->is_array());
+      EXPECT_EQ(data_element->get_array_length(), 2u);
+      auto data_type = data_element->get_typeref_ptr();
+      EXPECT_NE(data_type, nullptr);
+      auto record_element = data_type->get_data_element();
+      EXPECT_EQ(record_element->get_type_code(), apx::TypeCode::Record);
+
    }
 
 }

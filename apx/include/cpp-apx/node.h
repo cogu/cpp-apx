@@ -30,8 +30,9 @@ namespace apx
       apx::error_t finalize();
       int get_last_error_line() const { return m_last_error_line; }
    protected:
-      apx::error_t derive_types_on_ports(std::vector< std::unique_ptr<apx::Port>>& ports);
-      apx::error_t derive_proper_init_values_on_ports(std::vector< std::unique_ptr<apx::Port>>& ports);
+      apx::error_t derive_types_on_ports(std::vector<std::unique_ptr<apx::Port>>& ports);
+      apx::error_t derive_proper_init_values_on_ports(std::vector<std::unique_ptr<apx::Port>>& ports);
+      apx::error_t expand_data_elements_on_ports(std::vector<std::unique_ptr<apx::Port>>& ports);
 
       bool m_is_finalized{ false };
       std::string m_name;

@@ -1,12 +1,13 @@
 #include <cassert>
 #include "cpp-apx/data_type.h"
 
-apx::error_t apx::DataType::derive_data_element(apx::DataElement*& data_element) const
+apx::error_t apx::DataType::derive_data_element(apx::DataElement*& data_element, apx::DataElement** parent) const
 {
    apx::error_t retval = APX_NO_ERROR;
    std::uint16_t reference_follow_count = 0u;
-   data_element = get_data_element();
    apx::TypeCode type_code;
+   data_element = get_data_element();
+   parent = nullptr;
    do
    {
       type_code = data_element->get_type_code();
@@ -20,6 +21,7 @@ apx::error_t apx::DataType::derive_data_element(apx::DataElement*& data_element)
          }
          else
          {
+            if (parent != nullptr) *parent = data_element;
             data_element = data_type->get_data_element();
             if (data_element == nullptr)
             {
@@ -34,12 +36,14 @@ apx::error_t apx::DataType::derive_data_element(apx::DataElement*& data_element)
    return retval;
 }
 
-apx::error_t apx::DataType::derive_data_element(apx::DataElement const*& data_element) const
+apx::error_t apx::DataType::derive_data_element(apx::DataElement const*& data_element, apx::DataElement const** parent) const
 {
    apx::error_t retval = APX_NO_ERROR;
    std::uint16_t reference_follow_count = 0u;
-   data_element = get_data_element();
    apx::TypeCode type_code;
+   data_element = get_data_element();
+   parent = nullptr;
+
    do
    {
       type_code = data_element->get_type_code();
@@ -53,6 +57,7 @@ apx::error_t apx::DataType::derive_data_element(apx::DataElement const*& data_el
          }
          else
          {
+            if (parent != nullptr) *parent = data_element;
             data_element = data_type->get_const_data_element();
             if (data_element == nullptr)
             {

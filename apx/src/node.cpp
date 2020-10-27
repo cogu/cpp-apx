@@ -124,6 +124,16 @@ namespace apx
       {
          return result;
       }
+      result = expand_data_elements_on_ports(m_provide_ports);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      result = expand_data_elements_on_ports(m_require_ports);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
       result = derive_proper_init_values_on_ports(m_provide_ports);
       if (result != APX_NO_ERROR)
       {
@@ -166,6 +176,21 @@ namespace apx
          }
       }
       return APX_NO_ERROR;
+   }
+   apx::error_t Node::expand_data_elements_on_ports(std::vector<std::unique_ptr<apx::Port>>& ports)
+   {
+      for (auto it = ports.begin(); it != ports.end(); it++)
+      {
+         auto* port = it->get();
+         apx::error_t result = port->flatten_data_element();
+         if (result != APX_NO_ERROR)
+         {
+            m_last_error_line = port->line_number;
+            return result;
+         }
+      }
+      return APX_NO_ERROR;
+
    }
 }
 

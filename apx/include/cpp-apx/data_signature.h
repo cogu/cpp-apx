@@ -8,5 +8,6 @@ namespace apx
    struct DataSignature
    {
       std::unique_ptr<apx::DataElement> element;
+      std::unique_ptr<apx::DataElement> effective_element;
    };
 }

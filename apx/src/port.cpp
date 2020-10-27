@@ -18,16 +18,16 @@ namespace apx
    apx::error_t Port::derive_proper_init_value()
    {
       dtl::DynamicValue derived_init_value;
-      auto* data_element = get_data_element();
-      auto result = derive_data_element(data_element);
-      if (result != APX_NO_ERROR)
+      auto const* data_element = get_effective_data_element();
+      if (data_element == nullptr)
       {
-         return result;
+         return APX_NULL_PTR_ERROR;
       }
       if (data_element == nullptr)
       {
          return APX_NULL_PTR_ERROR;
       }
+      apx::error_t result = APX_NO_ERROR;
       if (attr.get() != nullptr)
       {
          dtl::DynamicValue parsed_init_value = attr->get_shared_init_value();
@@ -82,7 +82,7 @@ namespace apx
       return 0u;
    }
 
-   apx::error_t Port::derive_data_element(apx::DataElement*& data_element) const
+   apx::error_t Port::derive_data_element(apx::DataElement*& data_element, apx::DataElement*& parent) const
    {
       apx::error_t retval = APX_NO_ERROR;
       assert(data_element != nullptr);
@@ -92,7 +92,7 @@ namespace apx
          auto data_type = data_element->get_typeref_ptr();
          if (data_type != nullptr)
          {
-            retval = data_type->derive_data_element(data_element);
+            retval = data_type->derive_data_element(data_element, &parent);
             assert(data_element != nullptr);
          }
          else
@@ -103,7 +103,7 @@ namespace apx
       return retval;
    }
 
-   apx::error_t Port::derive_data_element(apx::DataElement const*& data_element) const
+   apx::error_t Port::derive_data_element(apx::DataElement const*& data_element, apx::DataElement const*& parent) const
    {
       apx::error_t retval = APX_NO_ERROR;
       assert(data_element != nullptr);
@@ -113,7 +113,7 @@ namespace apx
          auto data_type = data_element->get_typeref_ptr();
          if (data_type != nullptr)
          {
-            retval = data_type->derive_data_element(data_element);
+            retval = data_type->derive_data_element(data_element, &parent);
             assert(data_element != nullptr);
          }
          else
@@ -122,6 +122,36 @@ namespace apx
          }
       }
       return retval;
+   }
+
+   apx::error_t Port::flatten_data_element()
+   {
+      auto const* data_element = get_const_data_element();
+      DataElement const* parent_element = nullptr;
+      auto result = derive_data_element(data_element, parent_element);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      std::unique_ptr<DataElement> cloned_element = std::make_unique<DataElement>(*data_element);
+      if (parent_element != nullptr)
+      {
+         if (parent_element->is_array() && cloned_element->is_array())
+         {
+            return APX_PARSE_ERROR; //Illegal in APX to create an array-reference to array-element.
+         }
+         else if (parent_element->is_array())
+         {
+            //Handle array-reference to data element
+            cloned_element->set_array_length(parent_element->get_array_length());
+            if (parent_element->is_dynamic_array())
+            {
+               cloned_element->set_dynamic_array();
+            }
+         }
+      }
+      dsg.effective_element = std::move(cloned_element);
+      return APX_NO_ERROR;
    }
 }
 

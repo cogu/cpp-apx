@@ -698,6 +698,70 @@ namespace apx_test
       ASSERT_EQ(*program, expected);
    }
 
+   TEST(CompilerPack, ArrayOfRecord)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "R\"RecordPort\"{\"Id\"S\"Value\"C}[2]:={ {0xFFFF,0}, {0xFFFF,0} }\n";
+
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      apx::Compiler compiler;
+      apx::error_t error_code = APX_NO_ERROR;
+      auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
+      ASSERT_EQ(error_code, APX_NO_ERROR);
+      constexpr std::uint8_t array_length = 2u;
+      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, (UINT16_SIZE+UINT8_SIZE) * array_length,
+         ARRAY_FLAG | OPCODE_PACK | (VARIANT_RECORD << INST_VARIANT_SHIFT),
+         OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8),
+         array_length,
+         OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
+         'I', 'd','\0',
+         OPCODE_PACK | (VARIANT_U16 << INST_VARIANT_SHIFT),
+         LAST_FIELD_FLAG | OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
+         'V', 'a', 'l', 'u', 'e', '\0',
+         OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
+         OPCODE_FLOW_CTRL | (VARIANT_ARRAY_NEXT << INST_VARIANT_SHIFT),
+      };
+      ASSERT_EQ(*program, expected);
+   }
+
+   TEST(CompilerPack, ArrayOfDynamicRecordWithEmptyInitializer)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "R\"RecordPort\"{\"Id\"S\"Value\"C}[10*]:={}\n";
+
+      apx::Parser parser;
+      EXPECT_EQ(parser.parse(apx_text), APX_NO_ERROR);
+      auto node{ parser.take_last_node() };
+      auto port = node->get_require_port(0u);
+      ASSERT_NE(port, nullptr);
+      apx::Compiler compiler;
+      apx::error_t error_code = APX_NO_ERROR;
+      auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
+      ASSERT_EQ(error_code, APX_NO_ERROR);
+      constexpr std::uint8_t array_length = 10u;
+      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, (UINT16_SIZE + UINT8_SIZE) * array_length,
+         ARRAY_FLAG | OPCODE_PACK | (VARIANT_RECORD << INST_VARIANT_SHIFT),
+         DYN_ARRAY_FLAG | OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8),
+         array_length,
+         OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
+         'I', 'd','\0',
+         OPCODE_PACK | (VARIANT_U16 << INST_VARIANT_SHIFT),
+         LAST_FIELD_FLAG | OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
+         'V', 'a', 'l', 'u', 'e', '\0',
+         OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
+         OPCODE_FLOW_CTRL | (VARIANT_ARRAY_NEXT << INST_VARIANT_SHIFT),
+      };
+      ASSERT_EQ(*program, expected);
+   }
+
    /*********************** UNPACK TESTS ***********************/
 
    TEST(CompilerUnpack, UnpackU8)
@@ -1628,7 +1692,4 @@ namespace apx_test
       };
       ASSERT_EQ(*program, expected);
    }
-
-
-
 }

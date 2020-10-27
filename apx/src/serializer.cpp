@@ -463,6 +463,21 @@ namespace apx
 
       apx::error_t Serializer::pack_record(std::size_t array_len, apx::SizeType dynamic_size_type)
       {
+         auto result = prepare_for_buffer_write();
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         m_state->type_code = TypeCode::Record;
+         result = prepare_for_array(array_len, dynamic_size_type);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+         return pack_value();
+
+
+/*
          if ( (array_len == 0) && (dynamic_size_type == apx::SizeType::None) )
          {
             if (m_state->value_type != dtl::ValueType::Hash)
@@ -475,6 +490,7 @@ namespace apx
             return APX_NOT_IMPLEMENTED_ERROR;
          }
          return APX_NO_ERROR;
+*/
       }
 
       apx::error_t Serializer::check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit)
@@ -711,11 +727,8 @@ namespace apx
                   return APX_NOT_FOUND_ERROR;
                }
                m_state->set_field_name(key, is_last_field);
-               auto child_state = new Serializer::State();
-               child_state->parent = m_state;
-               m_stack.push(m_state);
-               m_state = child_state;
-               m_state->set_value(child_value);
+               enter_new_child_state();
+               m_state->set_value(child_value); //m_state on this line is the newly entered child_state
                return APX_NO_ERROR;
             }
             return APX_VALUE_TYPE_ERROR;
@@ -762,6 +775,48 @@ namespace apx
          apx::error_t retval = write_dynamic_value_to_buffer(m_queued_write.length_ptr,
             m_queued_write.length_ptr + value_size, m_queued_write.current_length, value_size);
          return retval;
+      }
+
+      apx::error_t Serializer::array_next(bool& is_last)
+      {
+         is_last = false;
+         if (m_state->value_type == dtl::ValueType::Array)
+         {
+            if (m_state->array_len > 0)
+            {
+               if (++m_state->index == m_state->array_len)
+               {
+                  is_last = true;
+               }
+               else
+               {
+                  if (m_state->type_code == apx::TypeCode::Record)
+                  {
+                     auto tmp = m_state->value.av->at(m_state->index);
+                     auto const* child_value = tmp.get();
+                     if (child_value == nullptr)
+                     {
+                        return APX_NULL_PTR_ERROR;
+                     }
+                     enter_new_child_state();
+                     m_state->set_value(child_value); //m_state on this line is the newly entered child_state
+                  }
+                  else
+                  {
+                     return APX_NOT_IMPLEMENTED_ERROR;
+                  }
+               }
+            }
+            else
+            {
+               return APX_INTERNAL_ERROR;
+            }
+         }
+         else
+         {
+            return APX_VALUE_TYPE_ERROR;
+         }
+         return APX_NO_ERROR;
       }
 
       void Serializer::reset_buffer(std::uint8_t* buf, std::size_t len)
@@ -816,6 +871,7 @@ namespace apx
       {
          apx::error_t retval = APX_NO_ERROR;
          assert(m_state != nullptr);
+         auto do_pop_state = true;
          if (m_queued_write.is_enabled)
          {
             if (m_queued_write.current_length >= m_queued_write.max_length)
@@ -825,26 +881,56 @@ namespace apx
          }
          if (m_state->array_len == 0)
          {
-            retval = pack_scalar_value();
-         }
-         else if (m_state->array_len > 0)
-         {
-            if (m_state->is_scalar_type())
+            if (m_state->dynamic_size_type != apx::SizeType::None)
             {
-               retval = pack_array_of_scalar();
+               //This is a zero-length array. Just write the array-size.
+               retval = write_dynamic_value_to_buffer(m_state->array_len, m_state->dynamic_size_type);
             }
-            else if (m_state->is_string_type())
+            else
             {
-               retval = pack_string();
-            }
-            else if (m_state->is_bytes_type())
-            {
-               retval = pack_byte_array_internal();
+               if (m_state->is_scalar_type())
+               {
+                  retval = pack_scalar_value();
+               }
+               else if (m_state->is_record_type())
+               {
+                  retval = pack_record_value(do_pop_state);
+               }
+               else
+               {
+                  retval = APX_NOT_IMPLEMENTED_ERROR;
+               }
             }
          }
          else
          {
-            retval = APX_NOT_IMPLEMENTED_ERROR;
+            if (m_state->dynamic_size_type != apx::SizeType::None)
+            {
+               retval = write_dynamic_value_to_buffer(m_state->array_len, m_state->dynamic_size_type);
+            }
+            if (retval == APX_NO_ERROR)
+            {
+               if (m_state->is_scalar_type())
+               {
+                  retval = pack_array_of_scalar();
+               }
+               else if (m_state->is_string_type())
+               {
+                  retval = pack_string();
+               }
+               else if (m_state->is_bytes_type())
+               {
+                  retval = pack_byte_array_internal();
+               }
+               else if (m_state->is_record_type())
+               {
+                  retval = pack_record_value(do_pop_state);
+               }
+               else
+               {
+                  retval = APX_NOT_IMPLEMENTED_ERROR;
+               }
+            }
          }
          if (retval == APX_NO_ERROR)
          {
@@ -852,7 +938,10 @@ namespace apx
             {
                m_queued_write.current_length++;
             }
-            pop_state();
+            if (do_pop_state)
+            {
+               pop_state();
+            }
          }
          return retval;
       }
@@ -889,20 +978,9 @@ namespace apx
             return APX_VALUE_TYPE_ERROR;
          }
          assert(m_state->value.av != nullptr);
-         if (m_state->max_array_len > 0)
+         if ( (m_state->dynamic_size_type == apx::SizeType::None) && (m_state->value.av->length() != m_state->array_len))
          {
-            auto result = write_dynamic_value_to_buffer(m_state->array_len, m_state->dynamic_size_type);
-            if (result != APX_NO_ERROR)
-            {
-               return result;
-            }
-         }
-         else
-         {
-            if (m_state->value.av->length() != m_state->array_len)
-            {
-               return APX_VALUE_LENGTH_ERROR;
-            }
+            return APX_VALUE_LENGTH_ERROR; //For non-dynamic arrays the array length of the value must match exactly.
          }
          if (m_state->range_check_state == RangeCheckState::NotChecked)
          {
@@ -1011,22 +1089,13 @@ namespace apx
             return APX_VALUE_TYPE_ERROR;
          }
 
-         auto const array_len{ m_state->array_len };
-         if (m_state->max_array_len > 0u)
-         {
-            auto result = write_dynamic_value_to_buffer(array_len, m_state->dynamic_size_type);
-            if (result != APX_NO_ERROR)
-            {
-               return result;
-            }
-         }
          bool ok{ false };
          auto const value = m_state->value.sv->to_string(ok);
          if (!ok)
          {
             return APX_VALUE_CONVERSION_ERROR;
          }
-         std::size_t const target_string_size{ m_state->element_size * array_len };
+         std::size_t const target_string_size{ m_state->element_size * m_state->array_len };
          apx::error_t retval{ APX_NO_ERROR };
          if ((m_buffer.next + target_string_size) <= m_buffer.end)
          {
@@ -1077,17 +1146,9 @@ namespace apx
          }
          auto const array_len{ m_state->array_len };
          auto const byte_array = m_state->value.sv->get_byte_array();
-         if (m_state->max_array_len > 0)
+         if ( (m_state->dynamic_size_type == apx::SizeType::None) && (array_len > 0u) )
          {
-            auto result = write_dynamic_value_to_buffer(array_len, m_state->dynamic_size_type);
-            if (result != APX_NO_ERROR)
-            {
-               return result;
-            }
-         }
-         else
-         {
-            if (array_len != byte_array.size())
+            if (array_len != byte_array.size()) //For non-dynamic arrays the length of the value must match exactly.
             {
                return APX_VALUE_LENGTH_ERROR;
             }
@@ -1103,6 +1164,46 @@ namespace apx
             retval = APX_BUFFER_BOUNDARY_ERROR;
          }
          return retval;
+      }
+
+      apx::error_t Serializer::pack_record_value(bool& do_pop_state)
+      {
+         std::size_t const expected_array_len{ m_state->array_len };
+         do_pop_state = false;
+         if (expected_array_len > 0)
+         {
+            if (m_state->value_type == dtl::ValueType::Array)
+            {
+               if (m_state->dynamic_size_type == apx::SizeType::None)
+               {
+                  //For non-dynamic arrays the length of the value must match exactly.
+                  std::size_t const value_array_length{ m_state->value.av->length() };
+                  if (expected_array_len != value_array_length)
+                  {
+                     return APX_VALUE_LENGTH_ERROR;
+                  }
+               }
+               //select the first array value in a new child state.
+               assert(m_state->index == 0u);
+               auto tmp = m_state->value.av->at(m_state->index);
+               auto const* child_value = tmp.get();
+               if (child_value == nullptr)
+               {
+                  return APX_NULL_PTR_ERROR;
+               }
+               enter_new_child_state();
+               m_state->set_value(child_value); //m_state on this line is the newly entered child_state
+            }
+            else
+            {
+               return APX_VALUE_TYPE_ERROR;
+            }
+         }
+         if (m_state->value_type != dtl::ValueType::Hash) //This check applies to both top-level state as well as (potentially newly entered) child-state
+         {
+            return APX_VALUE_TYPE_ERROR;
+         }
+         return APX_NO_ERROR;
       }
 
       apx::error_t Serializer::default_range_check_value()
@@ -1293,6 +1394,14 @@ namespace apx
                break;
             }
          }
+      }
+
+      void Serializer::enter_new_child_state()
+      {
+         auto child_state = new Serializer::State();
+         child_state->parent = m_state;
+         m_stack.push(m_state);
+         m_state = child_state;
       }
 
       apx::error_t Serializer::write_dynamic_value_to_buffer(std::size_t value, apx::SizeType size_type)
