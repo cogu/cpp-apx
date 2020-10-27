@@ -60,6 +60,7 @@ namespace apx
                (type_code == TypeCode::Char16) ||
                (type_code == TypeCode::Char32); }
             bool is_bytes_type() { return type_code == TypeCode::Byte; }
+            bool is_record_type() { return type_code == TypeCode::Record; }
             dtl::Value const* get_child_value(const char* key);
             void set_field_name(const char* name, bool is_last) { field_name = name;  is_last_field = is_last; }
             apx::error_t determine_array_length_from_value();
@@ -116,6 +117,7 @@ namespace apx
          apx::error_t record_select(const char* key, bool is_last_field);
          apx::error_t queued_write_begin(std::uint32_t element_size, std::uint32_t max_length, bool clear_queue);
          apx::error_t queued_write_end();
+         apx::error_t array_next(bool& is_last);
 
       protected:
          WriteBuffer m_buffer;
@@ -132,6 +134,7 @@ namespace apx
          apx::error_t pack_string();
          apx::error_t pack_char_string(std::string const& str, std::size_t max_target_size);
          apx::error_t pack_byte_array_internal();
+         apx::error_t pack_record_value(bool& do_pop_state);
          apx::error_t default_range_check_value();
          apx::error_t default_range_check_scalar();
          apx::error_t value_in_range_i32(std::int32_t value, std::int32_t lower_limit, std::int32_t upper_limit);
@@ -139,6 +142,7 @@ namespace apx
          apx::error_t value_in_range_i64(std::int64_t value, std::int64_t lower_limit, std::int64_t upper_limit);
          apx::error_t value_in_range_u64(std::uint64_t value, std::uint64_t lower_limit, std::uint64_t upper_limit);
          void pop_state();
+         void enter_new_child_state();
          apx::error_t write_dynamic_value_to_buffer(std::size_t value, apx::SizeType size_type);
          apx::error_t write_dynamic_value_to_buffer(std::uint8_t* begin, std::uint8_t* end, std::size_t value, std::size_t value_size);
          apx::error_t read_dynamic_value_from_buffer(std::uint8_t const* begin, std::uint8_t const* end, std::size_t &value, std::size_t value_size);

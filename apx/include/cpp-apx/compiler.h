@@ -29,6 +29,7 @@ namespace apx
       apx::error_t compile_array_size_instruction(std::uint32_t array_size, bool is_dynamic_array);
       apx::error_t compile_record_fields(apx::DataElement const* data_element, apx::ProgramType program_type, std::uint32_t &record_size);
       apx::error_t compile_record_select_instruction(apx::DataElement const* data_element, bool is_last_field);
+      apx::error_t compile_array_next_instruction();
 
       //std::stack<std::uint32_t> m_offset_stack;
       std::unique_ptr<apx::vm::Program> m_program;

@@ -25,18 +25,14 @@ namespace apx
       {
          if (m_last_error == APX_NO_ERROR)
          {
-            auto data_element = port->get_const_data_element();
-            m_last_error = port->derive_data_element(data_element);
-            if (m_last_error == APX_NO_ERROR)
+            auto data_element = port->get_effective_data_element();
+            if (data_element != nullptr)
             {
-               if (data_element != nullptr)
-               {
-                  m_last_error = compile_data_element(data_element, program_type, element_size);
-               }
-               else
-               {
-                  m_last_error = APX_NULL_PTR_ERROR;
-               }
+               m_last_error = compile_data_element(data_element, program_type, element_size);
+            }
+            else
+            {
+               m_last_error = APX_NULL_PTR_ERROR;
             }
          }
       }
@@ -154,7 +150,23 @@ namespace apx
          {
             auto const instruction = vm::encode_instruction(opcode, data_variant, is_array);
             m_program->push_back(instruction);
+            if (is_array)
+            {
+               retval = compile_array_size_instruction(array_length, is_dynamic_array);
+               if (retval != APX_NO_ERROR)
+               {
+                  return retval;
+               }
+               if (is_dynamic_array)
+               {
+                  m_is_dynamic = true;
+               }
+            }
             retval = compile_record_fields(data_element, program_type, elem_size);
+            if ((retval == APX_NO_ERROR) && (is_array))
+            {
+               retval = compile_array_next_instruction();
+            }
          }
          else
          {
@@ -424,7 +436,8 @@ namespace apx
             return result;
          }
          auto derived_element = child_element;
-         result = data_element->derive_data_element(derived_element);
+         DataElement const* derived_parent = nullptr;
+         result = data_element->derive_data_element(derived_element, &derived_parent);
          if (result != APX_NO_ERROR)
          {
             return result;
@@ -456,6 +469,14 @@ namespace apx
       m_program->push_back(instruction);
       m_program->insert(m_program->end(), name.begin(), name.end());
       m_program->push_back(0u); //null-terminator;
+      return APX_NO_ERROR;
+   }
+
+   apx::error_t Compiler::compile_array_next_instruction()
+   {
+      assert(m_program.get() != nullptr);
+      std::uint8_t const instruction = vm::encode_instruction(vm::OPCODE_FLOW_CTRL, vm::VARIANT_ARRAY_NEXT, false);
+      m_program->push_back(instruction);
       return APX_NO_ERROR;
    }
 

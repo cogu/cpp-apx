@@ -1309,4 +1309,100 @@ namespace apx_test
       ASSERT_EQ(buf[2], 8u);
       ASSERT_EQ(buf[3], 9u);
    }
+
+   TEST(Serializer, PackRecordOfRecord_Uint8Uint16__Uint16Uint32)
+   {
+      std::array<std::uint8_t, UINT8_SIZE + UINT16_SIZE + UINT16_SIZE + UINT32_SIZE> buf;
+      std::memset(buf.data(), 0, buf.size());
+      Serializer serializer;
+      auto hv = dtl::make_hv({
+         std::make_pair("First", dtl::make_hv_dv({
+            std::make_pair("Inner1", dtl::make_sv<std::uint32_t>(0x12u)),
+            std::make_pair("Inner2", dtl::make_sv<std::uint32_t>(0x1234u))
+            })),
+         std::make_pair("Second", dtl::make_hv_dv({
+            std::make_pair("Inner3", dtl::make_sv<std::uint32_t>(0x1234u)),
+            std::make_pair("Inner4", dtl::make_sv<std::uint32_t>(0x12345678ul))
+            }))
+         });
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_record(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("First", false), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_record(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Inner1", false), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Inner2", true), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint16(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Second", true), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_record(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Inner3", false), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint16(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Inner4", true), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint32(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.bytes_written(), buf.size());
+      ASSERT_EQ(buf[0], 0x12u);
+      ASSERT_EQ(buf[1], 0x34u);
+      ASSERT_EQ(buf[2], 0x12u);
+      ASSERT_EQ(buf[3], 0x34u);
+      ASSERT_EQ(buf[4], 0x12u);
+      ASSERT_EQ(buf[5], 0x78u);
+      ASSERT_EQ(buf[6], 0x56u);
+      ASSERT_EQ(buf[7], 0x34u);
+      ASSERT_EQ(buf[8], 0x12u);
+
+   }
+
+   TEST(Serializer, PackArrayOfRecord_UInt16UInt8)
+   {
+      constexpr std::size_t array_length = 3u;
+      std::array<std::uint8_t, (UINT16_SIZE + UINT8_SIZE)* array_length> buf;
+      std::memset(buf.data(), 0, buf.size());
+      Serializer serializer;
+      auto hv = dtl::make_av({
+         dtl::make_hv_dv({
+            std::make_pair("Id", dtl::make_sv<std::uint32_t>(1000u)),
+            std::make_pair("Value", dtl::make_sv<std::uint32_t>(1u))
+            }),
+         dtl::make_hv_dv({
+            std::make_pair("Id", dtl::make_sv<std::uint32_t>(2000u)),
+            std::make_pair("Value", dtl::make_sv<std::uint32_t>(0u))
+            }),
+         dtl::make_hv_dv({
+            std::make_pair("Id", dtl::make_sv<std::uint32_t>(4000u)),
+            std::make_pair("Value", dtl::make_sv<std::uint32_t>(1u))
+            })
+      });
+      ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
+      ASSERT_EQ(serializer.set_value(hv), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_record(array_length, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Id", false), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint16(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Value", true), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      auto is_last{ false };
+      EXPECT_EQ(serializer.array_next(is_last), APX_NO_ERROR);
+      EXPECT_FALSE(is_last);
+      EXPECT_EQ(serializer.record_select("Id", false), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint16(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Value", true), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.array_next(is_last), APX_NO_ERROR);
+      EXPECT_FALSE(is_last);
+      EXPECT_EQ(serializer.record_select("Id", false), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint16(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.record_select("Value", true), APX_NO_ERROR);
+      EXPECT_EQ(serializer.pack_uint8(0u, apx::SizeType::None), APX_NO_ERROR);
+      EXPECT_EQ(serializer.array_next(is_last), APX_NO_ERROR);
+      EXPECT_TRUE(is_last);
+      EXPECT_EQ(serializer.bytes_written(), buf.size());
+      std::array<std::uint8_t, buf.size()> expected =
+      {
+         0xE8, 0x03, 0x01,
+         0xd0, 0x07, 0x00,
+         0xA0, 0x0F, 0x01
+      };
+      EXPECT_EQ(buf, expected);
+   }
+
 }

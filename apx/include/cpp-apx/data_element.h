@@ -19,6 +19,7 @@ namespace apx
    {
    public:
       DataElement() = default;
+      DataElement(DataElement const &other);
       DataElement(apx::TypeCode type_code, std::uint32_t array_length = 0u);
       DataElement(apx::TypeCode type_code, std::int32_t lowerLimit, std::int32_t upperLimit, std::uint32_t array_length = 0u);
       DataElement(apx::TypeCode type_code, std::uint32_t lowerLimit, std::uint32_t upperLimit, std::uint32_t array_length = 0u);
@@ -55,16 +56,15 @@ namespace apx
       void set_dynamic_array() { m_dynamic_array = true; }
       bool is_dynamic_array() const { return m_dynamic_array; }
       apx::error_t derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
-      apx::error_t derive_proper_init_value(dtl::DynamicValue const &parsed_init_value, dtl::DynamicValue& derived_value);
-      apx::error_t create_default_init_value(dtl::DynamicValue& derived_value);
-      apx::error_t derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv);
-      apx::error_t derive_data_element(apx::DataElement*& data_element) const;
-      apx::error_t derive_data_element(apx::DataElement const*& data_element) const;
+      apx::error_t derive_proper_init_value(dtl::DynamicValue const &parsed_init_value, dtl::DynamicValue& derived_value) const;
+      apx::error_t create_default_init_value(dtl::DynamicValue& derived_value) const;
+      apx::error_t derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv) const;
+      apx::error_t derive_data_element(apx::DataElement*& data_element, apx::DataElement** parent) const;
+      apx::error_t derive_data_element(apx::DataElement const*& data_element, apx::DataElement const** parent) const;
 
 
 
    protected:
-      void init_element_vector();
       std::string m_name;
       apx::TypeCode m_type_code = apx::TypeCode::None;
       std::uint32_t m_array_len = 0u;
@@ -76,6 +76,6 @@ namespace apx
       std::optional<std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_lower_limit = {};
       std::optional <std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_upper_limit = {};
 
-
+      void init_element_vector();
    };
 }
