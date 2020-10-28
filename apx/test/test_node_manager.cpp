@@ -1,13 +1,14 @@
 #include "pch.h"
 #include "cpp-apx/node_manager.h"
-#include <iostream>
+#include <array>
+#include <cstring>
 
 using namespace apx::vm;
 using namespace std::string_literals;
 
 namespace apx_test
 {
-   TEST(NodeManager, buildNodeContainingUnsignedTypesWithoutLimits)
+   TEST(NodeManager, nodeContainingUnsignedTypesWithoutLimits)
    {
       const char* apx_text =
          "APX/1.2\n"
@@ -43,7 +44,7 @@ namespace apx_test
       EXPECT_EQ(require_port_data[4], 0u);
    }
 
-   TEST(NodeManager, buildNodeContainingUnsignedTypesWithLimits)
+   TEST(NodeManager, nodeContainingUnsignedTypesWithLimits)
    {
       const char* apx_text =
          "APX/1.2\n"
@@ -79,7 +80,7 @@ namespace apx_test
       EXPECT_EQ(require_port_data[4], 0u);
    }
 
-   TEST(NodeManager, buildNodeContainingOutOfRangeInitValue)
+   TEST(NodeManager, nodeContainingOutOfRangeInitValue)
    {
       const char* apx_text =
          "APX/1.2\n"
@@ -89,7 +90,7 @@ namespace apx_test
       EXPECT_EQ(manager.build_node(apx_text), APX_VALUE_RANGE_ERROR);
    }
 
-   TEST(NodeManager, buildNodeContainingUnsignedArrayTypes)
+   TEST(NodeManager, nodeContainingUnsignedArrayTypes)
    {
       const char* apx_text =
          "APX/1.2\n"
@@ -121,7 +122,7 @@ namespace apx_test
       EXPECT_EQ(provide_port_data[4], 0xffu);
    }
 
-   TEST(NodeManager, buildNodeContainingSignedTypesWithoutLimits)
+   TEST(NodeManager, nodeContainingSignedTypesWithoutLimits)
    {
       const char* apx_text =
          "APX/1.2\n"
@@ -149,7 +150,7 @@ namespace apx_test
       EXPECT_EQ(provide_port_data[6], 0u);
    }
 
-   TEST(NodeManager, buildNodeContainingSignedTypesWithLimits)
+   TEST(NodeManager, nodeContainingSignedTypesWithLimits)
    {
       const char* apx_text =
          "APX/1.2\n"
@@ -177,7 +178,7 @@ namespace apx_test
       EXPECT_EQ(provide_port_data[6], 0xffu);
    }
 
-   TEST(NodeManager, buildNodeContainingSignedArrayTypes)
+   TEST(NodeManager, nodeContainingSignedArrayTypes)
    {
       const char* apx_text =
          "APX/1.2\n"
@@ -216,7 +217,7 @@ namespace apx_test
       EXPECT_EQ(provide_port_data[17], 0xffu);
    }
 
-   TEST(NodeManager, buildNodeContainingStringType)
+   TEST(NodeManager, nodeContainingStringType)
    {
       const char* apx_text =
          "APX/1.2\n"
@@ -246,12 +247,14 @@ namespace apx_test
       EXPECT_EQ(provide_port_data[11], '!');
    }
 
-   TEST(NodeManager, buildNodeContainingRecordType)
+   TEST(NodeManager, portContainingRecordType)
    {
       const char* apx_text =
          "APX/1.2\n"
          "N\"TestNode\"\n"
-         "P\"RecordPort\"{\"First\"C\"Second\"S}:={0xab, 0x1234}\n";
+         "P\"RecordPortOut\"{\"First\"C\"Second\"S}:={0x12, 0x1234}\n"
+         "R\"RecordPortIn\"{\"First\"C\"Second\"S}:={0x12, 0x1234}\n";
+      constexpr std::size_t expected_size = UINT8_SIZE + UINT16_SIZE;
       apx::NodeManager manager;
       EXPECT_EQ(manager.build_node(apx_text), APX_NO_ERROR);
       auto* node = manager.get_last_attached();
@@ -259,15 +262,25 @@ namespace apx_test
       auto const* node_data = node->get_const_node_data();
       EXPECT_NE(node_data, nullptr);
       EXPECT_EQ(node_data->num_provide_ports(), 1u);
-      EXPECT_EQ(node_data->provide_port_data_size(), UINT8_SIZE + UINT16_SIZE);
+      EXPECT_EQ(node_data->num_require_ports(), 1u);
+      EXPECT_EQ(node_data->provide_port_data_size(), expected_size);
+      EXPECT_EQ(node_data->require_port_data_size(), expected_size);
       auto const* provide_port_data = node_data->get_provide_port_data();
       EXPECT_NE(provide_port_data, nullptr);
-      EXPECT_EQ(provide_port_data[0], 0xabu);
-      EXPECT_EQ(provide_port_data[1], 0x34u);
-      EXPECT_EQ(provide_port_data[2], 0x12u);
+      std::array<std::uint8_t, expected_size> expected = {
+         0x12,
+         0x34, 0x12
+      };
+      std::array<std::uint8_t, expected.size()> actual;
+      std::memcpy(actual.data(), provide_port_data, actual.size());
+      EXPECT_EQ(actual, expected);
+      auto const* require_port_data = node_data->get_require_port_data();
+      EXPECT_NE(require_port_data, nullptr);
+      std::memcpy(actual.data(), require_port_data, actual.size());
+      EXPECT_EQ(actual, expected);
    }
 
-   TEST(NodeManager, buildNodeContainingTypeDefinition)
+   TEST(NodeManager, providePortContainingTypeReference)
    {
       const char* apx_text =
          "APX/1.3\n"
@@ -302,5 +315,72 @@ namespace apx_test
       EXPECT_EQ(vt->lower_limit.i32, 0xFF00);
       EXPECT_EQ(vt->upper_limit.i32, 0xFFFF);
       EXPECT_EQ(vt->values[0], "NotAvailable"s);
+   }
+
+   TEST(NodeManager, providePortContainingArrayOfRecords)
+   {
+      constexpr std::size_t array_length = 2u;
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "P\"ArrayPortOut\"{\"First\"S\"Second\"C}[2]:={ {0x1234, 0x12}, {0x1234, 0x12} }\n"
+         "R\"ArrayPortIn\"{\"First\"S\"Second\"C}[2]:={ {0x1234, 0x12}, {0x1234, 0x12} }\n";
+      constexpr std::size_t expected_size = (UINT16_SIZE + UINT8_SIZE) * array_length;
+      apx::NodeManager manager;
+      EXPECT_EQ(manager.build_node(apx_text), APX_NO_ERROR);
+      auto* node = manager.get_last_attached();
+      EXPECT_NE(node, nullptr);
+      auto const* node_data = node->get_const_node_data();
+      EXPECT_NE(node_data, nullptr);
+      EXPECT_EQ(node_data->num_provide_ports(), 1u);
+      EXPECT_EQ(node_data->num_provide_ports(), 1u);
+      EXPECT_EQ(node_data->provide_port_data_size(), expected_size);
+      EXPECT_EQ(node_data->require_port_data_size(), expected_size);
+      auto const* provide_port_data = node_data->get_provide_port_data();
+      EXPECT_TRUE(provide_port_data);
+      std::array<std::uint8_t, (UINT16_SIZE + UINT8_SIZE)* array_length> expected = {
+         0x34, 0x12, 0x12,
+         0x34, 0x12, 0x12
+      };
+      std::array<std::uint8_t, expected.size()> actual;
+      std::memcpy(actual.data(), provide_port_data, actual.size());
+      EXPECT_EQ(actual, expected);
+      auto const* require_port_data = node_data->get_require_port_data();
+      EXPECT_NE(require_port_data, nullptr);
+      std::memcpy(actual.data(), require_port_data, actual.size());
+      EXPECT_EQ(actual, expected);
+   }
+
+   TEST(NodeManager, providePortContainingRecordInsideRecord)
+   {
+      const char* apx_text =
+         "APX/1.3\n"
+         "N\"TestNode\"\n"
+         "P\"RecordPortOut\"{\"First\"{\"Inner1\"C\"Inner2\"S}\"Second\"{\"Inner3\"S\"Inner4\"L}}:={ {0x12, 0x1234}, {0x1234, 0x12345678} }\n"
+         "R\"RecordPortOutIn\"{\"First\"{\"Inner1\"C\"Inner2\"S}\"Second\"{\"Inner3\"S\"Inner4\"L}}:={ {0x12, 0x1234}, {0x1234, 0x12345678} }\n";
+      constexpr std::size_t expected_size = (UINT8_SIZE + UINT16_SIZE) + (UINT16_SIZE + UINT32_SIZE);
+      apx::NodeManager manager;
+      EXPECT_EQ(manager.build_node(apx_text), APX_NO_ERROR);
+      auto* node = manager.get_last_attached();
+      EXPECT_NE(node, nullptr);
+      auto const* node_data = node->get_const_node_data();
+      EXPECT_NE(node_data, nullptr);
+      EXPECT_EQ(node_data->num_provide_ports(), 1u);
+      EXPECT_EQ(node_data->num_require_ports(), 1u);
+      EXPECT_EQ(node_data->provide_port_data_size(), expected_size);
+      EXPECT_EQ(node_data->require_port_data_size(), expected_size);
+      auto const* provide_port_data = node_data->get_provide_port_data();
+      EXPECT_TRUE(provide_port_data);
+      std::array<std::uint8_t, expected_size> expected = {
+         0x12, 0x34, 0x12,
+         0x34, 0x12, 0x78, 0x56, 0x34, 0x12
+      };
+      std::array<std::uint8_t, expected.size()> actual;
+      std::memcpy(actual.data(), provide_port_data, actual.size());
+      EXPECT_EQ(actual, expected);
+      auto const* require_port_data = node_data->get_require_port_data();
+      EXPECT_NE(require_port_data, nullptr);
+      std::memcpy(actual.data(), require_port_data, actual.size());
+      EXPECT_EQ(actual, expected);
    }
 }
