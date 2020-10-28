@@ -50,6 +50,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         apx/test/test_compiler.cpp
         apx/test/test_data_element.cpp
         apx/test/test_decoder.cpp
+        apx/test/test_deserializer.cpp
         apx/test/test_file_client.cpp
         apx/test/test_node_data.cpp
         apx/test/test_node_manager.cpp
@@ -58,6 +59,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         apx/test/test_parser.cpp
         apx/test/test_port_instance.cpp
         apx/test/test_program.cpp
+        apx/test/test_serializer.cpp
         apx/test/test_signature_parser.cpp
         apx/test/test_vm.cpp
     )

@@ -43,12 +43,10 @@ set (CPP_APX_COMMON_LIB_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/node_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/node.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/parser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/port_attribute.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/port_instance.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/port.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/program.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/signature_parser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/type_attribute.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vm.cpp
 )
 

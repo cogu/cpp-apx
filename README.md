@@ -4,7 +4,7 @@ This is the new [APX](https://cogu.github.io/apx/) for C++ implementation.
 
 ## Implementation Status
 
-This repo is in early stages of development and just contains a set of classes with unit tests.
+This repo is in early stages of development and mostly contains a set of classes with unit tests.
 
 ## Reasons for this repo
 
