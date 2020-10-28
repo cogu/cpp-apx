@@ -13,9 +13,14 @@ namespace apx
          {
             return APX_INVALID_ARGUMENT_ERROR;
          }
-         m_program_next = begin;
+         m_program_begin = m_program_next = begin;
          m_program_end = end;
          return APX_NO_ERROR;
+      }
+
+      apx::error_t Decoder::parse_program_header(ProgramHeader& header)
+      {
+         return apx::vm::decode_program_header(m_program_begin, m_program_end, m_program_next, header);
       }
 
       apx::error_t Decoder::parse_next_operation(OperationType& operation_type)
@@ -41,6 +46,22 @@ namespace apx
             }
          }
          return APX_NO_ERROR;
+      }
+
+      void Decoder::save_program_position()
+      {
+         if (m_program_next != nullptr)
+         {
+            m_program_mark = m_program_next;
+         }
+      }
+
+      void Decoder::recall_program_position()
+      {
+         if (m_program_mark != nullptr)
+         {
+            m_program_next = m_program_mark;
+         }
       }
 
       apx::error_t Decoder::decode_next_instruction_internal()

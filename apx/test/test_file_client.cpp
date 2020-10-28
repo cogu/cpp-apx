@@ -70,7 +70,7 @@ namespace apx_test
       }
    };
 
-   TEST_F(FileClientTest, NodeWithUint8ProvidePort)
+   TEST_F(FileClientTest, SaveInitDataToFile_UInt8ProvidePort)
    {
       char const* apx_text = "APX/1.2\n"
          "N\"TestNode\"\n"
@@ -90,7 +90,7 @@ namespace apx_test
       ASSERT_EQ(buf[0], 7u);
    }
 
-   TEST_F(FileClientTest, NodeWithUint8RequirePort)
+   TEST_F(FileClientTest, SaveInitDataToFile_UInt8RequirePort)
    {
       char const* apx_text = "APX/1.2\n"
          "N\"TestNode\"\n"
@@ -110,7 +110,7 @@ namespace apx_test
       ASSERT_EQ(buf[0], 7u);
    }
 
-   TEST_F(FileClientTest, ReadRequirePortDataFromFile)
+   TEST_F(FileClientTest, LoadRequirePortDataFromFile_UInt8)
    {
       std::array<std::uint8_t, sizeof(std::uint8_t)> stored{ 1u };
       auto path_to_file = m_test_dir / "TestNode.in";
@@ -132,7 +132,7 @@ namespace apx_test
       ASSERT_EQ(buf[0], stored[0]);
    }
 
-   TEST_F(FileClientTest, ReadProvidePortDataFromFile)
+   TEST_F(FileClientTest, LoadProvidePortDataFromFile_UInt8)
    {
       std::array<std::uint8_t, sizeof(std::uint8_t)> stored{ 1u };
       auto path_to_file = m_test_dir / "TestNode.out";

@@ -4,14 +4,14 @@ namespace apx
 {
    apx::error_t VirtualMachine::select_program(apx::vm::Program const& program)
    {
-      m_program_begin = m_program_next = program.data();
-      m_program_end = m_program_begin + program.size();
-      apx::error_t result = parse_program_header();
-      if (result != APX_NO_ERROR)
+      std::uint8_t const* program_begin = program.data();
+      std::uint8_t const* program_end = program_begin + program.size();
+      apx::error_t result = m_decoder.select_program(program_begin, program_end);
+      if (result == APX_NO_ERROR)
       {
-         return result;
+         result = m_decoder.parse_program_header(m_program_header);
       }
-      return m_decoder.select_program(m_program_next, m_program_end);
+      return result;
    }
 
    apx::error_t VirtualMachine::set_write_buffer(std::uint8_t* data, std::size_t size)
@@ -66,11 +66,6 @@ namespace apx
       return retval;
    }
 
-   apx::error_t VirtualMachine::parse_program_header()
-   {
-      return vm::decode_program_header(m_program_begin, m_program_end, m_program_next, m_program_header);
-   }
-
    apx::error_t VirtualMachine::run_pack_program()
    {
       vm::OperationType operation_type = vm::OperationType::ProgramEnd;
@@ -101,10 +96,10 @@ namespace apx
             result = run_range_check_pack_uint64();
             break;
          case vm::OperationType::RecordSelect:
-            result = run_record_select();
+            result = run_pack_record_select();
             break;
          case vm::OperationType::ArrayNext:
-            result = APX_NOT_IMPLEMENTED_ERROR;
+            result = run_array_next();
             break;
          case vm::OperationType::ProgramEnd:
             break;
@@ -203,6 +198,10 @@ namespace apx
          break;
       case TypeCode::Record:
          retval = m_serializer.pack_record(operation.array_length, dynamic_size_type);
+         if (operation.array_length > 0u)
+         {
+            m_decoder.save_program_position();
+         }
          break;
       }
       return retval;
@@ -270,10 +269,40 @@ namespace apx
       return m_deserializer.check_value_range_uint64(operation.lower_limit, operation.upper_limit);
    }
 
-   apx::error_t VirtualMachine::run_record_select()
+   apx::error_t VirtualMachine::run_pack_record_select()
    {
       auto const& field_name = m_decoder.get_field_name();
       return m_serializer.record_select(field_name.c_str(), m_decoder.is_last_field());
    }
+
+   apx::error_t VirtualMachine::run_unpack_record_select()
+   {
+      auto const& field_name = m_decoder.get_field_name();
+      return m_deserializer.record_select(field_name.c_str(), m_decoder.is_last_field());
+   }
+
+   apx::error_t VirtualMachine::run_array_next()
+   {
+      bool is_last_index{ false };
+      apx::error_t result = is_pack_prog() ? m_serializer.array_next(is_last_index) : m_deserializer.array_next(is_last_index);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      if (!is_last_index)
+      {
+         if (m_decoder.has_saved_program_position())
+         {
+            m_decoder.recall_program_position();
+         }
+         else
+         {
+            return APX_INVALID_INSTRUCTION_ERROR;
+         }
+      }
+      return APX_NO_ERROR;
+   }
+
+
 
 }

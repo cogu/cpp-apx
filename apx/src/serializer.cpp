@@ -475,22 +475,6 @@ namespace apx
             return result;
          }
          return pack_value();
-
-
-/*
-         if ( (array_len == 0) && (dynamic_size_type == apx::SizeType::None) )
-         {
-            if (m_state->value_type != dtl::ValueType::Hash)
-            {
-               return APX_VALUE_TYPE_ERROR;
-            }
-         }
-         else
-         {
-            return APX_NOT_IMPLEMENTED_ERROR;
-         }
-         return APX_NO_ERROR;
-*/
       }
 
       apx::error_t Serializer::check_value_range_int32(std::int32_t lower_limit, std::int32_t upper_limit)

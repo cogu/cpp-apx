@@ -52,10 +52,7 @@ namespace apx
       apx::error_t unpack_value(dtl::ScalarValue& value);
 #endif
    protected:
-      apx::error_t parse_program_header();
-      std::uint8_t const* m_program_begin{ nullptr };
-      std::uint8_t const* m_program_end{ nullptr };
-      std::uint8_t const* m_program_next{ nullptr };
+
       vm::ProgramHeader m_program_header;
       vm::Decoder m_decoder;
 #ifdef QT_API
@@ -77,7 +74,10 @@ namespace apx
       apx::error_t run_range_check_unpack_uint32();
       apx::error_t run_range_check_unpack_int64();
       apx::error_t run_range_check_unpack_uint64();
-      apx::error_t run_record_select();
+      apx::error_t run_pack_record_select();
+      apx::error_t run_unpack_record_select();
+      apx::error_t run_array_next();
+      bool is_pack_prog() { return m_program_header.prog_type == ProgramType::Pack; }
 
    };
 }

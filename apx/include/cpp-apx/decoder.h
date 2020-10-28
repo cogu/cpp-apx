@@ -36,6 +36,7 @@ namespace apx
       {
       public:
          apx::error_t select_program(std::uint8_t const* begin, std::uint8_t const* end);
+         apx::error_t parse_program_header(ProgramHeader &header);
          apx::error_t parse_next_operation(OperationType& operation_type);
          PackUnpackOperationInfo const& get_pack_unpack_info() { return m_pack_unpack_info; }
          RangeCheckUInt32OperationInfo const& get_range_check_uint32() { return m_range_check_uint32_info; }
@@ -44,10 +45,15 @@ namespace apx
          RangeCheckInt64OperationInfo const& get_range_check_int64() { return m_range_check_int64_info; }
          std::string const& get_field_name() { return m_field_name; }
          bool is_last_field() { return m_is_last_field; }
+         void save_program_position();
+         void recall_program_position();
+         bool has_saved_program_position() { return m_program_mark != nullptr; }
 
       protected:
+         std::uint8_t const* m_program_begin{ nullptr };
          std::uint8_t const* m_program_next{ nullptr };
          std::uint8_t const* m_program_end{ nullptr };
+         std::uint8_t const* m_program_mark{ nullptr }; //TODO: Perhaps create a stack out of this?
          OperationType m_operation_type{ OperationType::ProgramEnd };
          PackUnpackOperationInfo m_pack_unpack_info{ TypeCode::None, 0u, false };
          RangeCheckUInt32OperationInfo m_range_check_uint32_info{ 0u, 0u };
