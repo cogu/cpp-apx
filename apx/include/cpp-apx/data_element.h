@@ -18,7 +18,7 @@ namespace apx
    class DataElement
    {
    public:
-      DataElement() = default;
+      DataElement() = delete;
       DataElement(DataElement const &other);
       DataElement(apx::TypeCode type_code, std::uint32_t array_length = 0u);
       DataElement(apx::TypeCode type_code, std::int32_t lowerLimit, std::int32_t upperLimit, std::uint32_t array_length = 0u);
@@ -61,7 +61,8 @@ namespace apx
       apx::error_t derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv) const;
       apx::error_t derive_data_element(apx::DataElement*& data_element, apx::DataElement** parent) const;
       apx::error_t derive_data_element(apx::DataElement const*& data_element, apx::DataElement const** parent) const;
-
+      std::string to_string();
+      bool operator==(DataElement const& other) const;
 
 
    protected:
@@ -74,8 +75,16 @@ namespace apx
                                                                          // Pointer when m_type_code equals TypeRefPtr
       std::unique_ptr<std::vector<std::unique_ptr<DataElement>>> m_elements = nullptr;
       std::optional<std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_lower_limit = {};
-      std::optional <std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_upper_limit = {};
+      std::optional<std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_upper_limit = {};
 
       void init_element_vector();
+      std::string limit_to_string();
+      std::string array_to_string();
+      bool is_limits_equal(DataElement const& other) const;
+      bool is_array_equal(DataElement const& other) const;
+      bool is_elements_equal(DataElement const& other) const;
+      bool is_typeref_id_equal(DataElement const& other) const { return get_typeref_id() == other.get_typeref_id(); };
+      bool is_typeref_name_equal(DataElement const& other) const { return get_typeref_name() == other.get_typeref_name(); };
+      bool is_typeref_ptr_equal(DataElement const& other) const { return get_typeref_ptr() == other.get_typeref_ptr(); };
    };
 }

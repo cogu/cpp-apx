@@ -29,24 +29,32 @@
 #include <version>
 #include <limits>
 #include <iostream>
-#if __has_include(<bit>)
+#if __has_include(<bit>) && __cpp_lib_endian
 #include <bit>
+constexpr bool _is_big_endian = std::endian::native == std::endian::big;
+constexpr bool _is_little_endian = std::endian::native == std::endian::little;
+#else
+#ifdef BYTE_ORDER
+constexpr bool _is_big_endian = BYTE_ORDER == 1u;
+constexpr bool _is_little_endian = BYTE_ORDER == 0u;
+#else
+constexpr bool _is_big_endian = false;
+constexpr bool _is_little_endian = false;
 #endif
+#endif
+
 
 namespace apx
 {
    template<typename T> void packBE(std::uint8_t* p, T value)
    {
       static_assert(std::is_integral<T>::value, "Value type must be integer");
-
-#ifdef __cpp_lib_endian
-      if constexpr(std::endian::native == std::endian::big)
+      if constexpr(_is_big_endian)
       {
          constexpr std::size_t size = sizeof(T);
          std::memcpy(p, &value, size);
       }
       else
-#endif
       {
          std::size_t size = sizeof(T);
          p += (size - 1);
@@ -68,14 +76,12 @@ namespace apx
    {
       static_assert(std::is_integral<T>::value, "Value type must be integer");
       T value = 0u;
-#ifdef __cpp_lib_endian
-      if constexpr (std::endian::native == std::endian::big)
+      if constexpr (_is_big_endian)
       {
          constexpr std::size_t size = sizeof(T);
          std::memcpy(&value, p, size);
       }
       else
-#endif
       {
          std::size_t size = sizeof(T);
          while (size > 0)
@@ -95,14 +101,12 @@ namespace apx
    template<typename T> void packLE(std::uint8_t* p, T value)
    {
       static_assert(std::is_integral<T>::value, "Value type must be integer");
-#ifdef __cpp_lib_endian
-      if constexpr (std::endian::native == std::endian::little)
+      if constexpr (_is_little_endian)
       {
          constexpr std::size_t size = sizeof(T);
          std::memcpy(p, &value, size);
       }
       else
-#endif
       {
          std::size_t size = sizeof(T);
          while (size > 0)
@@ -123,14 +127,12 @@ namespace apx
    {
       static_assert(std::is_integral<T>::value, "Value type must be integer");
       T value = 0u;
-#ifdef __cpp_lib_endian
-      if constexpr (std::endian::native == std::endian::little)
+      if constexpr (_is_little_endian)
       {
          constexpr std::size_t size = sizeof(T);
          std::memcpy(&value, p, size);
       }
       else
-#endif
       {
          std::size_t size = sizeof(T);
          p += (size-1);

@@ -117,6 +117,12 @@
     <ClCompile Include="..\..\..\..\apx\test\test_numheader.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_data_signature.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\data_signature.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
