@@ -1,8 +1,8 @@
 /*****************************************************************************
-* \file      data_signature.h
+* \file      decoder.h
 * \author    Conny Gustafsson
-* \date      2020-08-27
-* \brief     Data signature container class
+* \date      2020-09-27
+* \brief     APX VM instruction decoder
 *
 * Copyright (c) 2020 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -21,21 +21,36 @@
 * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *
 ******************************************************************************/
-#pragma once
 
-#include <memory>
-#include <string>
-#include "cpp-apx/data_element.h"
-#include "cpp-apx/error.h"
+#include <typeinfo>
+#include "cpp-apx/data_signature.h"
+#include "cpp-apx/signature_parser.h"
 
 namespace apx
 {
-   struct DataSignature
+   apx::error_t DataSignature::parse_effective(std::string const& str)
    {
-
-      std::unique_ptr<apx::DataElement> element{ nullptr };
-      std::unique_ptr<apx::DataElement> effective_element{ nullptr };
-
-      apx::error_t parse_effective(std::string const& str);
-   };
+      apx::error_t retval = APX_NO_ERROR;
+      SignatureParser parser;
+      char const* begin = str.data();
+      char const* end = begin + str.size();
+      auto result = parser.parse_data_signature(begin, end);
+      if (result == end)
+      {
+         effective_element.reset(parser.take_data_element());
+      }
+      else
+      {
+         if ((result == nullptr) || (result == begin))
+         {
+            retval = APX_PARSE_ERROR;
+         }
+         else
+         {
+            retval = APX_STRAY_CHARACTERS_AFTER_PARSE_ERROR;
+         }
+      }
+      return retval;
+   }
 }
+

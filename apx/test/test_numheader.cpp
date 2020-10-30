@@ -34,7 +34,7 @@ namespace apx_test
 
    TEST(NumHeader16, LongUpperLimit)
    {
-      std::array<std::uint8_t, sizeof(uint32_t)> buf;
+      std::array<std::uint8_t, sizeof(uint16_t)> buf;
       std::array < std::uint8_t, buf.size()> expected = { 0xffu, 0xff };
       std::uint16_t const value = numheader::LONG16_MAX;
       EXPECT_EQ(numheader::encode16(buf.data(), buf.data() + buf.size(), value), numheader::LONG16_SIZE);

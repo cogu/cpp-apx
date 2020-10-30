@@ -8,6 +8,11 @@ using namespace std;
 
 namespace apx
 {
+   constexpr std::size_t INT32_INDEX  = 0u;
+   constexpr std::size_t UINT32_INDEX = 1u;
+   constexpr std::size_t INT64_INDEX  = 2u;
+   constexpr std::size_t UINT64_INDEX = 3u;
+
    DataElement::DataElement(DataElement const& other) :
       m_name{other.m_name},
       m_type_code{other.m_type_code},
@@ -51,7 +56,7 @@ namespace apx
 
    DataElement::~DataElement()
    {
-      //std::cout << "Destroying" << (int) m_type_code << std::endl;
+
    }
 
    bool DataElement::get_lower_limit(int32_t& limit) const noexcept
@@ -117,14 +122,6 @@ namespace apx
    void DataElement::append(std::unique_ptr<DataElement> child_element)
    {
       m_elements->push_back(std::forward<std::unique_ptr<DataElement>>(child_element));
-   }
-
-   void DataElement::init_element_vector()
-   {
-      if (m_type_code == apx::TypeCode::Record)
-      {
-         m_elements = std::make_unique<std::vector<std::unique_ptr<DataElement>>>();
-      }
    }
 
    apx::error_t apx::DataElement::derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map)
@@ -433,5 +430,274 @@ namespace apx
          }
       }
       return retval;
+   }
+
+   std::string DataElement::to_string()
+   {
+      std::string retval;
+      if (m_type_code == TypeCode::Record)
+      {
+         retval.push_back('{');
+         for (auto const& it : *m_elements)
+         {
+            retval.push_back('"');
+            retval.append(it->get_name());
+            retval.push_back('"');
+            retval.append(it->to_string());
+         }
+         retval.push_back('}');
+      }
+      else
+      {
+         char type_code = '\0';
+         switch (m_type_code)
+         {
+         case TypeCode::UInt8:
+            type_code = 'C';
+            break;
+         case TypeCode::UInt16:
+            type_code = 'S';
+            break;
+         case TypeCode::UInt32:
+            type_code = 'L';
+            break;
+         case TypeCode::UInt64:
+            type_code = 'Q';
+            break;
+         case TypeCode::Int8:
+            type_code = 'c';
+            break;
+         case TypeCode::Int16:
+            type_code = 's';
+            break;
+         case TypeCode::Int32:
+            type_code = 'l';
+            break;
+         case TypeCode::Int64:
+            type_code = 'q';
+            break;
+         case TypeCode::Char:
+            type_code = 'a';
+            break;
+         case TypeCode::Char8:
+            type_code = 'A';
+            break;
+         case TypeCode::Char16:
+            type_code = 'u';
+            break;
+         case TypeCode::Char32:
+            type_code = 'U';
+            break;
+         case TypeCode::Bool:
+            type_code = 'b';
+            break;
+         case TypeCode::Byte:
+            type_code = 'B';
+            break;
+         default:
+            throw std::bad_typeid();
+         }
+         retval.push_back(type_code);
+         if (has_limits())
+         {
+            retval.append(limit_to_string());
+         }
+      }
+      if (is_array())
+      {
+         retval.append(array_to_string());
+      }
+      return retval;
+   }
+
+   bool DataElement::operator==(DataElement const& other) const
+   {
+      if (m_type_code != other.m_type_code)
+      {
+         return false;
+      }
+      if (has_limits())
+      {
+         if (other.has_limits())
+         {
+            is_limits_equal(other);
+         }
+         else
+         {
+            return false;
+         }
+      }
+      else if (other.has_limits())
+      {
+         return false;
+      }
+      if (is_array())
+      {
+         if (other.is_array())
+         {
+            is_array_equal(other);
+         }
+         else
+         {
+            return false;
+         }
+      }
+      else if (other.is_array())
+      {
+         return false;
+      }
+      switch (m_type_code)
+      {
+      case TypeCode::Record:
+         if (!is_elements_equal(other))
+         {
+            return false;
+         }
+         break;
+      case TypeCode::TypeRefId:
+         if (!is_typeref_id_equal(other))
+         {
+            return false;
+         }
+         break;
+      case TypeCode::TypeRefName:
+         if (!is_typeref_name_equal(other))
+         {
+            return false;
+         }
+         break;
+      case TypeCode::TypeRefPtr:
+         if (!is_typeref_ptr_equal(other))
+         {
+            return false;
+         }
+         break;
+      default:
+         break;
+      }
+      return true;
+   }
+
+   void DataElement::init_element_vector()
+   {
+      if (m_type_code == apx::TypeCode::Record)
+      {
+         m_elements = std::make_unique<std::vector<std::unique_ptr<DataElement>>>();
+      }
+   }
+
+   std::string DataElement::limit_to_string()
+   {
+      std::string retval{ '(' };
+      switch (m_lower_limit->index())
+      {
+      case INT32_INDEX:
+         retval.append(std::to_string(std::get<std::int32_t>(m_lower_limit.value())));
+         retval.push_back(',');
+         retval.append(std::to_string(std::get<std::int32_t>(m_upper_limit.value())));
+         break;
+      case UINT32_INDEX:
+         retval.append(std::to_string(std::get<std::uint32_t>(m_lower_limit.value())));
+         retval.push_back(',');
+         retval.append(std::to_string(std::get<std::uint32_t>(m_upper_limit.value())));
+         break;
+      case INT64_INDEX:
+         retval.append(std::to_string(std::get<std::int64_t>(m_lower_limit.value())));
+         retval.push_back(',');
+         retval.append(std::to_string(std::get<std::int64_t>(m_upper_limit.value())));
+         break;
+      case UINT64_INDEX:
+         retval.append(std::to_string(std::get<std::uint64_t>(m_lower_limit.value())));
+         retval.push_back(',');
+         retval.append(std::to_string(std::get<std::uint64_t>(m_upper_limit.value())));
+         break;
+      default:
+         throw std::bad_typeid();
+      }
+      retval.push_back(')');
+      return retval;
+   }
+
+   std::string DataElement::array_to_string()
+   {
+      std::string retval{ '[' };
+      retval.append(std::to_string(m_array_len));
+      if (m_dynamic_array)
+      {
+         retval.push_back('*');
+      }
+      retval.push_back(']');
+      return retval;
+   }
+
+   bool DataElement::is_limits_equal(DataElement const& other) const
+   {
+      if (m_lower_limit->index() != other.m_lower_limit->index())
+      {
+         return false;
+      }
+      switch (m_lower_limit->index())
+      {
+      case INT32_INDEX:
+         if ((std::get<std::int32_t>(m_lower_limit.value()) != std::get<std::int32_t>(other.m_lower_limit.value())) ||
+            (std::get<std::int32_t>(m_upper_limit.value()) != std::get<std::int32_t>(other.m_upper_limit.value())))
+            return false;
+         break;
+      case UINT32_INDEX:
+         if ((std::get<std::uint32_t>(m_lower_limit.value()) != std::get<std::uint32_t>(other.m_lower_limit.value())) ||
+            (std::get<std::uint32_t>(m_upper_limit.value()) != std::get<std::uint32_t>(other.m_upper_limit.value())))
+            return false;
+         break;
+      case INT64_INDEX:
+         if ((std::get<std::int64_t>(m_lower_limit.value()) != std::get<std::int64_t>(other.m_lower_limit.value())) ||
+            (std::get<std::int64_t>(m_upper_limit.value()) != std::get<std::int64_t>(other.m_upper_limit.value())))
+            return false;
+         break;
+      case UINT64_INDEX:
+         if ((std::get<std::uint64_t>(m_lower_limit.value()) != std::get<std::uint64_t>(other.m_lower_limit.value())) ||
+            (std::get<std::uint64_t>(m_upper_limit.value()) != std::get<std::uint64_t>(other.m_upper_limit.value())))
+            return false;
+         break;
+      default:
+         throw std::bad_typeid();
+      }
+      return true;
+   }
+
+   bool DataElement::is_array_equal(DataElement const& other) const
+   {
+      if ((m_array_len != other.m_array_len) || m_dynamic_array != other.m_dynamic_array)
+      {
+         return false;
+      }
+      return true;
+   }
+
+   bool DataElement::is_elements_equal(DataElement const& other) const
+   {
+      if ( (m_elements.get() == nullptr) || (other.m_elements.get() == nullptr) )
+      {
+         return false;
+      }
+
+      if (m_elements->size() != other.m_elements->size())
+      {
+         return false;
+      }
+      std::size_t const num_elements = m_elements->size();
+      for (std::size_t i=0; i < num_elements; i++)
+      {
+         auto const &my_child = m_elements->at(i);
+         auto const &other_child = other.m_elements->at(i);
+         if ((my_child.get() == nullptr) || (other_child.get() == nullptr))
+         {
+            return false;
+         }
+         if ( !(*my_child == *other_child) )
+         {
+            return false;
+         }
+      }
+      return true;
    }
 }

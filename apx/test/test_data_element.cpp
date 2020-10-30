@@ -8,12 +8,6 @@ using namespace std::string_literals;
 namespace apx_test
 {
 
-   TEST(DataElement, CreateEmptyDataElement)
-   {
-      apx::DataElement elem;
-      EXPECT_EQ(elem.get_type_code(), apx::TypeCode::None);
-   }
-
    TEST(DataElement, CreateUInt8DataElement)
    {
       apx::DataElement elem(apx::TypeCode::UInt8);
