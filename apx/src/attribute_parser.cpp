@@ -117,6 +117,22 @@ namespace apx
       return next;
    }
 
+   apx::error_t AttributeParser::parse_type_attributes(std::string const str, apx::TypeAttributes& attr)
+   {
+      char const* begin = str.data();
+      char const* end = begin + str.size();
+      char const* result = parse_type_attributes(begin, end, attr);
+      if (result == nullptr || result == begin)
+      {
+         return APX_PARSE_ERROR;
+      }
+      else if (result != end)
+      {
+         return APX_STRAY_CHARACTERS_AFTER_PARSE_ERROR;
+      }
+      return APX_NO_ERROR;
+   }
+
    const char* AttributeParser::parse_single_port_attribute(const char* begin, const char* end, apx::PortAttributes& attr)
    {
       const char* next = begin;

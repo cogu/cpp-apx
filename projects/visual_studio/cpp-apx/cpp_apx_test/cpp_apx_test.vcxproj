@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\..\..\apx\src\compiler.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\computation.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\data_element.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -129,6 +132,7 @@
     <ClCompile Include="..\..\..\..\apx\src\vm.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_computation.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_data_signature.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_numheader.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\sample_nodes.cpp">

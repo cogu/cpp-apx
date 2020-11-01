@@ -48,6 +48,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set (CPP_APX_TESTS
         apx/test/test_attribute_parser.cpp
         apx/test/test_compiler.cpp
+        apx/test/test_computation.cpp
         apx/test/test_data_element.cpp
         apx/test/test_data_signature.cpp
         apx/test/test_decoder.cpp
