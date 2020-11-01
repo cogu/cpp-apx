@@ -25,14 +25,13 @@
 
 #include <vector>
 #include <string>
-//#include <memory>
 #include <cstdint>
 #include <stdexcept>
 
 namespace apx
 {
    enum class ComputationType
-   {      
+   {
       ValueTable,
       RationalScaling
    };
@@ -65,6 +64,7 @@ namespace apx
          upper_limit.i32 = upper;
          is_signed_range = true;
       }
+      virtual std::string to_string() = 0;
       ComputationType computation_type;
       union
       {
@@ -76,14 +76,20 @@ namespace apx
          uint32_t u32;
          int32_t i32;
       } upper_limit;
-      bool is_signed_range;      
+      bool is_signed_range;
+
+   protected:
+      std::string limit_to_string();
+      bool limit_equals(Computation const& other) const;
    };
 
    struct ValueTable : public Computation
    {
       ValueTable():Computation(ComputationType::ValueTable){}
       ValueTable(int32_t lower_limit, int32_t upper_limit) :Computation{ ComputationType::ValueTable, lower_limit, upper_limit } {}
+      std::string to_string() override;
       std::vector<std::string> values;
+      bool operator ==(ValueTable const& other) const;
    };
 
    struct RationalScaling : public Computation
@@ -101,6 +107,9 @@ namespace apx
          numerator{ numerator_ },
          denominator{ denominator_ },
          unit{ unit_ } {}
+      std::string to_string() override;
+      bool operator ==(RationalScaling const& other) const;
+
       double offset = 0.0;
       int32_t numerator = 1;
       int32_t denominator = 0;

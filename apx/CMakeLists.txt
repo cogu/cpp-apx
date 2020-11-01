@@ -34,6 +34,7 @@ set (CPP_APX_COMMON_LIB_HEADER_LIST
 set (CPP_APX_COMMON_LIB_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/attribute_parser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/computation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data_element.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data_signature.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data_type.cpp

@@ -59,6 +59,7 @@ namespace apx
       const char* parse_initializer(const char* begin, const char* end, dtl::DynamicValue& dv);
       const char* parse_port_attributes(const char* begin, const char* end, apx::PortAttributes& attr);
       const char* parse_type_attributes(const char* begin, const char* end, apx::TypeAttributes& attr);
+      apx::error_t parse_type_attributes(std::string const str, apx::TypeAttributes& attr);
       apx::error_t get_last_error(const char*& error_next) { error_next = m_error_next;  return m_last_error; }
    protected:
 

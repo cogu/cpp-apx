@@ -123,6 +123,12 @@
     <ClCompile Include="..\..\..\..\apx\src\data_signature.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_computation.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\computation.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

@@ -348,7 +348,7 @@ TEST(AttributeParser, ValueTableRanges)
 
 TEST(AttributeParser, RationalScaling_VehicleSpeed)
 {
-   const char* begin = "RS(0, 65280, 0, 1, 64, \"km/h\")";
+   const char* begin = "RS(0,65280,0,1,64,\"km/h\")";
    const char* end = begin + strlen(begin);
    apx::AttributeParser parser;
    apx::TypeAttributes attr;
