@@ -145,7 +145,7 @@ namespace apx
       apx::error_t create_program_header(apx::vm::Program& header, apx::ProgramType program_type, std::uint32_t element_size, std::uint32_t queue_size, bool is_dynamic)
       {
          const std::array < std::uint8_t, MAGIC_NUMBER_SIZE + VERSION_SIZE> fixed_data = {
-            HEADER_MAGIC_NUMBER_0 , HEADER_MAGIC_NUMBER_1, HEADER_MAGIC_NUMBER_2, MAJOR_VERSION, MINOR_VERSION };
+            HEADER_MAGIC_NUMBER_0 , HEADER_MAGIC_NUMBER_1, MAJOR_VERSION, MINOR_VERSION };
          std::array <std::uint8_t, sizeof(uint32_t)> encoded_size = { 0u, 0u, 0u, 0u };
          std::uint8_t* p = encoded_size.data();
          std::uint8_t data_size_variant = 0u;
@@ -237,21 +237,20 @@ namespace apx
                return APX_LENGTH_ERROR;
             }
             if ((begin[0] != HEADER_MAGIC_NUMBER_0) ||
-               (begin[1] != HEADER_MAGIC_NUMBER_1) ||
-               (begin[2] != HEADER_MAGIC_NUMBER_2))
+               (begin[1] != HEADER_MAGIC_NUMBER_1))
             {
                return APX_INVALID_HEADER_ERROR;
             }
-            header.major_version = begin[3];
-            header.minor_version = begin[4];
+            header.major_version = begin[2];
+            header.minor_version = begin[3];
             if (header.major_version != MAJOR_VERSION || header.minor_version != MINOR_VERSION)
             {
                return APX_VERSION_ERROR;
             }
-            std::uint8_t const data_variant = begin[5] & HEADER_DATA_VARIANT_MASK;
-            header.prog_type = ((begin[5] & HEADER_PROG_TYPE_PACK) == HEADER_PROG_TYPE_PACK) ? ProgramType::Pack : ProgramType::Unpack;
-            bool const is_queued_data = ((begin[5] & HEADER_FLAG_QUEUED_DATA) == HEADER_FLAG_QUEUED_DATA);
-            header.is_dynamic_data = ((begin[5] & HEADER_FLAG_DYNAMIC_DATA) == HEADER_FLAG_DYNAMIC_DATA);
+            std::uint8_t const data_variant = begin[4] & HEADER_DATA_VARIANT_MASK;
+            header.prog_type = ((begin[4] & HEADER_PROG_TYPE_PACK) == HEADER_PROG_TYPE_PACK) ? ProgramType::Pack : ProgramType::Unpack;
+            bool const is_queued_data = ((begin[4] & HEADER_FLAG_QUEUED_DATA) == HEADER_FLAG_QUEUED_DATA);
+            header.is_dynamic_data = ((begin[4] & HEADER_FLAG_DYNAMIC_DATA) == HEADER_FLAG_DYNAMIC_DATA);
             next = begin + FIXED_HEADER_SIZE;
             if (auto result = parse_uint32_by_variant(next, end, data_variant, header.data_size); (result > next) && (result <= end) )
             {
