@@ -24,6 +24,7 @@ set (CPP_APX_COMMON_LIB_HEADER_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/port_instance.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/port.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/program.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/sha256.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/signature_parser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/type_attribute.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/types.h
@@ -49,6 +50,7 @@ set (CPP_APX_COMMON_LIB_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/port_instance.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/port.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/program.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sha256.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/signature_parser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vm.cpp
 )

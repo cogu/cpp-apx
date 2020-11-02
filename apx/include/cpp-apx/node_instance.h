@@ -41,25 +41,25 @@ namespace apx
       ~NodeInstance();
       NodeInstance(std::string const& name) : m_name{ name } {}
       void set_name(std::string const& name) { m_name = name; }
-      std::string const& get_name() { return m_name; }
+      std::string const& get_name() const { return m_name; }
       void alloc_port_instance_memory(std::size_t num_provide_ports, std::size_t num_require_ports);
       apx::error_t create_provide_port(port_id_t port_id, std::string const& name, std::unique_ptr<apx::vm::Program> pack_program, std::uint32_t data_offset, std::uint32_t& data_size);
       apx::error_t create_require_port(port_id_t port_id, std::string const& name, std::unique_ptr<apx::vm::Program> pack_program, std::unique_ptr<apx::vm::Program> unpack_program, std::uint32_t data_offset, std::uint32_t& data_size);
-      std::size_t get_num_provide_ports(){ return m_num_provide_ports; }
-      std::size_t get_num_require_ports(){ return m_num_require_ports; }
-      std::size_t get_provide_port_init_data_size() { return m_provide_port_init_data_size; }
-      std::size_t get_require_port_init_data_size() { return m_require_port_init_data_size; }
-      std::uint8_t const* get_provide_port_init_data() { return m_provide_port_init_data; }
-      std::uint8_t const* get_require_port_init_data() { return m_require_port_init_data; }
+      std::size_t get_num_provide_ports() const { return m_num_provide_ports; }
+      std::size_t get_num_require_ports() const { return m_num_require_ports; }
+      std::size_t get_provide_port_init_data_size() const { return m_provide_port_init_data_size; }
+      std::size_t get_require_port_init_data_size() const { return m_require_port_init_data_size; }
+      std::uint8_t const* get_provide_port_init_data() const { return m_provide_port_init_data; }
+      std::uint8_t const* get_require_port_init_data() const { return m_require_port_init_data; }
       apx::error_t create_port_init_data_memory(std::uint8_t*& provide_port_data, std::size_t& provide_port_data_size,
-         std::uint8_t*& require_port_data, std::size_t& require_port_data_size);
-      PortInstance* get_provide_port(std::size_t port_id);
-      PortInstance* get_require_port(std::size_t port_id);
+      std::uint8_t*& require_port_data, std::size_t& require_port_data_size);
+      PortInstance* get_provide_port(std::size_t port_id) const;
+      PortInstance* get_require_port(std::size_t port_id) const;
       apx::error_t init_node_data(std::uint8_t const* definition_data, std::size_t definition_size);
-      bool has_provide_port_data() { return m_provide_port_init_data != nullptr; }
-      bool has_require_port_data() { return m_require_port_init_data != nullptr; }
-      NodeData const* get_const_node_data() { return m_node_data.get(); }
-      NodeData* get_node_data() { return m_node_data.get(); }
+      bool has_provide_port_data() const { return m_provide_port_init_data != nullptr; }
+      bool has_require_port_data() const { return m_require_port_init_data != nullptr; }
+      NodeData const* get_const_node_data() const { return m_node_data.get(); }
+      NodeData* get_node_data() const { return m_node_data.get(); }
 
    protected:
       std::string m_name;

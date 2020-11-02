@@ -124,7 +124,7 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   PortInstance* NodeInstance::get_provide_port(std::size_t port_id)
+   PortInstance* NodeInstance::get_provide_port(std::size_t port_id) const
    {
       if (port_id < m_num_provide_ports)
       {
@@ -133,7 +133,7 @@ namespace apx
       return nullptr;
    }
 
-   PortInstance* NodeInstance::get_require_port(std::size_t port_id)
+   PortInstance* NodeInstance::get_require_port(std::size_t port_id) const
    {
       if (port_id < m_num_require_ports)
       {
