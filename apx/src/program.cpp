@@ -246,7 +246,7 @@ namespace apx
             header.minor_version = begin[4];
             if (header.major_version != MAJOR_VERSION || header.minor_version != MINOR_VERSION)
             {
-               return APX_NOT_IMPLEMENTED_ERROR;
+               return APX_VERSION_ERROR;
             }
             std::uint8_t const data_variant = begin[5] & HEADER_DATA_VARIANT_MASK;
             header.prog_type = ((begin[5] & HEADER_PROG_TYPE_PACK) == HEADER_PROG_TYPE_PACK) ? ProgramType::Pack : ProgramType::Unpack;

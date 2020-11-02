@@ -61,7 +61,7 @@ namespace apx
       apx::error_t derive_hash_init_value(dtl::Array const* parsed_av, dtl::Hash*& derived_hv) const;
       apx::error_t derive_data_element(apx::DataElement*& data_element, apx::DataElement** parent) const;
       apx::error_t derive_data_element(apx::DataElement const*& data_element, apx::DataElement const** parent) const;
-      std::string to_string();
+      std::string to_string() const;
       bool operator==(DataElement const& other) const;
 
 
@@ -78,8 +78,8 @@ namespace apx
       std::optional<std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_upper_limit = {};
 
       void init_element_vector();
-      std::string limit_to_string();
-      std::string array_to_string();
+      std::string limit_to_string() const;
+      std::string array_to_string() const;
       bool is_limits_equal(DataElement const& other) const;
       bool is_array_equal(DataElement const& other) const;
       bool is_elements_equal(DataElement const& other) const;

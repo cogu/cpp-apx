@@ -432,7 +432,7 @@ namespace apx
       return retval;
    }
 
-   std::string DataElement::to_string()
+   std::string DataElement::to_string() const
    {
       std::string retval;
       if (m_type_code == TypeCode::Record)
@@ -586,7 +586,7 @@ namespace apx
       }
    }
 
-   std::string DataElement::limit_to_string()
+   std::string DataElement::limit_to_string() const
    {
       std::string retval{ '(' };
       switch (m_lower_limit->index())
@@ -618,7 +618,7 @@ namespace apx
       return retval;
    }
 
-   std::string DataElement::array_to_string()
+   std::string DataElement::array_to_string() const
    {
       std::string retval{ '[' };
       retval.append(std::to_string(m_array_len));

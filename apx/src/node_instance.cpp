@@ -161,6 +161,26 @@ namespace apx
       return retval;
    }
 
+   std::size_t NodeInstance::get_definition_size() const
+   {
+      auto const* node_data = get_const_node_data();
+      if (node_data != nullptr)
+      {
+         return node_data->definition_data_size();
+      }
+      return 0u;
+   }
+
+   std::uint8_t const* NodeInstance::get_definition_data() const
+   {
+      auto const* node_data = get_const_node_data();
+      if (node_data != nullptr)
+      {
+         return node_data->get_definition_data();
+      }
+      return nullptr;
+   }
+
    apx::error_t NodeInstance::calc_init_data_size(PortInstance** port_list, std::size_t num_ports, std::size_t& total_size)
    {
       if ( (port_list == nullptr) || (num_ports == 0) )

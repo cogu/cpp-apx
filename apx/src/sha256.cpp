@@ -71,9 +71,9 @@ static const uint32_t k[] = {
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
-bool util::sha256_calc(std::uint8_t* hash, std::size_t max_size, const std::uint8_t* input, std::size_t len)
+bool sha256::calc(std::uint8_t* hash, std::size_t max_hash_size, const std::uint8_t* input, std::size_t input_size)
 {
-   if (hash == nullptr || max_size < 32 || input == nullptr || len == 0)
+   if ( (hash == nullptr) || (max_hash_size < 32u) || (input == nullptr) || (input_size == 0) )
    {
       return false;
    }
@@ -84,7 +84,7 @@ bool util::sha256_calc(std::uint8_t* hash, std::size_t max_size, const std::uint
 
    struct buffer_state state;
 
-   init_buf_state(&state, input, len);
+   init_buf_state(&state, input, input_size);
 
    while (calc_chunk(chunk, &state)) {
       uint32_t ah[8];

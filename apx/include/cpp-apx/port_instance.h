@@ -45,28 +45,33 @@ namespace apx
          m_pack_program{ pack_program },
          m_unpack_program{ unpack_program } {}
       apx::error_t derive_properties(std::uint32_t offset, std::uint32_t&size);
-      std::string const& get_name() { return m_name; }
-      std::uint32_t get_data_offset() { return m_data_offset; }
-      std::size_t get_data_size() { return static_cast<std::size_t>(m_data_size); }
-      std::uint32_t get_queue_length() { return m_queue_length; }
-      std::size_t get_element_size() { return static_cast<std::size_t>(m_element_size); }
-      bool is_dynamic_data() { return m_is_dynamic_data; }
-      apx::vm::Program const& get_pack_program() { return *m_pack_program; }
-      apx::vm::Program const& get_unpack_program() { return *m_unpack_program; }
+      std::string const& get_name() const { return m_name; }
+      std::uint32_t get_data_offset() const { return m_data_offset; }
+      std::size_t get_data_size() const { return static_cast<std::size_t>(m_data_size); }
+      std::uint32_t get_queue_length() const { return m_queue_length; }
+      std::size_t get_element_size() const { return static_cast<std::size_t>(m_element_size); }
+      bool is_dynamic_data() const { return m_is_dynamic_data; }
+      apx::vm::Program const& get_pack_program() const { return *m_pack_program; }
+      apx::vm::Program const& get_unpack_program() const { return *m_unpack_program; }
       apx::error_t append_computation(Computation const* computation);
-      std::size_t get_computation_length() { return m_computations.size(); }
-      Computation const* get_computation(std::size_t id);
+      std::size_t get_computation_length() const { return m_computations.size(); }
+      Computation const* get_computation(std::size_t id) const;
+      void set_data_signature(std::string const& data_signature) { m_data_signature = data_signature; }
+      std::string const& get_data_signature() const { return m_data_signature; }
    protected:
+      //Members that requires serialization
       std::vector<std::unique_ptr<Computation>> m_computations;
+      std::unique_ptr<apx::vm::Program> m_pack_program;
+      std::unique_ptr<apx::vm::Program> m_unpack_program;
+      std::string m_name;
+      std::string m_data_signature; //For clients this is only used for debugging/visualization purposes
+      //Members that can be derived from serialized data or from parse tree
       apx::PortType m_port_type;
       apx::port_id_t m_port_id;
-      std::string m_name;
       std::uint32_t m_data_offset = 0u;
       std::uint32_t m_data_size = 0u;
       std::uint32_t m_queue_length = 0u;
       std::uint32_t m_element_size = 0u; //Only used when m_queue_length > 0
-      std::unique_ptr<apx::vm::Program> m_pack_program;
-      std::unique_ptr<apx::vm::Program> m_unpack_program;
       bool m_is_dynamic_data = false;
 
       apx::error_t process_info_from_program_header(apx::vm::Program const* program);

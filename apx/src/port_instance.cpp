@@ -66,7 +66,7 @@ namespace apx
        return APX_NO_ERROR;
     }
 
-    Computation const* PortInstance::get_computation(std::size_t id)
+    Computation const* PortInstance::get_computation(std::size_t id) const
     {
        if (id < m_computations.size())
        {

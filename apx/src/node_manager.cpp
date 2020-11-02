@@ -272,6 +272,13 @@ namespace apx
             }
          }
       }
+      auto const* effective_data_element = parsed_port->get_effective_data_element();
+      if (effective_data_element == nullptr)
+      {
+         return APX_NULL_PTR_ERROR;
+      }
+      auto const effective_signature = effective_data_element->to_string();
+      port_instance->set_data_signature(effective_signature);
       return APX_NO_ERROR;
    }
 }
