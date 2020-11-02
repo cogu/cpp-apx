@@ -31,18 +31,18 @@ namespace apx
    namespace vm
    {
       /*
-      * APX PROGRAM HEADER (Varies between 7 and 14 bytes)
-      * bytes 0-2: Magic numbers 'A','P','X'
-      * Byte 3: VM_MAJOR_VERSION
-      * Byte 4: VM_MINOR_VERSION
-      * Byte 5 (bits 4-7): program flags
-      * Byte 5 (bit 3): pack or unpack program (0-1)
-      * Byte 5 (bits 0-2): data size variant (VARIANT_U8, VARIANT_U16, VARIANT_U32)
-      * Bytes 6-9: DataSize (Maximum data size required by this program) (variable-size encoded integer)
+      * APX PROGRAM HEADER (Varies between 6 and 13 bytes)
+      * bytes 0-1: Magic numbers 'V','M'
+      * Byte 2: VM_MAJOR_VERSION
+      * Byte 3: VM_MINOR_VERSION
+      * Byte 4 (bits 4-7): program flags
+      * Byte 4 (bit 3): pack or unpack program (0-1)
+      * Byte 4 (bits 0-2): data size variant (VARIANT_U8, VARIANT_U16, VARIANT_U32)
+      * Bytes 5-(N-1): DataSize (Maximum data size required by this program) (variable-size encoded integer)
       *            - If Byte 5 (bits 0-2) has value VARIANT_U8 this is encoded as uint8.
       *            - If Byte 5 (bits 0-2) has value VARIANT_U16 this is encoded as uint16le (little endian).
       *            - If Byte 5 (bits 0-2) has value VARIANT_U32 this is encoded as uint32le.
-      * After the the previous integer is encoded the header usually ends. However, if HEADER_FLAG_QUEUED_DATA was set among program flags (Byte 5)
+      * After the the previous integer is encoded the header usually ends. However, if HEADER_FLAG_QUEUED_DATA was set among program flags (Byte 4)
       * The header continues with an encoded DATA_SIZE instruction where variant must be value 2 or above.
       * Since length of previous header field varies we call the first byte after the encoded integer "Byte N".
       * Byte N: DATA_SIZE instruction header
@@ -57,14 +57,13 @@ namespace apx
       * where QueueStorageSize is either 1, 2, or 4 (which can be determined from the variant on the DATA_SIZE instruction).
       */
 
-      constexpr std::uint8_t HEADER_MAGIC_NUMBER_0 = ((uint8_t)'A');
-      constexpr std::uint8_t HEADER_MAGIC_NUMBER_1 = ((uint8_t)'P');
-      constexpr std::uint8_t HEADER_MAGIC_NUMBER_2 = ((uint8_t)'X');
-      constexpr std::uint32_t MAGIC_NUMBER_SIZE = 3u;
+      constexpr std::uint8_t HEADER_MAGIC_NUMBER_0 = ((uint8_t)'V');
+      constexpr std::uint8_t HEADER_MAGIC_NUMBER_1 = ((uint8_t)'M');
+      constexpr std::uint32_t MAGIC_NUMBER_SIZE = 2u;
       constexpr std::uint8_t MAJOR_VERSION = 2u;
       constexpr std::uint8_t MINOR_VERSION = 0u;
       constexpr std::uint32_t VERSION_SIZE = 2u;
-      constexpr std::uint32_t FIXED_HEADER_SIZE = 6;
+      constexpr std::uint32_t FIXED_HEADER_SIZE = 5;
       constexpr std::uint8_t HEADER_PROG_TYPE_UNPACK = 0x00;
       constexpr std::uint8_t HEADER_PROG_TYPE_PACK = 0x08;
       constexpr std::uint8_t HEADER_DATA_VARIANT_MASK = 0x07;

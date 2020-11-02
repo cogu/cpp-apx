@@ -9,12 +9,12 @@ namespace apx_test
    {
       Program min_header;
       create_program_header(min_header, apx::ProgramType::Pack, 0, 0, false);
-      Program const min_expected{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U8, 0};
+      Program const min_expected{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U8, 0};
       ASSERT_EQ(min_header, min_expected);
 
       Program max_header;
       create_program_header(max_header, apx::ProgramType::Pack, 255, 0, false);
-      Program const max_expected{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U8, 255 };
+      Program const max_expected{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U8, 255 };
       ASSERT_EQ(max_header, max_expected);
    }
 
@@ -22,12 +22,12 @@ namespace apx_test
    {
       Program min_header;
       create_program_header(min_header, apx::ProgramType::Pack, 256, 0, false);
-      Program const min_expected{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U16, 0, 1 }; //256 encoded as LE
+      Program const min_expected{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U16, 0, 1 }; //256 encoded as LE
       ASSERT_EQ(min_header, min_expected);
 
       Program max_header;
       create_program_header(max_header, apx::ProgramType::Pack, 65535, 0, false);
-      Program const max_expected{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U16, 0xFF, 0xFF }; //65565 in LE
+      Program const max_expected{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U16, 0xFF, 0xFF }; //65565 in LE
       ASSERT_EQ(max_header, max_expected);
    }
 
@@ -35,12 +35,12 @@ namespace apx_test
    {
       Program min_header;
       create_program_header(min_header, apx::ProgramType::Pack, 65536, 0, false);
-      Program const min_expected{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U32, 0, 0, 1, 0 };
+      Program const min_expected{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U32, 0, 0, 1, 0 };
       ASSERT_EQ(min_header, min_expected);
 
       Program max_header;
       create_program_header(max_header, apx::ProgramType::Pack, UINT32_MAX, 0, false);
-      Program const max_expected{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U32, 0xFF, 0xFF, 0xFF, 0xFF };
+      Program const max_expected{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U32, 0xFF, 0xFF, 0xFF, 0xFF };
       ASSERT_EQ(max_header, max_expected);
    }
 
@@ -48,7 +48,7 @@ namespace apx_test
    {
       Program header;
       create_program_header(header, apx::ProgramType::Pack, UINT8_SIZE, 10, false);
-      Program const expected{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE*10+1,
+      Program const expected{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE*10+1,
          apx::vm::OPCODE_DATA_SIZE | (VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U8 << INST_VARIANT_SHIFT), UINT8_SIZE};
       ASSERT_EQ(header, expected);
    }
@@ -57,14 +57,14 @@ namespace apx_test
    {
       Program header;
       create_program_header(header, apx::ProgramType::Pack, UINT8_SIZE, 4095, false);
-      Program const expected{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U16, 0x01, 0x10, //4095+2
+      Program const expected{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U16, 0x01, 0x10, //4095+2
          apx::vm::OPCODE_DATA_SIZE | (VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U16 << INST_VARIANT_SHIFT), UINT8_SIZE };
       ASSERT_EQ(header, expected);
    }
 
    TEST(Program, DecodeSimpleProgramHeader_U8)
    {
-      Program const program{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U8, 0xFF };
+      Program const program{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U8, 0xFF };
       ProgramHeader header;
       std::uint8_t const* begin = program.data();
       std::uint8_t const* end = begin + program.size();
@@ -81,7 +81,7 @@ namespace apx_test
 
    TEST(Program, DecodeSimpleProgramHeader_U16)
    {
-      Program const program{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U16, 0xFF, 0xFF };
+      Program const program{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U16, 0xFF, 0xFF };
       ProgramHeader header;
       std::uint8_t const* begin = program.data();
       std::uint8_t const* end = begin + program.size();
@@ -98,7 +98,7 @@ namespace apx_test
 
    TEST(Program, DecodeSimpleProgramHeader_U32)
    {
-      Program const program{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U32, 0xFF, 0xFF, 0xFF, 0xFF };
+      Program const program{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U32, 0xFF, 0xFF, 0xFF, 0xFF };
       ProgramHeader header;
       std::uint8_t const* begin = program.data();
       std::uint8_t const* end = begin + program.size();
@@ -115,7 +115,7 @@ namespace apx_test
 
    TEST(Program, DecodeQueuedProgramHeader_E2Q4)
    {
-      Program const program{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U8,
+      Program const program{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U8,
          UINT8_SIZE + 2*4 , apx::vm::OPCODE_DATA_SIZE | (VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U8 << INST_VARIANT_SHIFT), 2 };
 
       ProgramHeader header;
@@ -135,7 +135,7 @@ namespace apx_test
 
    TEST(Program, DecodeQueuedProgramHeader_E1Q1000)
    {
-      Program const program{ 'A', 'P', 'X', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U16,
+      Program const program{ 'V', 'M', apx::vm::MAJOR_VERSION, apx::vm::MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | apx::vm::HEADER_PROG_TYPE_PACK | VARIANT_U16,
          0xEA , 0x03, //2+1000 encoded as little endian
          apx::vm::OPCODE_DATA_SIZE | (VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U16 << INST_VARIANT_SHIFT), 1 };
 

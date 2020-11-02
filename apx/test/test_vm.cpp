@@ -9,14 +9,14 @@ namespace apx_test
 {
    TEST(VM, ParseSimpleHeader)
    {
-      Program const program{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE };
+      Program const program{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE };
       apx::VirtualMachine vm;
       ASSERT_EQ(vm.select_program(program), APX_NO_ERROR);
    }
 
    TEST(VM, PackUint8Value)
    {
-      Program const program{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
+      Program const program{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
          OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT)
       };
       std::array<std::uint8_t, UINT8_SIZE> buf;
@@ -41,7 +41,7 @@ namespace apx_test
 
    TEST(VM, UnpackUint8Value)
    {
-      Program const program{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE,
+      Program const program{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE,
          OPCODE_UNPACK | (VARIANT_U8 << INST_VARIANT_SHIFT)
       };
       std::array<std::uint8_t, UINT8_SIZE> buf;

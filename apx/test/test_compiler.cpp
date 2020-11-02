@@ -24,7 +24,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
          OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -47,7 +47,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE * 2,
          INST_FLAG | OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -71,7 +71,7 @@ namespace apx_test
       apx::Compiler compiler;
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U8 << INST_VARIANT_SHIFT),
          0u,
          3u,
@@ -96,7 +96,7 @@ namespace apx_test
       apx::Compiler compiler;
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE * 2,
          INST_FLAG | OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U8 << INST_VARIANT_SHIFT),
          0u,
          3u,
@@ -129,7 +129,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, 1 + UINT8_SIZE * 10,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, 1 + UINT8_SIZE * 10,
          OPCODE_DATA_SIZE | (VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U8 << INST_VARIANT_SHIFT),
          UINT8_SIZE,
          OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT)
@@ -154,7 +154,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE * 8,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE * 8,
          INST_FLAG | OPCODE_PACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
          INST_FLAG | OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          8u
@@ -179,7 +179,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT8_SIZE,
          OPCODE_PACK | (VARIANT_S8 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -202,7 +202,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT8_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT8_SIZE * 2,
          INST_FLAG | OPCODE_PACK | (VARIANT_S8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -227,7 +227,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT8_SIZE,
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_S8 << INST_VARIANT_SHIFT),
          0xF6,
          0x0A,
@@ -253,7 +253,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT8_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT8_SIZE * 2,
          INST_FLAG | OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_S8 << INST_VARIANT_SHIFT),
          0xF6,
          0x0A,
@@ -281,7 +281,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT16_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT16_SIZE,
          OPCODE_PACK | (VARIANT_U16 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -304,7 +304,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT16_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT16_SIZE * 2,
          INST_FLAG | OPCODE_PACK | (VARIANT_U16 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -329,7 +329,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT16_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT16_SIZE,
          OPCODE_PACK | (VARIANT_S16 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -352,7 +352,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT16_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT16_SIZE * 2,
          INST_FLAG | OPCODE_PACK | (VARIANT_S16 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -377,7 +377,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT32_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT32_SIZE,
          OPCODE_PACK | (VARIANT_U32 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -400,7 +400,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT32_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT32_SIZE * 2,
          INST_FLAG | OPCODE_PACK | (VARIANT_U32 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -425,7 +425,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT32_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT32_SIZE,
          OPCODE_PACK | (VARIANT_S32 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -448,7 +448,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT32_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, INT32_SIZE * 2,
          INST_FLAG | OPCODE_PACK | (VARIANT_S32 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -473,7 +473,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, BYTE_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, BYTE_SIZE,
          OPCODE_PACK | (VARIANT_BYTE << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -496,7 +496,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U16, 0xFF, 0x0F, //4095 encoded as little endian
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U16, 0xFF, 0x0F, //4095 encoded as little endian
          INST_FLAG | OPCODE_PACK | (VARIANT_BYTE << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U16 << INST_VARIANT_SHIFT),
          0xFF,
@@ -522,7 +522,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U16, 0xFF, 0x0F, //4095 encoded as little endian
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U16, 0xFF, 0x0F, //4095 encoded as little endian
          INST_FLAG | OPCODE_PACK | (VARIANT_BYTE << INST_VARIANT_SHIFT),
          INST_FLAG | OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U16 << INST_VARIANT_SHIFT),
          0xFF,
@@ -548,7 +548,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, 120,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, 120,
          INST_FLAG | OPCODE_PACK | (VARIANT_ASCII_CHAR << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          120,
@@ -573,7 +573,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, 120,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, 120,
          INST_FLAG | OPCODE_PACK | (VARIANT_CHAR8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          120,
@@ -598,7 +598,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U16, 0x00, 0x01, //256 in little endian
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U16, 0x00, 0x01, //256 in little endian
          INST_FLAG | OPCODE_PACK | (VARIANT_ASCII_CHAR << INST_VARIANT_SHIFT),
          INST_FLAG | OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U16 << INST_VARIANT_SHIFT),
          0x00,
@@ -624,7 +624,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE + UINT16_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE + UINT16_SIZE,
          OPCODE_PACK | (VARIANT_RECORD << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
          'F', 'i', 'r', 's', 't', '\0',
@@ -652,7 +652,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE,
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U8 << INST_VARIANT_SHIFT),
          0u,
          3u,
@@ -680,7 +680,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE + UINT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, UINT8_SIZE + UINT8_SIZE,
          OPCODE_PACK | (VARIANT_RECORD << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
          'F', 'i', 'r', 's', 't', '\0',
@@ -715,7 +715,7 @@ namespace apx_test
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
       constexpr std::uint8_t array_length = 2u;
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, (UINT16_SIZE+UINT8_SIZE) * array_length,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_PACK | VARIANT_U8, (UINT16_SIZE+UINT8_SIZE) * array_length,
          ARRAY_FLAG | OPCODE_PACK | (VARIANT_RECORD << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8),
          array_length,
@@ -747,7 +747,7 @@ namespace apx_test
       auto program = compiler.compile_port(port, apx::ProgramType::Pack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
       constexpr std::uint8_t array_length = 10u;
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, (UINT16_SIZE + UINT8_SIZE) * array_length,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_PACK | VARIANT_U8, (UINT16_SIZE + UINT8_SIZE) * array_length,
          ARRAY_FLAG | OPCODE_PACK | (VARIANT_RECORD << INST_VARIANT_SHIFT),
          DYN_ARRAY_FLAG | OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8),
          array_length,
@@ -778,7 +778,7 @@ namespace apx_test
       apx::Compiler compiler;
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE,
          OPCODE_UNPACK | (VARIANT_U8 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -801,7 +801,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE * 2,
          INST_FLAG | OPCODE_UNPACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -825,7 +825,7 @@ namespace apx_test
       apx::Compiler compiler;
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE,
          OPCODE_UNPACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U8 << INST_VARIANT_SHIFT),
          0u,
@@ -850,7 +850,7 @@ namespace apx_test
       apx::Compiler compiler;
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE * 2,
          INST_FLAG | OPCODE_UNPACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u,
@@ -882,7 +882,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U8, 1 + UINT8_SIZE * 10,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_QUEUED_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U8, 1 + UINT8_SIZE * 10,
          OPCODE_DATA_SIZE | (VARIANT_ELEMENT_SIZE_U8_QUEUE_SIZE_U8 << INST_VARIANT_SHIFT), UINT8_SIZE,
          OPCODE_UNPACK | (VARIANT_U8 << INST_VARIANT_SHIFT)
       };
@@ -906,7 +906,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE * 8,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE * 8,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
          DYN_ARRAY_FLAG | OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          8u,
@@ -931,7 +931,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE * 4,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE * 4,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_U8 << INST_VARIANT_SHIFT),
          DYN_ARRAY_FLAG | OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          4u,
@@ -959,7 +959,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT8_SIZE,
          OPCODE_UNPACK | (VARIANT_S8 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -982,7 +982,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT8_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT8_SIZE,
          OPCODE_UNPACK | (VARIANT_S8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_S8 << INST_VARIANT_SHIFT),
          0xF6,
@@ -1008,7 +1008,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT8_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT8_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_S8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -1033,7 +1033,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT8_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT8_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_S8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u,
@@ -1061,7 +1061,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT16_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT16_SIZE,
          OPCODE_UNPACK | (VARIANT_U16 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -1084,7 +1084,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT16_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT16_SIZE,
          OPCODE_UNPACK | (VARIANT_U16 << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U16 << INST_VARIANT_SHIFT),
          0x00, //lower-limit LSB
@@ -1112,7 +1112,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT16_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT16_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_U16 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -1137,7 +1137,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT16_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT16_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_U16 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u,
@@ -1167,7 +1167,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT16_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT16_SIZE,
          OPCODE_UNPACK | (VARIANT_S16 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -1190,7 +1190,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT16_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT16_SIZE,
          OPCODE_UNPACK | (VARIANT_S16 << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_S16 << INST_VARIANT_SHIFT),
          0x18, //lower-limit LSB
@@ -1218,7 +1218,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT16_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT16_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_S16 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -1243,7 +1243,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT16_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT16_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_S16 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u,
@@ -1273,7 +1273,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT32_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT32_SIZE,
          OPCODE_UNPACK | (VARIANT_U32 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -1296,7 +1296,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT32_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT32_SIZE,
          OPCODE_UNPACK | (VARIANT_U32 << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_U32 << INST_VARIANT_SHIFT),
          0x00, //lower-limit LSB
@@ -1328,7 +1328,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT32_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT32_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_U32 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -1353,7 +1353,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT32_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT32_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_U32 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u,
@@ -1387,7 +1387,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT32_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT32_SIZE,
          OPCODE_UNPACK | (VARIANT_S32 << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -1410,7 +1410,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT32_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT32_SIZE,
          OPCODE_UNPACK | (VARIANT_S32 << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_LIMIT_CHECK_S32 << INST_VARIANT_SHIFT),
          0x60, //lower-limit LSB
@@ -1442,7 +1442,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT32_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT32_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_S32 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u
@@ -1467,7 +1467,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT32_SIZE * 2,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, INT32_SIZE * 2,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_S32 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
          2u,
@@ -1501,7 +1501,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, BYTE_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, BYTE_SIZE,
          OPCODE_UNPACK | (VARIANT_BYTE << INST_VARIANT_SHIFT)
       };
       ASSERT_EQ(*program, expected);
@@ -1522,7 +1522,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U16,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U16,
          0xFF,
          0x0F,
          INST_FLAG | OPCODE_UNPACK | (VARIANT_BYTE << INST_VARIANT_SHIFT),
@@ -1548,7 +1548,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U16,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U16,
          0xFF,
          0x0F,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_BYTE << INST_VARIANT_SHIFT),
@@ -1574,7 +1574,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8,
          120,
          INST_FLAG | OPCODE_UNPACK | (VARIANT_ASCII_CHAR << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
@@ -1599,7 +1599,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8,
          120,
          INST_FLAG | OPCODE_UNPACK | (VARIANT_CHAR8 << INST_VARIANT_SHIFT),
          OPCODE_DATA_SIZE | (VARIANT_ARRAY_SIZE_U8 << INST_VARIANT_SHIFT),
@@ -1625,7 +1625,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U16,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U16,
          0x00,
          0x01,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_ASCII_CHAR << INST_VARIANT_SHIFT),
@@ -1653,7 +1653,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U16,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_FLAG_DYNAMIC_DATA | HEADER_PROG_TYPE_UNPACK | VARIANT_U16,
          0x00,
          0x01,
          ARRAY_FLAG | OPCODE_UNPACK | (VARIANT_CHAR8 << INST_VARIANT_SHIFT),
@@ -1681,7 +1681,7 @@ namespace apx_test
       apx::error_t error_code = APX_NO_ERROR;
       auto program = compiler.compile_port(port, apx::ProgramType::Unpack, error_code);
       ASSERT_EQ(error_code, APX_NO_ERROR);
-      Program const expected{ 'A', 'P', 'X', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE + UINT16_SIZE,
+      Program const expected{ 'V', 'M', MAJOR_VERSION, MINOR_VERSION, HEADER_PROG_TYPE_UNPACK | VARIANT_U8, UINT8_SIZE + UINT16_SIZE,
          OPCODE_UNPACK | (VARIANT_RECORD << INST_VARIANT_SHIFT),
          OPCODE_DATA_CTRL | (VARIANT_RECORD_SELECT << INST_VARIANT_SHIFT),
          'F', 'i', 'r', 's', 't', '\0',
