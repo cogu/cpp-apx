@@ -84,3 +84,5 @@ namespace apx
 #define APX_VALUE_RANGE_ERROR                  68
 #define APX_VALUE_CONVERSION_ERROR             69
 #define APX_VALUE_LENGTH_ERROR                 70
+#define APX_NUMBER_TOO_LARGE_ERROR             71
+#define APX_VERSION_ERROR                      72

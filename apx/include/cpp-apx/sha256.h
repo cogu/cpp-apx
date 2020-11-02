@@ -31,7 +31,7 @@
 #include <cstdint>
 #include <cstddef>
 
-namespace util
+namespace sha256
 {
-   bool sha256_calc(std::uint8_t *hash, std::size_t max_size, const std::uint8_t* input, std::size_t len);
+   bool calc(std::uint8_t *hash, std::size_t max_hash_size, const std::uint8_t* input, std::size_t input_size);
 }
