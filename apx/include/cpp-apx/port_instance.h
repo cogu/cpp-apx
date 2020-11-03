@@ -53,18 +53,21 @@ namespace apx
       bool is_dynamic_data() const { return m_is_dynamic_data; }
       apx::vm::Program const& get_pack_program() const { return *m_pack_program; }
       apx::vm::Program const& get_unpack_program() const { return *m_unpack_program; }
-      apx::error_t append_computation(Computation const* computation);
-      std::size_t get_computation_length() const { return m_computations.size(); }
-      Computation const* get_computation(std::size_t id) const;
-      void set_data_signature(std::string const& data_signature) { m_data_signature = data_signature; }
-      std::string const& get_data_signature() const { return m_data_signature; }
+      void set_effective_data_element(DataElement const* data_element) { m_effective_data_element = data_element; }
+      DataElement const* get_effective_data_element() const { return m_effective_data_element; }
+      element_id_t get_data_element_id() const;
+      void set_computation_list(ComputationList const* computation_list) { m_computation_list = computation_list; }
+      ComputationList const* get_computation_list() { return m_computation_list; }
+      std::size_t get_computation_length() const;
+      Computation const* get_computation(std::size_t index) const;
+      computation_id_t get_computation_id() const;
    protected:
+
       //Members that requires serialization
-      std::vector<std::unique_ptr<Computation>> m_computations;
       std::unique_ptr<apx::vm::Program> m_pack_program;
       std::unique_ptr<apx::vm::Program> m_unpack_program;
       std::string m_name;
-      std::string m_data_signature; //For clients this is only used for debugging/visualization purposes
+      DataElement const* m_effective_data_element{ nullptr }; //For clients this is only used for debugging and/or visualization purposes
       //Members that can be derived from serialized data or from parse tree
       apx::PortType m_port_type;
       apx::port_id_t m_port_id;
@@ -73,7 +76,7 @@ namespace apx
       std::uint32_t m_queue_length = 0u;
       std::uint32_t m_element_size = 0u; //Only used when m_queue_length > 0
       bool m_is_dynamic_data = false;
-
+      ComputationList const* m_computation_list{ nullptr };
       apx::error_t process_info_from_program_header(apx::vm::Program const* program);
    };
 }

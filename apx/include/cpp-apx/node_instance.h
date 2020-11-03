@@ -31,6 +31,8 @@
 #include "cpp-apx/error.h"
 #include "cpp-apx/vm.h"
 #include "cpp-apx/node_data.h"
+#include "cpp-apx/data_element.h"
+#include "cpp-apx/computation.h"
 
 namespace apx
 {
@@ -47,6 +49,8 @@ namespace apx
          std::uint32_t data_offset, std::uint32_t& data_size);
       apx::error_t create_require_port(port_id_t port_id, std::string const& name, std::unique_ptr<apx::vm::Program> pack_program,
          std::unique_ptr<apx::vm::Program> unpack_program, std::uint32_t data_offset, std::uint32_t& data_size);
+      std::size_t get_num_data_elements() const { return m_num_data_elements; }
+      std::size_t get_num_computation_lists() const { return m_num_computation_lists; }
       std::size_t get_num_provide_ports() const { return m_num_provide_ports; }
       std::size_t get_num_require_ports() const { return m_num_require_ports; }
       std::size_t get_provide_port_init_data_size() const { return m_provide_port_init_data_size; }
@@ -57,20 +61,28 @@ namespace apx
          std::uint8_t*& require_port_data, std::size_t& require_port_data_size);
       PortInstance* get_provide_port(std::size_t port_id) const;
       PortInstance* get_require_port(std::size_t port_id) const;
-      apx::error_t init_node_data(std::uint8_t const* definition_data, std::size_t definition_size);
+      DataElement const* get_data_element(element_id_t id) const;
+      ComputationList const* get_computation_list(computation_id_t id) const;
+      apx::error_t create_node_data(std::uint8_t const* definition_data, std::size_t definition_size);
       bool has_provide_port_data() const { return m_provide_port_init_data != nullptr; }
       bool has_require_port_data() const { return m_require_port_init_data != nullptr; }
       NodeData const* get_const_node_data() const { return m_node_data.get(); }
       NodeData* get_node_data() const { return m_node_data.get(); }
       std::size_t get_definition_size() const;
       std::uint8_t const* get_definition_data() const;
+      void create_data_element_list(std::vector<std::unique_ptr<DataElement>>& data_element_list);
+      void create_computation_lists(std::vector<std::unique_ptr<ComputationList>>& computation_lists);
 
    protected:
       std::string m_name;
       std::size_t m_num_provide_ports{ 0u };
       std::size_t m_num_require_ports{ 0u };
+      std::size_t m_num_data_elements{ 0u };
+      std::size_t m_num_computation_lists{ 0u };
       PortInstance** m_provide_ports{ nullptr };
       PortInstance** m_require_ports{ nullptr };
+      DataElement** m_data_elements{ nullptr };
+      ComputationList** m_computation_lists{ nullptr };
       std::uint8_t* m_provide_port_init_data{ nullptr };
       std::uint8_t* m_require_port_init_data{ nullptr };
       std::size_t m_provide_port_init_data_size{ 0u };

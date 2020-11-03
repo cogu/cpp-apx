@@ -55,6 +55,8 @@ namespace apx
       std::string const& get_name() const { return m_name; }
       void set_dynamic_array() { m_dynamic_array = true; }
       bool is_dynamic_array() const { return m_dynamic_array; }
+      void set_id(element_id_t new_id) { m_element_id = new_id; }
+      element_id_t get_id() const { return m_element_id; }
       apx::error_t derive_types_on_element(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
       apx::error_t derive_proper_init_value(dtl::DynamicValue const &parsed_init_value, dtl::DynamicValue& derived_value) const;
       apx::error_t create_default_init_value(dtl::DynamicValue& derived_value) const;
@@ -76,6 +78,8 @@ namespace apx
       std::unique_ptr<std::vector<std::unique_ptr<DataElement>>> m_elements = nullptr;
       std::optional<std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_lower_limit = {};
       std::optional<std::variant<std::int32_t, std::uint32_t, std::int64_t, std::uint64_t>> m_upper_limit = {};
+      apx::element_id_t m_element_id{ INVALID_ELEMENT_ID };
+
 
       void init_element_vector();
       std::string limit_to_string() const;

@@ -23,6 +23,7 @@
 ******************************************************************************/
 #include <charconv>
 #include <array>
+#include <cassert>
 #include "cpp-apx/computation.h"
 
 namespace apx
@@ -154,5 +155,40 @@ namespace apx
          return false;
       }
       return true;
+   }
+
+   apx::error_t ComputationList::append_clone_of_computation(Computation const* computation)
+   {
+      std::unique_ptr<apx::ValueTable> vt;
+      std::unique_ptr<apx::RationalScaling> rs;
+      apx::ValueTable const* vt_tmp;
+      apx::RationalScaling const* rs_tmp;
+      switch (computation->computation_type)
+      {
+      case ComputationType::ValueTable:
+         vt_tmp = dynamic_cast<apx::ValueTable const*>(computation);
+         assert(vt_tmp != nullptr);
+         vt = std::make_unique<apx::ValueTable>(*vt_tmp);
+         m_computations.push_back(std::move(vt));
+         break;
+      case ComputationType::RationalScaling:
+         rs_tmp = dynamic_cast<apx::RationalScaling const*>(computation);
+         assert(rs_tmp != nullptr);
+         rs = std::make_unique<apx::RationalScaling>(*rs_tmp);
+         m_computations.push_back(std::move(rs));
+         break;
+      default:
+         return APX_NOT_IMPLEMENTED_ERROR;
+      }
+      return APX_NO_ERROR;
+   }
+
+   Computation const* ComputationList::get_computation(std::size_t id) const
+   {
+      if (id < m_computations.size())
+      {
+         return m_computations.at(id).get();
+      }
+      return nullptr;
    }
 }

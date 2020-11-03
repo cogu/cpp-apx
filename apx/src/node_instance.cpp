@@ -46,6 +46,23 @@ namespace apx
          }
          delete[] m_require_ports;
       }
+      if (m_num_data_elements > 0u)
+      {
+         for (std::size_t i = 0; i < m_num_data_elements; i++)
+         {
+            delete m_data_elements[i];
+         }
+         delete[] m_data_elements;
+      }
+      if (m_num_computation_lists > 0u)
+      {
+         for (std::size_t i = 0; i < m_num_computation_lists; i++)
+         {
+            delete m_computation_lists[i];
+         }
+         delete[] m_computation_lists;
+      }
+
       if (m_provide_port_init_data != nullptr)
       {
          delete[] m_provide_port_init_data;
@@ -142,7 +159,25 @@ namespace apx
       return nullptr;
    }
 
-   apx::error_t NodeInstance::init_node_data(std::uint8_t const* definition_data, std::size_t definition_size)
+   DataElement const* NodeInstance::get_data_element(element_id_t id) const
+   {
+      if (static_cast<std::size_t>(id) < m_num_data_elements)
+      {
+         return const_cast<DataElement const*>(m_data_elements[id]);
+      }
+      return nullptr;
+   }
+
+   ComputationList const* NodeInstance::get_computation_list(computation_id_t id) const
+   {
+      if (static_cast<std::size_t>(id) < m_num_computation_lists)
+      {
+         return const_cast<ComputationList const*>(m_computation_lists[id]);
+      }
+      return nullptr;
+   }
+
+   apx::error_t NodeInstance::create_node_data(std::uint8_t const* definition_data, std::size_t definition_size)
    {
       std::unique_ptr<NodeData> node_data = std::make_unique<NodeData>();
       auto retval = node_data->create_definition_data(definition_data, definition_size);
@@ -179,6 +214,38 @@ namespace apx
          return node_data->get_definition_data();
       }
       return nullptr;
+   }
+
+   void NodeInstance::create_data_element_list(std::vector<std::unique_ptr<DataElement>>& data_element_list)
+   {
+      m_num_data_elements = data_element_list.size();
+      if (m_num_data_elements > 0u)
+      {
+         m_data_elements = new DataElement*[m_num_data_elements];
+         if (m_data_elements != nullptr)
+         {
+            for (std::size_t i = 0; i < m_num_data_elements; i++)
+            {
+               m_data_elements[i] = data_element_list[i].release();
+            }
+         }
+      }
+   }
+
+   void NodeInstance::create_computation_lists(std::vector<std::unique_ptr<ComputationList>>& computation_lists)
+   {
+      m_num_computation_lists = computation_lists.size();
+      if (m_num_computation_lists > 0u)
+      {
+         m_computation_lists = new ComputationList*[m_num_computation_lists];
+         if (m_computation_lists != nullptr)
+         {
+            for (std::size_t i = 0; i < m_num_computation_lists; i++)
+            {
+               m_computation_lists[i] = computation_lists[i].release();
+            }
+         }
+      }
    }
 
    apx::error_t NodeInstance::calc_init_data_size(PortInstance** port_list, std::size_t num_ports, std::size_t& total_size)

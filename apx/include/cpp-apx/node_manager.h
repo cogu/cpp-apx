@@ -26,6 +26,8 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include <vector>
+#include <map>
 #include "cpp-apx/types.h"
 #include "cpp-apx/node_instance.h"
 #include "cpp-apx/parser.h"
@@ -47,7 +49,12 @@ namespace apx
       apx::Compiler m_compiler;
       std::unordered_map<std::string, std::unique_ptr<apx::NodeInstance>> m_instance_map;
       apx::NodeInstance* m_last_attached{ nullptr };
+      using DataElementMap = std::map<std::string, DataElement const*>;
+      using ComputationListMap = std::map<std::string, ComputationList const*>;
+      using DataElementList = std::vector<std::unique_ptr<apx::DataElement>>;
+      using ComputationListOfLists = std::vector<std::unique_ptr<apx::ComputationList>>;
 
+      void reset();
       apx::error_t create_node_instance(Node const* node, std::uint8_t const* definition_data, std::size_t definition_size);
       void attach_node(apx::NodeInstance* node_instance);
       apx::error_t create_ports_on_node_instance(apx::NodeInstance* node_instance, Node const* node,
@@ -55,6 +62,10 @@ namespace apx
       apx::error_t create_init_data_on_node_instance(apx::NodeInstance* node_instance, Node const* node,
          std::size_t expected_provide_port_data_size, std::size_t expected_require_port_data_size);
       apx::error_t create_port_init_data(apx::VirtualMachine &vm, apx::PortInstance* port_instance, dtl::Value const* value, std::uint8_t* data, std::size_t data_size);
-      apx::error_t finalize_port_instance(apx::PortInstance* port_instance, apx::Port const* parsed_port);
+      apx::error_t create_data_element_list_on_node_instance(apx::NodeInstance* node_instance, Node const* node);
+      apx::error_t update_data_element_list_on_port(DataElementList &list, DataElementMap& map, apx::PortInstance* port_instance, apx::Port const* parsed_port);
+      apx::error_t create_computation_list_on_node_instance(apx::NodeInstance* node_instance, Node const* node);
+      apx::error_t update_computation_list_on_port(ComputationListOfLists& list, ComputationListMap& map, apx::PortInstance* port_instance, apx::Port const* parsed_port);
+      //apx::error_t finalize_port_instance(apx::PortInstance* port_instance, apx::Port const* parsed_port);
    };
 }

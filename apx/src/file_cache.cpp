@@ -126,12 +126,18 @@ namespace apx
          write_node_name_to_header(&file, node_instance);
          write_node_size_to_header(&file, node_instance);
          write_hash_to_header(&file, hash_data, hash_size);
-         (void )write_number_of_ports(&file, node_instance); //TODO: Error handling
-         if (node_instance->get_num_provide_ports() > 0)
+         (void)write_number_of_data_elements(&file, node_instance);//TODO: Error handling
+         (void)write_number_computation_lists(&file, node_instance);//TODO: Error handling
+         (void)write_number_of_ports(&file, node_instance); //TODO: Error handling
+         if (node_instance->get_num_data_elements() > 0u)
+         {
+            serialize_data_elements(&file, node_instance);
+         }
+         if (node_instance->get_num_provide_ports() > 0u)
          {
             serialize_provide_port_data(&file, node_instance);
          }
-         if (node_instance->get_num_require_ports() > 0)
+         if (node_instance->get_num_require_ports() > 0u)
          {
             serialize_require_port_data(&file, node_instance);
          }
@@ -160,14 +166,14 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   void FileCache::write_version_header(std::ostream* stream) const
+   void FileCache::write_version_header(std::basic_ostream<char>* stream) const
    {
       std::array<char, NODE_VERSION_HEADER_SIZE> header = { 'A', 'P', 'X', NODE_HEADER_MAJOR_VERSION, NODE_HEADER_MINOR_VERSION,
                                               'V', 'M', vm::MAJOR_VERSION, vm::MINOR_VERSION };
       stream->write(header.data(), header.size());
    }
 
-   void FileCache::write_node_name_to_header(std::ostream* stream, NodeInstance const* node_instance) const
+   void FileCache::write_node_name_to_header(std::basic_ostream<char>* stream, NodeInstance const* node_instance) const
    {
       std::string const& name = node_instance->get_name();
       stream->write(name.data(), name.size());
@@ -199,6 +205,16 @@ namespace apx
       stream->write(reinterpret_cast<char const*>(hash_data), hash_size);
    }
 
+   apx::error_t FileCache::write_number_of_data_elements(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
+   {
+      return write_integer_to_stream(stream, node_instance->get_num_data_elements());
+   }
+
+   apx::error_t FileCache::write_number_computation_lists(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
+   {
+      return write_integer_to_stream(stream, node_instance->get_num_computation_lists());
+   }
+
    apx::error_t FileCache::write_number_of_ports(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
    {
       apx::error_t retval = write_integer_to_stream(stream, node_instance->get_num_provide_ports());
@@ -208,6 +224,22 @@ namespace apx
       }
       return retval;
    }
+   apx::error_t FileCache::serialize_data_elements(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
+   {
+      stream->put('D');
+      element_id_t const num_data_elements = static_cast<element_id_t>(node_instance->get_num_data_elements());
+      for (element_id_t id = 0u; id < num_data_elements; id++)
+      {
+         auto const* data_element = node_instance->get_data_element(id);
+         if (data_element == nullptr)
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         write_string_with_null_terminator(stream, data_element->to_string());
+      }
+      return APX_NO_ERROR;
+   }
+
    apx::error_t FileCache::serialize_provide_port_data(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
    {
       stream->put('P');
@@ -240,8 +272,8 @@ namespace apx
    apx::error_t FileCache::serialize_port_instance(std::basic_ostream<char>* stream, PortInstance const* port_instance)
    {
       write_string_with_null_terminator(stream, port_instance->get_name());
-      write_string_with_null_terminator(stream, port_instance->get_data_signature());
-      return APX_NO_ERROR;
+      auto retval = write_integer_to_stream(stream, port_instance->get_data_element_id());
+      return retval;
    }
 
    apx::error_t FileCache::write_byte_array_to_stream_with_size_header(std::basic_ostream<char>* stream, std::uint8_t const* data, std::size_t size)

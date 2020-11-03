@@ -40,40 +40,43 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-    apx::error_t PortInstance::append_computation(Computation const* computation)
+    element_id_t PortInstance::get_data_element_id() const
     {
-       std::unique_ptr<apx::ValueTable> vt;
-       std::unique_ptr<apx::RationalScaling> rs;
-       apx::ValueTable const* vt_tmp;
-       apx::RationalScaling const* rs_tmp;
-       switch (computation->computation_type)
+       if (m_effective_data_element != nullptr)
        {
-       case ComputationType::ValueTable:
-          vt_tmp = dynamic_cast<apx::ValueTable const*>(computation);
-          assert(vt_tmp != nullptr);
-          vt = std::make_unique<apx::ValueTable>(*vt_tmp);
-          m_computations.push_back(std::move(vt));
-          break;
-       case ComputationType::RationalScaling:
-          rs_tmp = dynamic_cast<apx::RationalScaling const*>(computation);
-          assert(rs_tmp != nullptr);
-          rs = std::make_unique<apx::RationalScaling>(*rs_tmp);
-          m_computations.push_back(std::move(rs));
-          break;
-       default:
-          return APX_NOT_IMPLEMENTED_ERROR;
+          return m_effective_data_element->get_id();
        }
-       return APX_NO_ERROR;
+       return INVALID_ELEMENT_ID;
     }
 
-    Computation const* PortInstance::get_computation(std::size_t id) const
+    std::size_t PortInstance::get_computation_length() const
     {
-       if (id < m_computations.size())
+       if (m_computation_list != nullptr)
        {
-          return m_computations.at(id).get();
+          return m_computation_list->get_computation_length();
+       }
+       return 0u;
+    }
+
+    Computation const* PortInstance::get_computation(std::size_t index) const
+    {
+       if (m_computation_list != nullptr)
+       {
+          return m_computation_list->get_computation(index);
        }
        return nullptr;
+
     }
+
+    computation_id_t PortInstance::get_computation_id() const
+    {
+       if (m_computation_list != nullptr)
+       {
+          return m_computation_list->get_id();
+       }
+       return apx::INVALID_COMPUTATION_ID;
+    }
+
 
    apx::error_t PortInstance::process_info_from_program_header(apx::vm::Program const* program)
    {

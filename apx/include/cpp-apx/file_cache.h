@@ -34,7 +34,7 @@ namespace apx
 {
    constexpr std::size_t NODE_VERSION_HEADER_SIZE = 9u;
    constexpr std::uint8_t NODE_HEADER_MAJOR_VERSION = 0u;
-   constexpr std::uint8_t NODE_HEADER_MINOR_VERSION = 1u;
+   constexpr std::uint8_t NODE_HEADER_MINOR_VERSION = 2u;
    constexpr std::size_t SHA256_HASH_SIZE = 32u;
    constexpr std::size_t SHA_BYTES_IN_SUFFIX = 4u; //Number of characters in suffix name is twice this number
 
@@ -56,7 +56,10 @@ namespace apx
       void write_node_name_to_header(std::basic_ostream<char>* stream, NodeInstance const* node_instance) const;
       bool write_node_size_to_header(std::basic_ostream<char>* stream, NodeInstance const* node_instance) const;
       void write_hash_to_header(std::basic_ostream<char>* stream, std::uint8_t const* hash_data, std::size_t hash_size) const;
+      apx::error_t write_number_of_data_elements(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
+      apx::error_t write_number_computation_lists(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
       apx::error_t write_number_of_ports(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
+      apx::error_t serialize_data_elements(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
       apx::error_t serialize_provide_port_data(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
       apx::error_t serialize_require_port_data(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
       apx::error_t serialize_port_instance(std::basic_ostream<char>* stream, PortInstance const* port_instance);
