@@ -4,6 +4,23 @@
 
 namespace apx
 {
+   apx::TypeAttributes* Port::get_referenced_type_attributes() const
+   {
+      auto const* data_element = get_data_element();
+      assert(data_element != nullptr);
+      auto const type_code = data_element->get_type_code();
+      assert( (type_code != apx::TypeCode::TypeRefId) && (type_code != apx::TypeCode::TypeRefName) ); //User must have previously finalized the parse tree
+      if (type_code == apx::TypeCode::TypeRefPtr)
+      {
+         auto const* data_type = data_element->get_typeref_ptr();
+         assert(data_type != nullptr);
+         if (data_type->has_attributes())
+         {
+            return data_type->get_attributes();
+         }
+      }
+      return nullptr;
+   }
 
    apx::error_t Port::derive_types(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map)
    {
@@ -154,7 +171,3 @@ namespace apx
       return APX_NO_ERROR;
    }
 }
-
-
-
-

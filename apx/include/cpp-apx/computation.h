@@ -27,6 +27,9 @@
 #include <string>
 #include <cstdint>
 #include <stdexcept>
+#include <memory>
+#include "cpp-apx/types.h"
+#include "cpp-apx/error.h"
 
 namespace apx
 {
@@ -65,6 +68,7 @@ namespace apx
          is_signed_range = true;
       }
       virtual std::string to_string() = 0;
+
       ComputationType computation_type;
       union
       {
@@ -114,6 +118,19 @@ namespace apx
       int32_t numerator = 1;
       int32_t denominator = 0;
       std::string unit;
+   };
+
+   class ComputationList
+   {
+   public:
+      void set_id(element_id_t new_id) { m_computation_id = new_id; }
+      computation_id_t get_id() const { return m_computation_id; }
+      apx::error_t append_clone_of_computation(Computation const* computation);
+      std::size_t get_computation_length() const { return m_computations.size(); }
+      Computation const* get_computation(std::size_t id) const;
+   protected:
+      apx::computation_id_t m_computation_id{ INVALID_COMPUTATION_ID };
+      std::vector<std::unique_ptr<Computation>> m_computations;
    };
 
 }

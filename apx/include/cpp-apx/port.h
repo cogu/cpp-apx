@@ -22,6 +22,7 @@ namespace apx
       apx::DataElement const* get_effective_data_element() const { return dsg.effective_element.get(); }
 
       apx::PortAttributes* get_attributes() const { return attr.get(); }
+      apx::TypeAttributes* get_referenced_type_attributes() const; //Will return nullptr if this port isn't referencing a data type
       apx::error_t derive_types(const std::vector<std::unique_ptr<apx::DataType>>& type_list, const std::map<std::string, apx::DataType*>& type_map);
       apx::error_t derive_proper_init_value();
       bool is_queued() const;

@@ -48,6 +48,12 @@ namespace apx
       return APX_NO_ERROR;
    }
 
+   void NodeManager::reset()
+   {
+      //m_effective_element_map.clear();
+      //m_computation_element_map.clear();
+   }
+
    apx::error_t NodeManager::create_node_instance(Node const* node, std::uint8_t const* definition_data, std::size_t definition_size)
    {
       if ( (node == nullptr) || (definition_data == nullptr) || (definition_size == 0u) )
@@ -69,7 +75,7 @@ namespace apx
       {
          return result;
       }
-      result = node_instance->init_node_data(definition_data, definition_size);
+      result = node_instance->create_node_data(definition_data, definition_size);
       if (result != APX_NO_ERROR)
       {
          return result;
@@ -111,11 +117,6 @@ namespace apx
          data_offset += data_size;
          auto* port_instance = node_instance->get_provide_port(port_id);
          assert(port_instance != nullptr);
-         result = finalize_port_instance(port_instance, port);
-         if (result != APX_NO_ERROR)
-         {
-            return result;
-         }
       }
       expected_provide_port_data_size = static_cast<std::size_t>(data_offset);
       data_offset = 0u;
@@ -142,14 +143,14 @@ namespace apx
          data_offset += data_size;
          auto* port_instance = node_instance->get_require_port(port_id);
          assert(port_instance != nullptr);
-         result = finalize_port_instance(port_instance, port);
-         if (result != APX_NO_ERROR)
-         {
-            return result;
-         }
       }
       expected_require_port_data_size = static_cast<std::size_t>(data_offset);
-      return APX_NO_ERROR;
+      result = create_data_element_list_on_node_instance(node_instance, node);
+      if (result == APX_NO_ERROR)
+      {
+         result = create_computation_list_on_node_instance(node_instance, node);
+      }
+      return result;
    }
 
    apx::error_t NodeManager::create_init_data_on_node_instance(apx::NodeInstance* node_instance, Node const* node,
@@ -248,37 +249,175 @@ namespace apx
       return vm.pack_value(value);
    }
 
-   apx::error_t NodeManager::finalize_port_instance(apx::PortInstance* port_instance, apx::Port const* parsed_port)
+   apx::error_t NodeManager::create_data_element_list_on_node_instance(apx::NodeInstance* node_instance, Node const* node)
    {
-      auto const* parsed_data_element = parsed_port->get_data_element();
-      assert(parsed_data_element != nullptr);
-      auto const type_code = parsed_data_element->get_type_code();
-      assert(type_code != apx::TypeCode::TypeRefId && type_code != apx::TypeCode::TypeRefName);
-      if (type_code == apx::TypeCode::TypeRefPtr)
+      auto const num_provide_ports = static_cast<port_id_t>(node->get_num_provide_ports());
+      auto const num_require_ports = static_cast<port_id_t>(node->get_num_require_ports());
+      DataElementList data_element_list;
+      DataElementMap data_element_map;
+      ComputationListOfLists computation_list;
+      ComputationListMap computation_map;
+      for (port_id_t port_id = 0u; port_id < num_provide_ports; port_id++)
       {
-         auto const* data_type = parsed_data_element->get_typeref_ptr();
-         assert(data_type != nullptr);
-         if (data_type->has_attributes())
+         auto parsed_port = node->get_provide_port(port_id);
+         auto port_instance = node_instance->get_provide_port(port_id);
+         if ((parsed_port == nullptr) || (port_instance == nullptr))
          {
-            auto const* attributes = data_type->get_attributes();
-            std::vector<std::unique_ptr<Computation>> computations;
-            for (auto &it : attributes->computations)
+            return APX_NULL_PTR_ERROR;
+         }
+         auto result = update_data_element_list_on_port(data_element_list, data_element_map, port_instance, parsed_port);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+      }
+      for (port_id_t port_id = 0u; port_id < num_require_ports; port_id++)
+      {
+         auto parsed_port = node->get_require_port(port_id);
+         auto port_instance = node_instance->get_require_port(port_id);
+         if ((parsed_port == nullptr) || (port_instance == nullptr))
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         auto result = update_data_element_list_on_port(data_element_list, data_element_map, port_instance, parsed_port);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+      }
+      if (data_element_list.size() > 0u)
+      {
+         node_instance->create_data_element_list(data_element_list);
+      }
+      return APX_NO_ERROR;
+   }
+
+   apx::error_t NodeManager::update_data_element_list_on_port(DataElementList& list, DataElementMap& map, apx::PortInstance* port_instance, apx::Port const* parsed_port)
+   {
+      assert((port_instance != nullptr) && (parsed_port != nullptr));
+      std::size_t current_length = list.size();
+      if (current_length >= UINT32_MAX) //TODO: Make improved check that also works on 32-bit platforms
+      {
+         return APX_TOO_MANY_PORTS_ERROR;
+      }
+      auto const* data_element = parsed_port->get_effective_data_element();
+      assert(data_element != nullptr);
+      std::string signature = data_element->to_string();
+      auto it = map.find(signature);
+      if (it == map.end())
+      {
+         std::unique_ptr<DataElement> clone = std::make_unique<DataElement>(*data_element);
+         data_element = clone.get();
+         assert(data_element != nullptr);
+         clone->set_id(static_cast<element_id_t>(current_length));
+         map.emplace(std::make_pair(signature, clone.get()));
+         list.push_back(std::move(clone));
+      }
+      else
+      {
+         data_element = it->second;
+         assert(data_element != nullptr);
+      }
+      port_instance->set_effective_data_element(data_element);
+      return APX_NO_ERROR;
+   }
+
+   apx::error_t NodeManager::create_computation_list_on_node_instance(apx::NodeInstance* node_instance, Node const* node)
+   {
+      auto const num_provide_ports = static_cast<port_id_t>(node->get_num_provide_ports());
+      auto const num_require_ports = static_cast<port_id_t>(node->get_num_require_ports());
+      DataElementList data_element_list;
+      DataElementMap data_element_map;
+      ComputationListOfLists computation_lists;
+      ComputationListMap computation_map;
+      for (port_id_t port_id = 0u; port_id < num_provide_ports; port_id++)
+      {
+         auto parsed_port = node->get_provide_port(port_id);
+         auto port_instance = node_instance->get_provide_port(port_id);
+         if ((parsed_port == nullptr) || (port_instance == nullptr))
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         auto result = update_computation_list_on_port(computation_lists, computation_map, port_instance, parsed_port);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+      }
+
+      for (port_id_t port_id = 0u; port_id < num_require_ports; port_id++)
+      {
+         auto parsed_port = node->get_require_port(port_id);
+         auto port_instance = node_instance->get_require_port(port_id);
+         if ((parsed_port == nullptr) || (port_instance == nullptr))
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         auto result = update_computation_list_on_port(computation_lists, computation_map, port_instance, parsed_port);
+         if (result != APX_NO_ERROR)
+         {
+            return result;
+         }
+      }
+      if (computation_lists.size() > 0u)
+      {
+         node_instance->create_computation_lists(computation_lists);
+      }
+      return APX_NO_ERROR;
+   }
+
+   apx::error_t NodeManager::update_computation_list_on_port(ComputationListOfLists& list, ComputationListMap& map, apx::PortInstance* port_instance, apx::Port const* parsed_port)
+   {
+      assert((port_instance != nullptr) && (parsed_port != nullptr));
+      std::size_t current_length = list.size();
+      if (current_length >= UINT32_MAX) //TODO: Make improved check that also works on 32-bit platforms
+      {
+         return APX_TOO_MANY_PORTS_ERROR;
+      }
+      auto const* attributes = parsed_port->get_referenced_type_attributes();
+      if ( (attributes != nullptr) && (attributes->computations.size() > 0u) )
+      {
+         std::string signature;
+         bool first = true;
+         for (auto& computation : attributes->computations)
+         {
+            if (first)
             {
-               auto result = port_instance->append_computation(it.get());
+               first = false;
+            }
+            else
+            {
+               signature.push_back(',');
+            }
+            signature.append(computation->to_string());
+         }
+         assert(signature.size() > 0);
+         auto it = map.find(signature);
+         ComputationList const* computation_list = nullptr;
+         if (it == map.end())
+         {
+            std::unique_ptr<ComputationList> managed_list = std::make_unique<ComputationList>();
+            for (auto& computation : attributes->computations)
+            {
+               auto result = managed_list->append_clone_of_computation(computation.get());
                if (result != APX_NO_ERROR)
                {
                   return result;
                }
             }
+            managed_list->set_id(static_cast<computation_id_t>(current_length));
+            computation_list = managed_list.get();
+            map.emplace(std::make_pair(signature, managed_list.get()));
+            list.push_back(std::move(managed_list));
          }
+         else
+         {
+            //reuse element
+            computation_list = it->second;
+         }
+         assert(computation_list != nullptr);
+         port_instance->set_computation_list(computation_list);
       }
-      auto const* effective_data_element = parsed_port->get_effective_data_element();
-      if (effective_data_element == nullptr)
-      {
-         return APX_NULL_PTR_ERROR;
-      }
-      auto const effective_signature = effective_data_element->to_string();
-      port_instance->set_data_signature(effective_signature);
       return APX_NO_ERROR;
    }
 }
