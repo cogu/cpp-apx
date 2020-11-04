@@ -135,11 +135,11 @@ namespace apx
          }
          if (node_instance->get_num_provide_ports() > 0u)
          {
-            serialize_provide_port_data(&file, node_instance);
+            serialize_provide_ports(&file, node_instance);
          }
          if (node_instance->get_num_require_ports() > 0u)
          {
-            serialize_require_port_data(&file, node_instance);
+            serialize_require_ports(&file, node_instance);
          }
          file.close();
       }
@@ -168,7 +168,7 @@ namespace apx
 
    void FileCache::write_version_header(std::basic_ostream<char>* stream) const
    {
-      std::array<char, NODE_VERSION_HEADER_SIZE> header = { 'A', 'P', 'X', NODE_HEADER_MAJOR_VERSION, NODE_HEADER_MINOR_VERSION,
+      std::array<char, bin::VERSION_HEADER_SIZE> header = { 'A', 'P', 'X', bin::HEADER_MAJOR_VERSION, bin::HEADER_MINOR_VERSION,
                                               'V', 'M', vm::MAJOR_VERSION, vm::MINOR_VERSION };
       stream->write(header.data(), header.size());
    }
@@ -226,7 +226,7 @@ namespace apx
    }
    apx::error_t FileCache::serialize_data_elements(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
    {
-      stream->put('D');
+      stream->put(bin::START_OF_DATA_ELEMENTS);
       element_id_t const num_data_elements = static_cast<element_id_t>(node_instance->get_num_data_elements());
       for (element_id_t id = 0u; id < num_data_elements; id++)
       {
@@ -240,13 +240,20 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   apx::error_t FileCache::serialize_provide_port_data(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
+   apx::error_t FileCache::serialize_provide_ports(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
    {
-      stream->put('P');
-      auto retval = write_byte_array_to_stream_with_size_header(stream,
-         node_instance->get_provide_port_init_data(), node_instance->get_provide_port_init_data_size());
-      std::size_t const num_provide_ports = node_instance->get_num_provide_ports();
-      for (std::size_t port_id = 0u; port_id < num_provide_ports; port_id++)
+      stream->put(bin::START_OF_PROVIDE_PORTS);
+      auto const port_data_size = node_instance->get_provide_port_init_data_size();
+      auto retval = write_integer_to_stream(stream, port_data_size);
+      if (port_data_size > 0)
+      {
+         //TODO: If init data just contains zeros, we don't actually need to store it
+         stream->put(bin::START_OF_INIT_DATA);
+         stream->write(reinterpret_cast<char const*>(node_instance->get_provide_port_init_data()), port_data_size);
+      }
+      std::size_t const num_ports = node_instance->get_num_provide_ports();
+      stream->put(bin::START_OF_PORT_INSTANCES);
+      for (std::size_t port_id = 0u; port_id < num_ports; port_id++)
       {
          auto const* port_instance = node_instance->get_provide_port(port_id);
          if (port_instance == nullptr)
@@ -258,14 +265,37 @@ namespace apx
          {
             break;
          }
+         stream->put(bin::END_OF_RECORD);
       }
       return retval;
    }
-   apx::error_t FileCache::serialize_require_port_data(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
+   apx::error_t FileCache::serialize_require_ports(std::basic_ostream<char>* stream, NodeInstance const* node_instance)
    {
-      stream->put('R');
-      auto retval = write_byte_array_to_stream_with_size_header(stream,
-         node_instance->get_require_port_init_data(), node_instance->get_require_port_init_data_size());
+      stream->put(bin::START_OF_REQUIRE_PORTS);
+      auto const port_data_size = node_instance->get_require_port_init_data_size();
+      auto retval = write_integer_to_stream(stream, port_data_size);
+      if (port_data_size > 0)
+      {
+         //TODO: If init data just contains zeros, we don't actually need to store it
+         stream->put(bin::START_OF_INIT_DATA);
+         stream->write(reinterpret_cast<char const*>(node_instance->get_require_port_init_data()), port_data_size);
+      }
+      std::size_t const num_ports = node_instance->get_num_require_ports();
+      stream->put(bin::START_OF_PORT_INSTANCES);
+      for (std::size_t port_id = 0u; port_id < num_ports; port_id++)
+      {
+         auto const* port_instance = node_instance->get_require_port(port_id);
+         if (port_instance == nullptr)
+         {
+            return APX_NULL_PTR_ERROR;
+         }
+         retval = serialize_port_instance(stream, port_instance);
+         if (retval != APX_NO_ERROR)
+         {
+            break;
+         }
+         stream->put(bin::END_OF_RECORD);
+      }
       return retval;
    }
 
@@ -275,26 +305,29 @@ namespace apx
       auto retval = write_integer_to_stream(stream, port_instance->get_data_element_id());
       if (retval == APX_NO_ERROR)
       {
+         //TODO: Optional computation reference
          if (port_instance->get_port_type() == PortType::ProvidePort)
          {
-            auto pack_program = port_instance->get_pack_program();
-            std::size_t program_size = pack_program.size() - vm::INITIAL_HEADER_SIZE;
+            auto program = port_instance->get_pack_program();
+            std::size_t program_size = program.size() - vm::INITIAL_HEADER_SIZE;
+            stream->put(bin::START_OF_PACK_PROGRAM);
             retval = write_integer_to_stream(stream, program_size);
             if (retval == APX_NO_ERROR)
             {
-               stream->write(reinterpret_cast<char const*>(pack_program.data()) + vm::INITIAL_HEADER_SIZE, program_size);
+               stream->write(reinterpret_cast<char const*>(program.data()) + vm::INITIAL_HEADER_SIZE, program_size);
             }
          }
-      }
-      return retval;
-   }
-
-   apx::error_t FileCache::write_byte_array_to_stream_with_size_header(std::basic_ostream<char>* stream, std::uint8_t const* data, std::size_t size)
-   {
-      auto retval = write_integer_to_stream(stream, size);
-      if (retval == APX_NO_ERROR)
-      {
-         stream->write(reinterpret_cast<char const*>(data), size);
+         else
+         {
+            auto program = port_instance->get_unpack_program();
+            std::size_t program_size = program.size() - vm::INITIAL_HEADER_SIZE;
+            stream->put(bin::START_OF_UNPACK_PROGRAM);
+            retval = write_integer_to_stream(stream, program_size);
+            if (retval == APX_NO_ERROR)
+            {
+               stream->write(reinterpret_cast<char const*>(program.data()) + vm::INITIAL_HEADER_SIZE, program_size);
+            }
+         }
       }
       return retval;
    }
