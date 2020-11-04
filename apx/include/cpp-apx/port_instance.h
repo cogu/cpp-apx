@@ -44,6 +44,7 @@ namespace apx
          m_name { name },
          m_pack_program{ pack_program },
          m_unpack_program{ unpack_program } {}
+      PortType get_port_type() const { return m_port_type; }
       apx::error_t derive_properties(std::uint32_t offset, std::uint32_t&size);
       std::string const& get_name() const { return m_name; }
       std::uint32_t get_data_offset() const { return m_data_offset; }
