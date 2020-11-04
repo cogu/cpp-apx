@@ -273,6 +273,19 @@ namespace apx
    {
       write_string_with_null_terminator(stream, port_instance->get_name());
       auto retval = write_integer_to_stream(stream, port_instance->get_data_element_id());
+      if (retval == APX_NO_ERROR)
+      {
+         if (port_instance->get_port_type() == PortType::ProvidePort)
+         {
+            auto pack_program = port_instance->get_pack_program();
+            std::size_t program_size = pack_program.size() - vm::INITIAL_HEADER_SIZE;
+            retval = write_integer_to_stream(stream, program_size);
+            if (retval == APX_NO_ERROR)
+            {
+               stream->write(reinterpret_cast<char const*>(pack_program.data()) + vm::INITIAL_HEADER_SIZE, program_size);
+            }
+         }
+      }
       return retval;
    }
 

@@ -63,7 +63,8 @@ namespace apx
       constexpr std::uint8_t MAJOR_VERSION = 2u;
       constexpr std::uint8_t MINOR_VERSION = 0u;
       constexpr std::uint32_t VERSION_SIZE = 2u;
-      constexpr std::uint32_t FIXED_HEADER_SIZE = 5;
+      constexpr std::uint32_t INITIAL_HEADER_SIZE = 4u;
+      constexpr std::uint32_t FIXED_HEADER_SIZE = INITIAL_HEADER_SIZE + 1u;
       constexpr std::uint8_t HEADER_PROG_TYPE_UNPACK = 0x00;
       constexpr std::uint8_t HEADER_PROG_TYPE_PACK = 0x08;
       constexpr std::uint8_t HEADER_DATA_VARIANT_MASK = 0x07;

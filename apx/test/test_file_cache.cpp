@@ -123,7 +123,7 @@ namespace apx_test
       constexpr std::uint8_t expected_number_of_require_ports = 0u;
       constexpr std::size_t node_name_size = 10u; //Includes null-terminator char
       constexpr std::size_t data_element_size = 8u;
-      constexpr std::uint8_t provide_port_data_size = 14u;
+      constexpr std::uint8_t provide_port_data_size = 21u;
       std::array<std::uint8_t, NODE_VERSION_HEADER_SIZE + node_name_size + vm::UINT8_SIZE +
          SHA256_HASH_SIZE + vm::UINT8_SIZE*4 + data_element_size+provide_port_data_size> expected = {
          'A', 'P', 'X', NODE_HEADER_MAJOR_VERSION, NODE_HEADER_MINOR_VERSION, 'V','M', vm::MAJOR_VERSION, vm::MINOR_VERSION,
@@ -134,7 +134,12 @@ namespace apx_test
          expected_number_of_provide_ports, expected_number_of_require_ports,
          'D', 'C', '(', '0', ',' , '3', ')', '\0',
          'P', 0x01, 0x03, //PROVIDE-PORT INIT-DATA
-         'U', 'I', 'n', 't', '8', 'P', 'o', 'r', 't', '\0', 0x00
+         'U', 'I', 'n', 't', '8', 'P', 'o', 'r', 't', '\0', 0x00,
+         0x06, vm::HEADER_PROG_TYPE_PACK | vm::VARIANT_U8, vm::UINT8_SIZE,
+         vm::OPCODE_DATA_CTRL | (vm::VARIANT_LIMIT_CHECK_U8 << vm::INST_VARIANT_SHIFT),
+         0u,
+         3u,
+         vm::OPCODE_PACK | (vm::VARIANT_U8 << vm::INST_VARIANT_SHIFT)
       };
 
       const char* apx_text =
