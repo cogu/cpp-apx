@@ -32,11 +32,26 @@
 
 namespace apx
 {
-   constexpr std::size_t NODE_VERSION_HEADER_SIZE = 9u;
-   constexpr std::uint8_t NODE_HEADER_MAJOR_VERSION = 0u;
-   constexpr std::uint8_t NODE_HEADER_MINOR_VERSION = 2u;
+   namespace bin
+   {
+      constexpr std::size_t VERSION_HEADER_SIZE = 9u;
+      constexpr std::uint8_t HEADER_MAJOR_VERSION = 0u;
+      constexpr std::uint8_t HEADER_MINOR_VERSION = 2u;
+
+      constexpr std::uint8_t END_OF_RECORD           = 0x00;
+      constexpr std::uint8_t START_OF_DATA_ELEMENTS  = 0x01;
+      constexpr std::uint8_t START_OF_COMPUTATIONS   = 0x02;
+      constexpr std::uint8_t START_OF_PROVIDE_PORTS  = 0x03;
+      constexpr std::uint8_t START_OF_REQUIRE_PORTS  = 0x04;
+      constexpr std::uint8_t START_OF_INIT_DATA      = 0x05;
+      constexpr std::uint8_t START_OF_PORT_INSTANCES = 0x06;
+      constexpr std::uint8_t COMPUTATION_REFERENCE   = 0x07;
+      constexpr std::uint8_t START_OF_PACK_PROGRAM   = 0x08;
+      constexpr std::uint8_t START_OF_UNPACK_PROGRAM = 0x09;
+   }
    constexpr std::size_t SHA256_HASH_SIZE = 32u;
    constexpr std::size_t SHA_BYTES_IN_SUFFIX = 4u; //Number of characters in suffix name is twice this number
+
 
    class FileCache
    {
@@ -60,10 +75,9 @@ namespace apx
       apx::error_t write_number_computation_lists(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
       apx::error_t write_number_of_ports(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
       apx::error_t serialize_data_elements(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
-      apx::error_t serialize_provide_port_data(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
-      apx::error_t serialize_require_port_data(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
+      apx::error_t serialize_provide_ports(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
+      apx::error_t serialize_require_ports(std::basic_ostream<char>* stream, NodeInstance const* node_instance);
       apx::error_t serialize_port_instance(std::basic_ostream<char>* stream, PortInstance const* port_instance);
-      apx::error_t write_byte_array_to_stream_with_size_header(std::basic_ostream<char>* stream, std::uint8_t const* data, std::size_t size);
       apx::error_t write_integer_to_stream(std::basic_ostream<char>* stream, std::size_t value);
       void write_string_with_null_terminator(std::basic_ostream<char>* stream, std::string const& str);
    };

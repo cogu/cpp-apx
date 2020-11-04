@@ -69,8 +69,8 @@ namespace apx_test
       constexpr std::uint8_t expected_number_of_provide_ports = 0u;
       constexpr std::uint8_t expected_number_of_require_ports = 0u;
       constexpr std::size_t node_name_size = 10u; //Includes null-terminator char
-      std::array<std::uint8_t, NODE_VERSION_HEADER_SIZE + node_name_size + vm::UINT8_SIZE + SHA256_HASH_SIZE + vm::UINT8_SIZE*4> expected = {
-         'A', 'P', 'X', NODE_HEADER_MAJOR_VERSION, NODE_HEADER_MINOR_VERSION, 'V','M', vm::MAJOR_VERSION, vm::MINOR_VERSION,
+      std::array<std::uint8_t, bin::VERSION_HEADER_SIZE + node_name_size + vm::UINT8_SIZE + SHA256_HASH_SIZE + vm::UINT8_SIZE*4> expected = {
+         'A', 'P', 'X', bin::HEADER_MAJOR_VERSION, bin::HEADER_MINOR_VERSION, 'V','M', vm::MAJOR_VERSION, vm::MINOR_VERSION,
          'T', 'e', 's', 't', 'N', 'o', 'd', 'e', '0','\0', static_cast<std::uint8_t>(expected_definition_size),
          0x43,0xbb,0x81,0xdc,0xb1,0x7c,0xec,0x4b,0x63,0x55,0xfd,0x4b,0x7b,0x88,0x40,0x9b,
          0x4c,0x1e,0x1d,0x7e,0xff,0xa0,0x52,0xc1,0x8e,0x09,0x50,0x28,0xae,0x83,0x67,0x80,
@@ -123,23 +123,23 @@ namespace apx_test
       constexpr std::uint8_t expected_number_of_require_ports = 0u;
       constexpr std::size_t node_name_size = 10u; //Includes null-terminator char
       constexpr std::size_t data_element_size = 8u;
-      constexpr std::uint8_t provide_port_data_size = 21u;
-      std::array<std::uint8_t, NODE_VERSION_HEADER_SIZE + node_name_size + vm::UINT8_SIZE +
+      constexpr std::uint8_t provide_port_data_size = 25u;
+      std::array<std::uint8_t, bin::VERSION_HEADER_SIZE + node_name_size + vm::UINT8_SIZE +
          SHA256_HASH_SIZE + vm::UINT8_SIZE*4 + data_element_size+provide_port_data_size> expected = {
-         'A', 'P', 'X', NODE_HEADER_MAJOR_VERSION, NODE_HEADER_MINOR_VERSION, 'V','M', vm::MAJOR_VERSION, vm::MINOR_VERSION,
+         'A', 'P', 'X', bin::HEADER_MAJOR_VERSION, bin::HEADER_MINOR_VERSION, 'V','M', vm::MAJOR_VERSION, vm::MINOR_VERSION,
          'T', 'e', 's', 't', 'N', 'o', 'd', 'e', '1','\0', static_cast<std::uint8_t>(expected_definition_size),
          0xdc,0xa2,0xf6,0x4b,0x5b,0xaa,0xad,0x06,0xf4,0xd7,0x4a,0x13,0xbe,0xb6,0x58,0x53,
          0x1c,0xa1,0xe2,0xbb,0xda,0x70,0x12,0xf1,0x38,0x0c,0x6f,0x2d,0x64,0xe3,0xc4,0x8f,
          expected_number_of_data_elements, expected_number_of_computation_lists,
          expected_number_of_provide_ports, expected_number_of_require_ports,
-         'D', 'C', '(', '0', ',' , '3', ')', '\0',
-         'P', 0x01, 0x03, //PROVIDE-PORT INIT-DATA
-         'U', 'I', 'n', 't', '8', 'P', 'o', 'r', 't', '\0', 0x00,
-         0x06, vm::HEADER_PROG_TYPE_PACK | vm::VARIANT_U8, vm::UINT8_SIZE,
+         bin::START_OF_DATA_ELEMENTS, 'C', '(', '0', ',' , '3', ')', '\0',
+         bin::START_OF_PROVIDE_PORTS, 0x01, bin::START_OF_INIT_DATA, 0x03,
+         bin::START_OF_PORT_INSTANCES, 'U', 'I', 'n', 't', '8', 'P', 'o', 'r', 't', '\0', 0x00, //last byte is data-Element reference
+         bin::START_OF_PACK_PROGRAM, 0x06, vm::HEADER_PROG_TYPE_PACK | vm::VARIANT_U8, vm::UINT8_SIZE,
          vm::OPCODE_DATA_CTRL | (vm::VARIANT_LIMIT_CHECK_U8 << vm::INST_VARIANT_SHIFT),
          0u,
          3u,
-         vm::OPCODE_PACK | (vm::VARIANT_U8 << vm::INST_VARIANT_SHIFT)
+         vm::OPCODE_PACK | (vm::VARIANT_U8 << vm::INST_VARIANT_SHIFT), bin::END_OF_RECORD
       };
 
       const char* apx_text =
