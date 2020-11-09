@@ -14,6 +14,9 @@ set (CPP_APX_COMMON_LIB_HEADER_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/decoder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/error.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/file_client.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/file_info.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/file_map.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/file.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/node_data.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/node_instance.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-apx/node_manager.h
@@ -41,6 +44,9 @@ set (CPP_APX_COMMON_LIB_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data_type.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/decoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/file_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/file_info.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/file_map.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/file.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/node_data.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/node_instance.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/node_manager.cpp
