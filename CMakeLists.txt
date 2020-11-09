@@ -53,6 +53,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         apx/test/test_data_signature.cpp
         apx/test/test_decoder.cpp
         apx/test/test_deserializer.cpp
+        apx/test/test_file_info.cpp
+        apx/test/test_file_map.cpp
         apx/test/test_file_client.cpp
         apx/test/test_node_data.cpp
         apx/test/test_node_manager.cpp

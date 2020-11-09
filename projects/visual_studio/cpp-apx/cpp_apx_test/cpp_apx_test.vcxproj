@@ -45,7 +45,11 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\decoder.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\deserializer.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\error.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_info.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_client.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager_shared.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_map.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_data.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_instance.h" />
@@ -58,6 +62,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\program.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\remotefile.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\serializer.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\sha256.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\signature_parser.h" />
@@ -95,7 +100,16 @@
     <ClCompile Include="..\..\..\..\apx\src\deserializer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\file.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\file_client.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\file_info.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\file_map.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\node.cpp">
@@ -142,7 +156,10 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\test\test_computation.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_data_signature.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_file.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_file_cache.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_file_info.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_file_map.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_numheader.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\sample_nodes.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

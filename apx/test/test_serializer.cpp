@@ -1152,7 +1152,7 @@ namespace apx_test
       value = 0u;
       for (std::size_t i = 0; i < max_array_length; i++)
       {
-         ASSERT_EQ(buf[2+i], value++);
+         EXPECT_EQ(buf[2+i], value++);
       }
    }
 

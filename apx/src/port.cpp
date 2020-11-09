@@ -40,10 +40,6 @@ namespace apx
       {
          return APX_NULL_PTR_ERROR;
       }
-      if (data_element == nullptr)
-      {
-         return APX_NULL_PTR_ERROR;
-      }
       apx::error_t result = APX_NO_ERROR;
       if (attr.get() != nullptr)
       {

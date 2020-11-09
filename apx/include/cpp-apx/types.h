@@ -73,4 +73,14 @@ namespace apx
    constexpr computation_id_t INVALID_COMPUTATION_ID = static_cast<computation_id_t>(-1);
 
    constexpr std::uint16_t MAX_TYPE_REF_FOLLOW_COUNT = 255U;
+
+   constexpr std::uint32_t PORT_DATA_ADDRESS_START        = 0x0u;
+   constexpr std::uint32_t PORT_DATA_ADDRESS_ALIGNMENT    = 0x400u;      //1KB
+   constexpr std::uint32_t DEFINITION_ADDRESS_START       = 0x4000000u;  //64MB
+   constexpr std::uint32_t DEFINITION_ADDRESS_ALIGNMENT   = 0x40000u;    //256kB
+   constexpr std::uint32_t PORT_COUNT_ADDRESS_START       = 0x8000000u;  //128MB
+   constexpr std::uint32_t PORT_COUNT_ADDRESS_ALIGNMENT   = 0x400u;      //1KB
+   constexpr std::uint32_t USER_DEFINED_ADDRESS_START     = 0x20000000u; //128MB
+   constexpr std::uint32_t USER_DEFINED_ADDRESS_ALIGNMENT = 0x1000u;     //4KB
+
 }
