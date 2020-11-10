@@ -33,11 +33,14 @@ namespace apx
    {
    public:
       FileMap() = delete;
-      FileMap(bool is_remote) : m_is_remote_map{ is_remote }{}
+      FileMap(bool is_remote) : m_is_remote_map{ is_remote }, m_last_found_file{ nullptr }{}
       ~FileMap();
       bool is_remote() const { return m_is_remote_map; }
       File* create_file(rmf::FileInfo const& file_info);
-      File* find_by_address(std::uint32_t address) const;
+      File* find_by_address(std::uint32_t address);
+      File* find_by_name(char const* name);
+      File* find_by_name(std::string const& name);
+
       std::list<apx::File*>& list() { return m_list; }
    protected:
       std::list<apx::File*>::const_iterator auto_assign_address(File* file);
@@ -48,6 +51,6 @@ namespace apx
 
       std::list<apx::File*> m_list;
       bool m_is_remote_map;
-
+      File* m_last_found_file;
    };
 }

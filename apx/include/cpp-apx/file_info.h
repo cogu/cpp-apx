@@ -45,6 +45,7 @@ namespace rmf
       bool name_ends_with(char const* suffix) const;
       bool name_ends_with(std::string const& suffix) const;
       std::string base_name() const;
+      bool address_in_range(std::uint32_t addr) const { return ( (address_without_flags() <= addr) && (addr < (address_without_flags() + size)) ); }
 
       std::uint32_t address{ INVALID_ADDRESS };
       std::uint32_t size{ 0u };
