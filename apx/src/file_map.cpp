@@ -66,9 +66,70 @@ namespace apx
       return file;
    }
 
-   File* FileMap::find_by_address(std::uint32_t address) const
+   File* FileMap::find_by_address(std::uint32_t address)
    {
-      (void)address;
+      address &= rmf::ADDRESS_MASK_INTERNAL;
+      if (m_last_found_file != nullptr)
+      {
+         if (m_last_found_file->address_in_range(address))
+         {
+            return m_last_found_file;
+         }
+      }
+      for (auto it = m_list.begin(); it != m_list.end(); it++)
+      {
+         File* file = *it;
+         assert(file != nullptr);
+         if (file->address_in_range(address))
+         {
+            m_last_found_file = file;
+            return file;
+         }
+      }
+      return nullptr;
+   }
+
+   File* FileMap::find_by_name(char const* name)
+   {
+      if (m_last_found_file != nullptr)
+      {
+         if ((m_last_found_file->get_name().compare(name) == 0))
+         {
+            return m_last_found_file;
+         }
+      }
+      for (auto it = m_list.begin(); it != m_list.end(); it++)
+      {
+         File* file = *it;
+         assert(file != nullptr);
+         if ((file->get_name().compare(name) == 0))
+         {
+            m_last_found_file = file;
+            return file;
+         }
+      }
+      return nullptr;
+   }
+
+   File* FileMap::find_by_name(std::string const& name)
+   {
+      if (m_last_found_file != nullptr)
+      {
+         if (m_last_found_file->get_name() == name)
+         {
+            return m_last_found_file;
+         }
+      }
+      for (auto it = m_list.begin(); it != m_list.end(); it++)
+      {
+         File* file = *it;
+         assert(file != nullptr);
+         if (file->get_name() == name)
+         {
+            m_last_found_file = file;
+            return file;
+         }
+      }
       return nullptr;
    }
 
@@ -159,10 +220,10 @@ namespace apx
       }
       std::list<apx::File*>::const_iterator iterator_next = m_list.cbegin();
       std::list<apx::File*>::const_iterator iterator_prev = m_list.cend();
-      std::uint32_t const address = file->get_address();
+      std::uint32_t const address = file->get_address_without_flags();
       while (iterator_next != m_list.cend())
       {
-         if ((*iterator_next)->get_address() < address)
+         if ((*iterator_next)->get_address_without_flags() < address)
          {
             iterator_prev = iterator_next++;
          }
@@ -183,12 +244,12 @@ namespace apx
       }
       else
       {
-         auto const file_start_end_address = file->get_address_without_flags();
+         auto const file_start_address = file->get_address_without_flags();
          auto const file_end_address = file->get_end_address_without_flags(); //First byte after valid address
          std::list<apx::File*>::const_iterator iterator_right = m_list.cbegin();
          if (iterator_left != m_list.cend())
          {
-            assert((*iterator_left)->get_end_address_without_flags() <= file_start_end_address);
+            assert((*iterator_left)->get_end_address_without_flags() <= file_start_address);
             iterator_right = std::next(iterator_left);
          }
          if (iterator_right == m_list.cend())
