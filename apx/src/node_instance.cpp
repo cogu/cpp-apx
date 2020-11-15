@@ -24,7 +24,8 @@
 
 #include <cassert>
 #include <cstring>
-#include "cpp-apx\node_instance.h"
+#include "cpp-apx/node_instance.h"
+#include "cpp-apx/sha256.h"
 
 namespace apx
 {
@@ -246,6 +247,23 @@ namespace apx
             }
          }
       }
+   }
+
+   error_t NodeInstance::fill_definition_file_info(rmf::FileInfo& file_info)
+   {
+      file_info.size = static_cast<std::uint32_t>(get_definition_size());
+      file_info.name = m_name + ".apx";
+      file_info.digest_type = rmf::DigestType::SHA256;
+      auto success = sha256::calc(file_info.digest_data.data(), file_info.digest_data.size(), get_definition_data(), get_definition_size());
+      return success ? APX_NO_ERROR : APX_INTERNAL_ERROR;
+   }
+
+   void NodeInstance::fill_provide_port_data_file_info(rmf::FileInfo& file_info)
+   {
+      file_info.size = static_cast<std::uint32_t>(get_provide_port_init_data_size());
+      file_info.digest_type = rmf::DigestType::None;
+      std::memset(file_info.digest_data.data(), 0, file_info.digest_data.size());
+      file_info.name = m_name + ".out";
    }
 
    apx::error_t NodeInstance::calc_init_data_size(PortInstance** port_list, std::size_t num_ports, std::size_t& total_size)

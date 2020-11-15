@@ -90,6 +90,7 @@ namespace apx
    using port_id_t = std::uint32_t;
    using element_id_t = std::uint32_t;
    using computation_id_t = std::uint32_t;
+   using ByteArray = std::vector<std::uint8_t>;
    constexpr type_id_t INVALID_TYPE_ID = static_cast<type_id_t>(-1);
    constexpr port_id_t INVALID_PORT_ID = static_cast<port_id_t>(-1);
    constexpr element_id_t INVALID_ELEMENT_ID = static_cast<element_id_t>(-1);
@@ -97,7 +98,8 @@ namespace apx
 
    constexpr std::uint16_t MAX_TYPE_REF_FOLLOW_COUNT = 255U;
 
-   constexpr std::uint32_t INVALID_CONNECTION_ID = 0xfffffffful;
+   using connection_id_t = std::uint32_t;
+   constexpr connection_id_t INVALID_CONNECTION_ID = 0xfffffffful;
 
    constexpr std::uint32_t PORT_DATA_ADDRESS_START        = 0x0u;
    constexpr std::uint32_t PORT_DATA_ADDRESS_ALIGNMENT    = 0x400u;      //1KB
@@ -108,4 +110,6 @@ namespace apx
    constexpr std::uint32_t USER_DEFINED_ADDRESS_START     = 0x20000000u; //128MB
    constexpr std::uint32_t USER_DEFINED_ADDRESS_ALIGNMENT = 0x1000u;     //4KB
 
+   constexpr std::size_t SMALL_DATA_SIZE = sizeof(std::uint32_t);
+   constexpr std::size_t MAX_FILE_SIZE = 0x4000000; //64MB
 }

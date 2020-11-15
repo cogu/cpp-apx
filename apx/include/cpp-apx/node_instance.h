@@ -33,6 +33,7 @@
 #include "cpp-apx/node_data.h"
 #include "cpp-apx/data_element.h"
 #include "cpp-apx/computation.h"
+#include "cpp-apx/file_info.h"
 
 namespace apx
 {
@@ -68,10 +69,14 @@ namespace apx
       bool has_require_port_data() const { return m_require_port_init_data != nullptr; }
       NodeData const* get_const_node_data() const { return m_node_data.get(); }
       NodeData* get_node_data() const { return m_node_data.get(); }
+      bool has_node_data() const { return m_node_data.get() != nullptr; }
       std::size_t get_definition_size() const;
       std::uint8_t const* get_definition_data() const;
       void create_data_element_list(std::vector<std::unique_ptr<DataElement>>& data_element_list);
       void create_computation_lists(std::vector<std::unique_ptr<ComputationList>>& computation_lists);
+      error_t fill_definition_file_info(rmf::FileInfo& file_info);
+      void fill_provide_port_data_file_info(rmf::FileInfo& file_info);
+
 
    protected:
       std::string m_name;

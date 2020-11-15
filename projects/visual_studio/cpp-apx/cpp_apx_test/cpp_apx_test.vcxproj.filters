@@ -150,11 +150,47 @@
     <ClCompile Include="..\..\..\..\apx\test\test_file.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\apx\test\test_file_map.cpp">
+    <ClCompile Include="..\..\..\..\apx\test\test_remotefile.cpp">
       <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\remotefile.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\mock_client_connection.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\command.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\client_connection.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_client_connection.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_filemanager_receiver.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_filemanager_shared.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\file_manager_receiver.cpp">
+      <Filter>apx\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\file_map.cpp">
       <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\file_manager_worker.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\file_manager_shared.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\file_manager.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_file_map.cpp">
+      <Filter>apx\test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -258,16 +294,37 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\remotefile.h">
       <Filter>apx\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_map.h">
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_info.h">
       <Filter>apx\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_info.h">
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client_connection.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\mock_client_connection.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\connection_interface.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\command.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager.h">
       <Filter>apx\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager_shared.h">
       <Filter>apx\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file.h">
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager_worker.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager_receiver.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_map.h">
       <Filter>apx\include</Filter>
     </ClInclude>
   </ItemGroup>

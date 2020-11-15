@@ -87,3 +87,5 @@ namespace apx
 #define APX_NUMBER_TOO_LARGE_ERROR             71
 #define APX_VERSION_ERROR                      72
 #define APX_TOO_MANY_PORTS_ERROR               73
+#define APX_FILE_CREATE_ERROR                  74
+#define APX_BUFFER_TOO_SMALL_ERROR             75

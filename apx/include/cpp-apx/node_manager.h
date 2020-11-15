@@ -66,6 +66,5 @@ namespace apx
       apx::error_t update_data_element_list_on_port(DataElementList &list, DataElementMap& map, apx::PortInstance* port_instance, apx::Port const* parsed_port);
       apx::error_t create_computation_list_on_node_instance(apx::NodeInstance* node_instance, Node const* node);
       apx::error_t update_computation_list_on_port(ComputationListOfLists& list, ComputationListMap& map, apx::PortInstance* port_instance, apx::Port const* parsed_port);
-      //apx::error_t finalize_port_instance(apx::PortInstance* port_instance, apx::Port const* parsed_port);
    };
 }

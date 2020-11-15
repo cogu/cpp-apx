@@ -26,6 +26,7 @@
 #include <string>
 #include <array>
 #include "cpp-apx/remotefile.h"
+#include "cpp-apx/error.h"
 
 namespace rmf
 {
@@ -33,6 +34,7 @@ namespace rmf
 
    struct FileInfo
    {
+      FileInfo() = default;
       FileInfo(FileInfo const& other) = default;
       FileInfo(char const* _name, std::uint32_t _size, std::uint32_t _address = INVALID_ADDRESS);
       FileInfo(char const* _name, std::uint32_t _size, DigestType _digest_type, std::uint8_t const* _digest_data);
@@ -53,6 +55,7 @@ namespace rmf
       DigestType digest_type { DigestType::None };
       std::array <std::uint8_t, SHA256_SIZE> digest_data;
       std::string name;
-
    };
+
+   apx::error_t encode_publish_file_cmd(std::uint8_t* buf, std::size_t buf_size, rmf::FileInfo const* file, std::size_t &cmd_size);
 }

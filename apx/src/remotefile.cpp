@@ -91,4 +91,21 @@ namespace rmf
       }
       return retval;
    }
+
+   apx::error_t encode_open_file_cmd(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address)
+   {
+      std::size_t const required_size = rmf::FILE_OPEN_CMD_SIZE;
+      if (address > HIGH_ADDR_MAX)
+      {
+         return APX_INVALID_ADDRESS_ERROR;
+      }
+      if (required_size > buf_size)
+      {
+         return APX_BUFFER_TOO_SMALL_ERROR;
+      }
+      std::uint8_t* p{ buf };
+      apx::packLE<std::uint32_t>(p, rmf::CMD_OPEN_FILE_MSG); p += sizeof(std::uint32_t);
+      apx::packLE<std::uint32_t>(p, address); p += sizeof(std::uint32_t);
+      return APX_NO_ERROR;
+   }
 }
