@@ -1,8 +1,8 @@
 /*****************************************************************************
-* \file      file_manager_shared.h
+* \file      file_manager.h
 * \author    Conny Gustafsson
-* \date      2020-11-05
-* \brief     Shared objects used by file manager sub-components
+* \date      2020-11-10
+* \brief     APX File Manager
 *
 * Copyright (c) 2020 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,38 +23,37 @@
 ******************************************************************************/
 #pragma once
 
-#include <mutex>
-#include <vector>
-#include "cpp-apx/file_map.h"
-#include "cpp-apx/connection_interface.h"
+#include "cpp-apx/file_manager_shared.h"
+#include "cpp-apx/file_manager_worker.h"
+#include "cpp-apx/file_manager_receiver.h"
+#include "cpp-apx/error.h"
 
 namespace apx
 {
-   class FileManagerShared
+   class FileManager
    {
    public:
-      FileManagerShared() :m_local_file_map{ false }, m_remote_file_map{ true }, m_parent_connection{ nullptr }, m_is_connected{ false }{}
-      FileManagerShared(ConnectionInterface* parent_connection) :m_local_file_map{ false }, m_remote_file_map{ true },
-         m_parent_connection{ parent_connection }, m_is_connected{ false }{}
-
-      File* create_local_file(rmf::FileInfo const& file_info);
-      File* create_remote_file(rmf::FileInfo const& file_info);
-      File* find_local_file_by_name(char const* name);
-      File* find_local_file_by_name(std::string const& name);
-      File* find_remote_file_by_name(char const* name);
-      File* find_remote_file_by_name(std::string const& name);
-      File* find_file_by_address(std::uint32_t address);
+      FileManager() = delete;
+      FileManager(ConnectionInterface* parent_connection) : m_shared(parent_connection),
+         m_worker{ m_shared }{}
+      void start();
+      void stop();
       void connected();
       void disconnected();
-      bool is_connected();
-      void copy_local_file_info(std::vector<rmf::FileInfo*>& dest);
-      ConnectionInterface* connection() const { return m_parent_connection; }
+      error_t create_local_file(rmf::FileInfo const& file_info);
+      File* find_file_by_address(std::uint32_t address) { return m_shared.find_file_by_address(address); }
+      File* find_local_file_by_name(char const* name) { return m_shared.find_local_file_by_name(name); }
+      error_t message_received(uint8_t const* msg_data, std::size_t msg_len);
 
+#ifdef UNIT_TEST
+      bool run();
+      std::size_t num_pending_commands() { return 0u; }
+#endif
    protected:
-      FileMap m_local_file_map;
-      FileMap m_remote_file_map;
-      std::mutex m_mutex;
-      ConnectionInterface* m_parent_connection;
-      bool m_is_connected;
+      void publish_local_files();
+
+      FileManagerShared m_shared;
+      FileManagerWorker m_worker;
    };
+
 }

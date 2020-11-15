@@ -60,6 +60,7 @@ namespace apx
       std::uint32_t get_end_address() const { return (m_file_info.address + m_file_info.size); }
       std::uint32_t get_end_address_without_flags() const { return (m_file_info.address_without_flags() + m_file_info.size); }
       bool address_in_range(std::uint32_t address) const { return m_file_info.address_in_range(address); }
+      rmf::FileInfo const& get_file_info() const { return m_file_info; }
    protected:
       bool m_is_file_open{ false };
       bool m_has_first_write{ false };

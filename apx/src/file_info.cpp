@@ -22,7 +22,9 @@
 *
 ******************************************************************************/
 #include <cstring>
-#include "cpp-apx\file_info.h"
+#include <cassert>
+#include "cpp-apx/file_info.h"
+#include "cpp-apx/pack.h"
 
 namespace rmf
 {
@@ -100,5 +102,40 @@ namespace rmf
          }
       }
       return std::string();
+   }
+
+   apx::error_t encode_publish_file_cmd(std::uint8_t* buf, std::size_t buf_size, rmf::FileInfo const* file, std::size_t& cmd_size)
+   {
+      std::size_t const name_size = file->name.length();
+      std::size_t const required_size = rmf::FILE_INFO_HEADER_SIZE + name_size + 1u ; //Add 1 for null-terminator
+      if (required_size > buf_size)
+      {
+         return APX_BUFFER_TOO_SMALL_ERROR;
+      }
+      std::uint8_t* p{ buf };
+      apx::packLE<std::uint32_t>(p, rmf::CMD_PUBLISH_FILE_MSG); p += sizeof(std::uint32_t);
+      apx::packLE<std::uint32_t>(p, file->address_without_flags()); p += sizeof(std::uint32_t);
+      apx::packLE<std::uint32_t>(p, file->size); p += sizeof(std::uint32_t);
+      apx::packLE<std::uint16_t>(p, static_cast<std::uint16_t>(file->rmf_file_type)); p += sizeof(std::uint16_t);
+      apx::packLE<std::uint16_t>(p, static_cast<std::uint16_t>(file->digest_type)); p += sizeof(std::uint16_t);
+      switch (file->digest_type)
+      {
+      case DigestType::None:
+         std::memset(p, 0, SHA256_SIZE);
+         break;
+      case DigestType::SHA1:
+         std::memcpy(p, file->digest_data.data(), SHA1_SIZE);
+         std::memset(p + SHA1_SIZE, 0, SHA256_SIZE - SHA1_SIZE);
+         break;
+      case DigestType::SHA256:
+         std::memcpy(p, file->digest_data.data(), SHA256_SIZE);
+         break;
+      }
+      p += SHA256_SIZE;
+      assert((p + name_size + 1) == buf + required_size);
+      std::memcpy(p, reinterpret_cast<std::uint8_t const*>(file->name.data()), name_size); p += name_size;
+      *p = 0u;
+      cmd_size = required_size;
+      return APX_NO_ERROR;
    }
 }

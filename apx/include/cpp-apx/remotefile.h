@@ -25,6 +25,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include "cpp-apx/error.h"
 
 namespace rmf
 {
@@ -39,11 +40,12 @@ namespace rmf
       CompressedFixed
    };
 
-   enum class DigestType { None, SHA256 };
+   enum class DigestType { None, SHA1, SHA256 };
 
-     constexpr std::uint32_t REMOTE_ADDRESS_BIT = 0x80000000ul; //This is overlayed with HIGH_ADDR_BIT
+   constexpr std::uint32_t REMOTE_ADDRESS_BIT = 0x80000000ul; //This is overlayed with HIGH_ADDR_BIT
    constexpr std::uint32_t INVALID_ADDRESS = 0x7FFFFFFFul;
    constexpr std::uint32_t ADDRESS_MASK_INTERNAL = 0x7FFFFFFFul;
+   constexpr std::size_t SHA1_SIZE = 20u;
    constexpr std::size_t SHA256_SIZE = 32u;
    constexpr std::uint32_t CMD_AREA_START_ADDRESS = 0x3FFFFC00;
    constexpr std::size_t CMD_AREA_SIZE = 1024; //1KB
@@ -58,9 +60,24 @@ namespace rmf
    constexpr std::uint32_t HIGH_ADDR_MASK = HIGH_ADDR_MAX;
    constexpr std::uint8_t U8_MORE_BIT = 0x40;
    constexpr std::uint8_t U8_HIGH_ADDR_BIT = 0x80u;
+   constexpr std::size_t LOW_ADDR_SIZE = sizeof(std::uint16_t);
+   constexpr std::size_t HIGH_ADDR_SIZE = sizeof(std::uint32_t);
+   constexpr std::size_t FILE_NAME_MAX_SIZE = 255;
+   constexpr std::size_t FILE_INFO_HEADER_SIZE = 48u;
+
+   constexpr std::uint32_t CMD_FILE_ACK_MSG = 0u;
+   constexpr std::uint32_t CMD_FILE_NACK_MSG = 1u;
+   constexpr std::uint32_t CMD_PUBLISH_FILE_MSG = 3u;
+   constexpr std::uint32_t CMD_FILE_INFO_MSG = 3u;
+   constexpr std::uint32_t CMD_REVOKE_FILE_MSG = 4u;
+   constexpr std::uint32_t CMD_OPEN_FILE_MSG = 10u;
+   constexpr std::uint32_t CMD_CLOSE_FILE_MSG = 11u;
+   constexpr std::uint32_t FILE_OPEN_CMD_SIZE = 8u;
+   constexpr std::uint32_t FILE_CLOSE_CMD_SIZE = 8u;
 
    std::size_t needed_encoding_size(std::uint32_t address);
    std::size_t address_encode(std::uint8_t* begin, std::uint8_t* end, std::uint32_t address, bool more_bit);
    std::size_t address_decode(std::uint8_t const* begin, std::uint8_t const* end, std::uint32_t& address, bool& more_bit);
+   apx::error_t encode_open_file_cmd(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address);
 
 }

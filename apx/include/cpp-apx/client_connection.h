@@ -1,8 +1,8 @@
 /*****************************************************************************
-* \file      file_manager_shared.h
+* \file      client_connection.h
 * \author    Conny Gustafsson
-* \date      2020-11-05
-* \brief     Shared objects used by file manager sub-components
+* \date      2020-11-10
+* \brief     Client connection (abstract) base class
 *
 * Copyright (c) 2020 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,38 +23,29 @@
 ******************************************************************************/
 #pragma once
 
-#include <mutex>
-#include <vector>
-#include "cpp-apx/file_map.h"
+#include "cpp-apx/file_manager.h"
 #include "cpp-apx/connection_interface.h"
+#include "cpp-apx/node_manager.h"
 
 namespace apx
 {
-   class FileManagerShared
+   class ClientConnection : public ConnectionInterface
    {
-   public:
-      FileManagerShared() :m_local_file_map{ false }, m_remote_file_map{ true }, m_parent_connection{ nullptr }, m_is_connected{ false }{}
-      FileManagerShared(ConnectionInterface* parent_connection) :m_local_file_map{ false }, m_remote_file_map{ true },
-         m_parent_connection{ parent_connection }, m_is_connected{ false }{}
+   public:      
+      ClientConnection() :m_file_manager{ this }, m_node_manager{ nullptr }{}
+      virtual ~ClientConnection() {}
 
-      File* create_local_file(rmf::FileInfo const& file_info);
-      File* create_remote_file(rmf::FileInfo const& file_info);
-      File* find_local_file_by_name(char const* name);
-      File* find_local_file_by_name(std::string const& name);
-      File* find_remote_file_by_name(char const* name);
-      File* find_remote_file_by_name(std::string const& name);
-      File* find_file_by_address(std::uint32_t address);
-      void connected();
-      void disconnected();
-      bool is_connected();
-      void copy_local_file_info(std::vector<rmf::FileInfo*>& dest);
-      ConnectionInterface* connection() const { return m_parent_connection; }
-
+      void greeting_header_accepted();
+      void connected() override;
+      void disconnected() override;
+      void attach_node_manager(NodeManager* node_manager);
+      NodeManager* get_node_manager() const { return m_node_manager; }
+      error_t build_node(char const* definition_text);
    protected:
-      FileMap m_local_file_map;
-      FileMap m_remote_file_map;
-      std::mutex m_mutex;
-      ConnectionInterface* m_parent_connection;
-      bool m_is_connected;
+      error_t attach_node_instance(NodeInstance* node_instance);
+
+      FileManager m_file_manager;
+      NodeManager* m_node_manager;
+
    };
 }

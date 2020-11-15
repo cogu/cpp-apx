@@ -1,8 +1,8 @@
 /*****************************************************************************
-* \file      file_manager_shared.h
+* \file      file_manager_worker.h
 * \author    Conny Gustafsson
-* \date      2020-11-05
-* \brief     Shared objects used by file manager sub-components
+* \date      2020-11-11
+* \brief     An active object that executes commands from a command queue
 *
 * Copyright (c) 2020 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,38 +23,36 @@
 ******************************************************************************/
 #pragma once
 
+#include <queue>
 #include <mutex>
-#include <vector>
-#include "cpp-apx/file_map.h"
-#include "cpp-apx/connection_interface.h"
+#include <condition_variable>
+#include "cpp-apx/types.h"
+#include "cpp-apx/error.h"
+#include "cpp-apx/file_info.h"
+#include "cpp-apx/command.h"
+#include "cpp-apx/file_manager_shared.h"
 
 namespace apx
 {
-   class FileManagerShared
+   class FileManagerWorker
    {
    public:
-      FileManagerShared() :m_local_file_map{ false }, m_remote_file_map{ true }, m_parent_connection{ nullptr }, m_is_connected{ false }{}
-      FileManagerShared(ConnectionInterface* parent_connection) :m_local_file_map{ false }, m_remote_file_map{ true },
-         m_parent_connection{ parent_connection }, m_is_connected{ false }{}
-
-      File* create_local_file(rmf::FileInfo const& file_info);
-      File* create_remote_file(rmf::FileInfo const& file_info);
-      File* find_local_file_by_name(char const* name);
-      File* find_local_file_by_name(std::string const& name);
-      File* find_remote_file_by_name(char const* name);
-      File* find_remote_file_by_name(std::string const& name);
-      File* find_file_by_address(std::uint32_t address);
-      void connected();
-      void disconnected();
-      bool is_connected();
-      void copy_local_file_info(std::vector<rmf::FileInfo*>& dest);
-      ConnectionInterface* connection() const { return m_parent_connection; }
+      FileManagerWorker() = delete;
+      FileManagerWorker(FileManagerShared& shared) :m_shared{ shared } {}
+      void publish_local_file(rmf::FileInfo* file);
+#ifdef UNIT_TEST
+      bool run();
+      std::size_t num_pending_commands() const { return m_queue.size(); }
+#endif
 
    protected:
-      FileMap m_local_file_map;
-      FileMap m_remote_file_map;
+      std::queue<apx::Command> m_queue;
+      std::condition_variable m_cond;
       std::mutex m_mutex;
-      ConnectionInterface* m_parent_connection;
-      bool m_is_connected;
+      FileManagerShared& m_shared;
+
+      bool process_single_command(apx::Command const& cmd);
+      error_t run_publish_local_file(rmf::FileInfo* file);
+      error_t encode_file_info(std::uint8_t* buf, std::size_t buf_size, rmf::FileInfo const* file);
    };
 }
