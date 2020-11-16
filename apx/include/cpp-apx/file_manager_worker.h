@@ -39,7 +39,9 @@ namespace apx
    public:
       FileManagerWorker() = delete;
       FileManagerWorker(FileManagerShared& shared) :m_shared{ shared } {}
-      void publish_local_file(rmf::FileInfo* file);
+      void prepare_publish_local_file(rmf::FileInfo* file_info);
+      void prepare_send_local_const_data(std::uint32_t address, std::uint8_t const* data, std::uint32_t size);
+      void prepare_send_local_data(std::uint32_t address, std::uint8_t* data, std::uint32_t size);
 #ifdef UNIT_TEST
       bool run();
       std::size_t num_pending_commands() const { return m_queue.size(); }
@@ -53,6 +55,8 @@ namespace apx
 
       bool process_single_command(apx::Command const& cmd);
       error_t run_publish_local_file(rmf::FileInfo* file);
-      error_t encode_file_info(std::uint8_t* buf, std::size_t buf_size, rmf::FileInfo const* file);
+      error_t run_send_local_const_data(std::uint32_t address, std::uint8_t const* data, std::uint32_t size);
+      error_t run_send_local_data(std::uint32_t address, std::uint8_t* data, std::uint32_t size);
+
    };
 }

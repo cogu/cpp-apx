@@ -24,6 +24,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include "cpp-apx/types.h"
 #include "cpp-apx/error.h"
 
@@ -42,12 +43,14 @@ namespace apx
       apx::error_t create_provide_port_data(std::size_t num_ports, std::uint8_t const* init_data, std::size_t data_size);
       apx::error_t create_require_port_data(std::size_t num_ports, std::uint8_t const* init_data, std::size_t data_size);
       apx::error_t write_provide_port_data(std::size_t offset, std::uint8_t const* src, std::size_t size);
-      apx::error_t read_provide_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size) const;
+      apx::error_t read_provide_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size);
       apx::error_t write_require_port_data(std::size_t offset, std::uint8_t const* src, std::size_t size);
-      apx::error_t read_require_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size) const;
+      apx::error_t read_require_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size);
       std::uint8_t const* get_definition_data() const { return m_definition_data.get(); }
       std::uint8_t const* get_provide_port_data() const { return m_provide_port_data.get(); }
       std::uint8_t const* get_require_port_data() const { return m_require_port_data.get(); }
+      std::uint8_t* take_provide_port_data_snapshot();
+
    protected:
       std::unique_ptr<std::uint8_t[]> m_definition_data{ nullptr };
       std::unique_ptr<std::uint8_t[]> m_provide_port_data{ nullptr };
@@ -57,7 +60,7 @@ namespace apx
       std::size_t m_require_port_data_size{ 0u };
       std::size_t m_num_provide_ports{ 0u };
       std::size_t m_num_require_ports{ 0u };
-
+      std::mutex m_mutex;
    };
 }
 

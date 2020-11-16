@@ -107,7 +107,7 @@ namespace apx
          return APX_NULL_PTR_ERROR;
       }
       std::string const& node_name = m_node->get_name();
-      auto const* node_data = m_node->get_const_node_data();
+      auto* node_data = m_node->get_node_data();
       auto data_size = node_data->provide_port_data_size();
       apx::error_t retval = APX_NO_ERROR;
       auto const file_path = m_directory / (node_name + ".out");
@@ -131,7 +131,7 @@ namespace apx
          return APX_NULL_PTR_ERROR;
       }
       std::string const& node_name = m_node->get_name();
-      auto const* node_data = m_node->get_const_node_data();
+      auto* node_data = m_node->get_node_data();
       auto data_size = node_data->require_port_data_size();
       apx::error_t retval = APX_NO_ERROR;
       auto const file_path = m_directory / (node_name + ".in");

@@ -2,7 +2,7 @@
 * \file      file_client.h
 * \author    Conny Gustafsson
 * \date      2020-10-21
-* \brief     An APX client that operates on files in local file system 
+* \brief     An APX client that operates on files in local file system
 *
 * Copyright (c) 2020 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -45,7 +45,7 @@ namespace apx
       apx::error_t save_require_port_data();
       bool has_provide_port_data();
       bool has_require_port_data();
-      NodeData const* get_const_node_data() { return m_node != nullptr ? m_node->get_const_node_data() : nullptr; }
+      NodeData* get_node_data() { return m_node != nullptr ? m_node->get_node_data() : nullptr; }
       apx::error_t write_port(apx::port_id_t port_id, dtl::ScalarValue sv);
       apx::error_t read_port(apx::port_id_t port_id, dtl::ScalarValue &sv);
    protected:

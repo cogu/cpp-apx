@@ -126,7 +126,7 @@ namespace apx_test
       ASSERT_EQ(client.build_node(apx_text), APX_NO_ERROR);
       ASSERT_FALSE(client.has_provide_port_data());
       ASSERT_TRUE(client.has_require_port_data());
-      auto node_data = client.get_const_node_data();
+      auto node_data = client.get_node_data();
       ASSERT_EQ(node_data->require_port_data_size(), buf.size());
       ASSERT_EQ(node_data->read_require_port_data(0u, buf.data(), buf.size()), APX_NO_ERROR);
       ASSERT_EQ(buf[0], stored[0]);
@@ -148,7 +148,7 @@ namespace apx_test
       ASSERT_EQ(client.build_node(apx_text), APX_NO_ERROR);
       ASSERT_TRUE(client.has_provide_port_data());
       ASSERT_FALSE(client.has_require_port_data());
-      auto node_data = client.get_const_node_data();
+      auto node_data = client.get_node_data();
       ASSERT_EQ(node_data->provide_port_data_size(), buf.size());
       ASSERT_EQ(node_data->read_provide_port_data(0u, buf.data(), buf.size()), APX_NO_ERROR);
       ASSERT_EQ(buf[0], stored[0]);

@@ -85,4 +85,20 @@ namespace apx
    {
       return a->get_address_without_flags() < b->get_address_without_flags();
    }
+
+   void File::open_notify()
+   {
+      if (m_notification_handler != nullptr)
+      {
+         m_notification_handler->file_open_notify(this);
+      }
+   }
+
+   void File::close_notify()
+   {
+      if (m_notification_handler != nullptr)
+      {
+         m_notification_handler->file_close_notify(this);
+      }
+   }
 }

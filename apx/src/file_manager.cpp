@@ -22,7 +22,8 @@
 *
 ******************************************************************************/
 
-#include <iostream>
+#include <cassert>
+#include "cpp-apx/pack.h"
 #include "cpp-apx/file_manager.h"
 
 namespace apx
@@ -39,20 +40,76 @@ namespace apx
    }
    void FileManager::disconnected()
    {
+      //TODO: close_local_files();
    }
-   error_t FileManager::create_local_file(rmf::FileInfo const& file_info)
+
+   File* FileManager::create_local_file(rmf::FileInfo const& file_info)
    {
-      File* file = m_shared.create_local_file(file_info);
-      if (file == nullptr)
+      auto* file = m_shared.create_local_file(file_info);
+      if (file != nullptr)
       {
-         return APX_FILE_CREATE_ERROR;
+         file->set_file_manager(this);
+      }
+      return file;
+   }
+
+   error_t FileManager::message_received(std::uint8_t const* msg_data, std::size_t msg_len)
+   {
+      std::uint32_t address{ rmf::INVALID_ADDRESS };
+      bool more_bit{ false };
+      auto const header_size = rmf::address_decode(msg_data, msg_data + msg_len, address, more_bit);
+      if (header_size > 0)
+      {
+         assert(msg_len >= header_size);
+         auto const result = m_receiver.write(address, msg_data + header_size, msg_len - header_size, more_bit);
+         if (result.error != APX_NO_ERROR)
+         {
+            return result.error;
+         }
+         else if (result.is_complete)
+         {
+            return process_message(result.address, result.data, result.size);
+         }
+         else
+         {
+            //Wait for more data to arrive
+         }
+      }
+      else
+      {
+         return APX_INVALID_MSG_ERROR;
       }
       return APX_NO_ERROR;
    }
 
-   error_t FileManager::message_received(uint8_t const* msg_data, std::size_t msg_len)
+   error_t FileManager::send_local_const_data(std::uint32_t address, std::uint8_t const* data, std::size_t size)
    {
-      return error_t();
+      auto* file = m_shared.find_file_by_address(address);
+      if (file == nullptr)
+      {
+         return APX_FILE_NOT_FOUND_ERROR;
+      }
+      if (!file->is_open())
+      {
+         return APX_FILE_NOT_OPEN_ERROR;
+      }
+      m_worker.prepare_send_local_const_data(address, data, static_cast<std::uint32_t>(size));
+      return APX_NO_ERROR;
+   }
+
+   error_t FileManager::send_local_data(std::uint32_t address, std::uint8_t* data, std::size_t size)
+   {
+      auto* file = m_shared.find_file_by_address(address);
+      if (file == nullptr)
+      {
+         return APX_FILE_NOT_FOUND_ERROR;
+      }
+      if (!file->is_open())
+      {
+         return APX_FILE_NOT_OPEN_ERROR;
+      }
+      m_worker.prepare_send_local_data(address, data, static_cast<std::uint32_t>(size));
+      return APX_NO_ERROR;
    }
 
 #ifdef UNIT_TEST
@@ -66,10 +123,88 @@ namespace apx
    {
       std::vector<rmf::FileInfo*> local_file_list;
       m_shared.copy_local_file_info(local_file_list);
-      std::cout << local_file_list.size() << std::endl;
       for (auto& file_info : local_file_list)
       {
-         m_worker.publish_local_file(file_info);
+         m_worker.prepare_publish_local_file(file_info);
       }
+   }
+
+   error_t FileManager::process_message(std::uint32_t address, std::uint8_t const* data, std::size_t size)
+   {
+      if (address == rmf::CMD_AREA_START_ADDRESS)
+      {
+         return process_command_message(data, size);
+      }
+      else if (address < rmf::CMD_AREA_START_ADDRESS)
+      {
+         return process_file_write_message(address, data, size);
+      }
+      return APX_INVALID_ADDRESS_ERROR;
+   }
+
+   error_t FileManager::process_command_message(std::uint8_t const* data, std::size_t size)
+   {
+      if (size < sizeof(std::uint32_t))
+      {
+         return APX_INVALID_MSG_ERROR;
+      }
+      error_t retval = APX_NO_ERROR;
+      auto const cmd_type = apx::unpackLE<std::uint32_t>(data);
+      std::size_t const cmd_size = size - sizeof(std::uint32_t);
+      auto const* next = data + sizeof(std::uint32_t);
+      switch (cmd_type)
+      {
+      case rmf::CMD_PUBLISH_FILE_MSG:
+         break;
+      case rmf::CMD_REVOKE_FILE_MSG:
+         break;
+      case rmf::CMD_OPEN_FILE_MSG:
+         if (cmd_size == rmf::FILE_OPEN_CMD_SIZE)
+         {
+            std::uint32_t const address = apx::unpackLE<std::uint32_t>(next);
+            retval = process_open_file_request(address);
+         }
+         else
+         {
+            retval = APX_INVALID_MSG_ERROR;
+         }
+         break;
+      case rmf::CMD_CLOSE_FILE_MSG:
+         if (cmd_size == rmf::FILE_CLOSE_CMD_SIZE)
+         {
+            std::uint32_t const address = apx::unpackLE<std::uint32_t>(next);
+            retval = process_close_file_request(address);
+         }
+         else
+         {
+            retval = APX_INVALID_MSG_ERROR;
+         }
+         break;
+      default:
+         retval = APX_UNSUPPORTED_ERROR;
+      }
+      return retval;
+   }
+
+   error_t FileManager::process_file_write_message(std::uint32_t address, std::uint8_t const* data, std::size_t size)
+   {
+      return error_t();
+   }
+
+   error_t FileManager::process_open_file_request(std::uint32_t start_address)
+   {
+      auto* file = m_shared.find_file_by_address(start_address);
+      if (file == nullptr)
+      {
+         return APX_FILE_NOT_FOUND_ERROR;
+      }
+      file->open();
+      file->open_notify();
+      return APX_NO_ERROR;
+   }
+
+   error_t FileManager::process_close_file_request(std::uint32_t start_address)
+   {
+      return APX_NOT_IMPLEMENTED_ERROR;
    }
 }

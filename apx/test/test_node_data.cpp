@@ -99,4 +99,18 @@ namespace apx_test
       ASSERT_EQ(buf[3], 0x12u);
    }
 
+   TEST(NodeData, TakeProvidePortDataSnapshot)
+   {
+      std::array<std::uint8_t, UINT32_SIZE> provide_port_init{ 0x12u, 0x34u, 0x56u, 0x78u };
+      apx::NodeData node_data;
+      ASSERT_EQ(node_data.create_provide_port_data(1u, provide_port_init.data(), provide_port_init.size()), APX_NO_ERROR);
+      std::unique_ptr<std::uint8_t[]> snapshot{ node_data.take_provide_port_data_snapshot() };
+      ASSERT_TRUE(snapshot);
+      EXPECT_EQ(snapshot[0], 0x12u);
+      EXPECT_EQ(snapshot[1], 0x34u);
+      EXPECT_EQ(snapshot[2], 0x56u);
+      EXPECT_EQ(snapshot[3], 0x78u);
+
+   }
+
 }

@@ -65,18 +65,18 @@ namespace rmf
    constexpr std::size_t FILE_NAME_MAX_SIZE = 255;
    constexpr std::size_t FILE_INFO_HEADER_SIZE = 48u;
 
-   constexpr std::uint32_t CMD_FILE_ACK_MSG = 0u;
-   constexpr std::uint32_t CMD_FILE_NACK_MSG = 1u;
+   constexpr std::uint32_t CMD_ACK_MSG = 0u;
+   constexpr std::uint32_t CMD_NACK_MSG = 1u;
    constexpr std::uint32_t CMD_PUBLISH_FILE_MSG = 3u;
    constexpr std::uint32_t CMD_FILE_INFO_MSG = 3u;
    constexpr std::uint32_t CMD_REVOKE_FILE_MSG = 4u;
    constexpr std::uint32_t CMD_OPEN_FILE_MSG = 10u;
    constexpr std::uint32_t CMD_CLOSE_FILE_MSG = 11u;
-   constexpr std::uint32_t FILE_OPEN_CMD_SIZE = 8u;
-   constexpr std::uint32_t FILE_CLOSE_CMD_SIZE = 8u;
-
+   constexpr std::size_t FILE_OPEN_CMD_SIZE = sizeof(std::uint32_t);
+   constexpr std::size_t FILE_CLOSE_CMD_SIZE = sizeof(std::uint32_t);
+   constexpr std::size_t CMD_TYPE_SIZE = sizeof(std::uint32_t);
    std::size_t needed_encoding_size(std::uint32_t address);
-   std::size_t address_encode(std::uint8_t* begin, std::uint8_t* end, std::uint32_t address, bool more_bit);
+   std::size_t address_encode(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address, bool more_bit);
    std::size_t address_decode(std::uint8_t const* begin, std::uint8_t const* end, std::uint32_t& address, bool& more_bit);
    apx::error_t encode_open_file_cmd(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address);
 
