@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <cassert>
 #include "cpp-apx/client_connection.h"
 

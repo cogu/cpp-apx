@@ -86,7 +86,9 @@
     <ClCompile Include="..\..\..\..\apx\src\attribute_parser.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\apx\src\client_connection.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\client_connection.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\command.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -187,10 +189,10 @@
     <ClCompile Include="..\..\..\..\apx\test\test_computation.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_data_signature.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_file.cpp" />
-    <ClCompile Include="..\..\..\..\apx\test\test_filemanager_receiver.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_file_cache.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_file_info.cpp" />
-    <ClCompile Include="..\..\..\..\apx\test\test_filemanager_shared.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_file_manager_receiver.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_file_manager_shared.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_file_map.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_numheader.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\sample_nodes.cpp">
