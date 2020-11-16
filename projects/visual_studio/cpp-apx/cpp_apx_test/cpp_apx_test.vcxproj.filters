@@ -168,12 +168,6 @@
     <ClCompile Include="..\..\..\..\apx\test\test_client_connection.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\apx\test\test_filemanager_receiver.cpp">
-      <Filter>apx\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\apx\test\test_filemanager_shared.cpp">
-      <Filter>apx\test</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\file_manager_receiver.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
@@ -190,6 +184,12 @@
       <Filter>apx\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\test\test_file_map.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_file_manager_receiver.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_file_manager_shared.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
   </ItemGroup>

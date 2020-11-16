@@ -6,5 +6,6 @@ macro(package_add_test_with_libraries TESTNAME FILES LIBRARIES)
         PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
     )
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
+    target_compile_definitions(${TESTNAME} PUBLIC UNIT_TEST)
     target_include_directories(${TESTNAME} PUBLIC "${PROJECT_BINARY_DIR}")
 endmacro()
