@@ -35,7 +35,8 @@ namespace apx
       RevokeLocalFile,
       OpenRemoteFile,
       CloseRemoteFile,
-      SendConstData
+      SendLocalConstData,
+      SendLocalData,
    };
 
    struct Command
@@ -48,7 +49,7 @@ namespace apx
       Command(CmdType ct, std::uint32_t d1, std::uint32_t d2, std::uint8_t const* b, void* d4);
       CmdType cmd_type;
       std::uint32_t data1; //generic uint32 value
-      std::uint32_t data2; //generic uint32 value      
+      std::uint32_t data2; //generic uint32 value
       union {
          void* ptr; //This is used when data size is bigger than SMALL_DATA_SIZE
          std::uint8_t bytes[SMALL_DATA_SIZE]; //This is used when data size is less than or equal to SMALL_DATA_SIZE

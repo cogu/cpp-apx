@@ -45,7 +45,7 @@ namespace apx
       //Log API
       std::size_t log_length() { return m_transmit_log.size(); }
       apx::ByteArray const& get_log_packet(std::size_t index) { return m_transmit_log[index]; }
-      void log_clear() { m_transmit_log.clear(); };
+      void clear_log() { m_transmit_log.clear(); };
 
       //Mock API
       FileManager& get_file_manager(){ return m_file_manager; }

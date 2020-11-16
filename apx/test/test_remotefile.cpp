@@ -8,16 +8,16 @@ namespace apx_test
    {
       std::array<std::uint8_t, sizeof(std::uint16_t)> buffer;
       std::array<std::uint8_t, sizeof(std::uint16_t)> expected = { 0, 0 };
-      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.data() + buffer.size(), 0u, false), buffer.size());
+      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.size(), 0u, false), buffer.size());
       EXPECT_EQ(buffer, expected);
-      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.data() + buffer.size(), 0u, true), buffer.size());
+      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.size(), 0u, true), buffer.size());
       expected[0] = 0x40;
       EXPECT_EQ(buffer, expected);
-      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.data() + buffer.size(), rmf::LOW_ADDR_MAX, false), buffer.size());
+      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.size(), rmf::LOW_ADDR_MAX, false), buffer.size());
       expected[0] = 0x3F;
       expected[1] = 0xFF;
       EXPECT_EQ(buffer, expected);
-      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.data() + buffer.size(), rmf::LOW_ADDR_MAX, true), buffer.size());
+      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.size(), rmf::LOW_ADDR_MAX, true), buffer.size());
       expected[0] = 0x7F;
       EXPECT_EQ(buffer, expected);
    }
@@ -50,18 +50,18 @@ namespace apx_test
    {
       std::array<std::uint8_t, sizeof(std::uint32_t)> buffer;
       std::array<std::uint8_t, sizeof(std::uint32_t)> expected = { 0x80u, 0x0u, 0x40u , 0x0u };
-      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.data() + buffer.size(), rmf::HIGH_ADDR_MIN, false), buffer.size());
+      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.size(), rmf::HIGH_ADDR_MIN, false), buffer.size());
       EXPECT_EQ(buffer, expected);
-      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.data() + buffer.size(), rmf::HIGH_ADDR_MIN, true), buffer.size());
+      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.size(), rmf::HIGH_ADDR_MIN, true), buffer.size());
       expected[0] = 0xC0;
       EXPECT_EQ(buffer, expected);
-      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.data() + buffer.size(), rmf::HIGH_ADDR_MAX, false), buffer.size());
+      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.size(), rmf::HIGH_ADDR_MAX, false), buffer.size());
       expected[0] = 0xBF;
       expected[1] = 0xFF;
       expected[2] = 0xFF;
       expected[3] = 0xFF;
       EXPECT_EQ(buffer, expected);
-      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.data() + buffer.size(), rmf::HIGH_ADDR_MAX, true), buffer.size());
+      EXPECT_EQ(rmf::address_encode(buffer.data(), buffer.size(), rmf::HIGH_ADDR_MAX, true), buffer.size());
       expected[0] = 0xFF;
       EXPECT_EQ(buffer, expected);
    }

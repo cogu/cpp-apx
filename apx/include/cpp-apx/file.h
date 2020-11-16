@@ -24,6 +24,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include "cpp-apx/remotefile.h"
 #include "cpp-apx/file_info.h"
 #include "cpp-apx/types.h"
@@ -39,7 +40,21 @@ namespace apx
       ProvidePortCount,      //".cout"
       RequirePortCount,      //".cin"
    };
+
    std::string const& file_type_to_extension(FileType file_type);
+
+   class File;
+   class FileManager;
+
+   class FileNotificationHandler
+   {
+   public:
+      virtual error_t file_open_notify(File* file) = 0;
+      virtual error_t file_close_notify(File* file) = 0;
+      virtual error_t file_write_notify(File* file, std::uint32_t offset, std::uint8_t const* data, std::size_t size) = 0;
+   };
+
+
    class File
    {
    public:
@@ -61,12 +76,26 @@ namespace apx
       std::uint32_t get_end_address_without_flags() const { return (m_file_info.address_without_flags() + m_file_info.size); }
       bool address_in_range(std::uint32_t address) const { return m_file_info.address_in_range(address); }
       rmf::FileInfo const& get_file_info() const { return m_file_info; }
+      rmf::FileInfo* clone_file_info() const { return new rmf::FileInfo(m_file_info); }
+      bool is_open() const { return m_is_file_open; }
+      void open() { m_is_file_open = true; }
+      void close() { m_is_file_open = false; }
+      void open_notify();
+      void close_notify();
+      void set_file_manager(FileManager* file_manager) { m_file_manager = file_manager; }
+      FileManager* get_file_manager() { return m_file_manager; }
+      void set_notification_handler(FileNotificationHandler* handler) { m_notification_handler = handler; }
+      FileNotificationHandler* get_notification_handler() { return m_notification_handler; }
+
    protected:
       bool m_is_file_open{ false };
-      bool m_has_first_write{ false };
+      bool m_has_first_write{ false }; //only applies to remotely openend files
 
-      FileType m_apx_file_type{ FileType::Unknown };
+      FileType m_apx_file_type { FileType::Unknown };
       rmf::FileInfo m_file_info;
+      FileManager* m_file_manager{ nullptr };
+      FileNotificationHandler* m_notification_handler{ nullptr };
+
    };
 
 }

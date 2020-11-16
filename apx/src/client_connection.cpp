@@ -46,18 +46,6 @@ namespace apx
 
    error_t ClientConnection::attach_node_instance(NodeInstance* node_instance)
    {
-      rmf::FileInfo file_info;
-      if (node_instance->has_provide_port_data())
-      {
-         node_instance->fill_provide_port_data_file_info(file_info);
-         m_file_manager.create_local_file(file_info);
-      }
-      auto result = node_instance->fill_definition_file_info(file_info);
-      if (result != APX_NO_ERROR)
-      {
-         return result;
-      }
-      m_file_manager.create_local_file(file_info);
-      return APX_NO_ERROR;
+      return node_instance->attach_to_file_manager(&m_file_manager);
    }
 }

@@ -40,10 +40,12 @@ namespace apx
       void stop();
       void connected();
       void disconnected();
-      error_t create_local_file(rmf::FileInfo const& file_info);
+      File* create_local_file(rmf::FileInfo const& file_info);
       File* find_file_by_address(std::uint32_t address) { return m_shared.find_file_by_address(address); }
       File* find_local_file_by_name(char const* name) { return m_shared.find_local_file_by_name(name); }
       error_t message_received(uint8_t const* msg_data, std::size_t msg_len);
+      error_t send_local_const_data(std::uint32_t address, std::uint8_t const* data, std::size_t size);
+      error_t send_local_data(std::uint32_t address, std::uint8_t* data, std::size_t size);
 
 #ifdef UNIT_TEST
       bool run();
@@ -51,7 +53,13 @@ namespace apx
 #endif
    protected:
       void publish_local_files();
+      error_t process_message(std::uint32_t address, std::uint8_t const* data, std::size_t size);
+      error_t process_command_message(std::uint8_t const* data, std::size_t size);
+      error_t process_file_write_message(std::uint32_t address, std::uint8_t const* data, std::size_t size);
+      error_t process_open_file_request(std::uint32_t start_address);
+      error_t process_close_file_request(std::uint32_t start_address);
 
+      FileManagerReceiver m_receiver;
       FileManagerShared m_shared;
       FileManagerWorker m_worker;
    };

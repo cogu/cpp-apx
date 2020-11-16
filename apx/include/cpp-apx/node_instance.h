@@ -33,11 +33,11 @@
 #include "cpp-apx/node_data.h"
 #include "cpp-apx/data_element.h"
 #include "cpp-apx/computation.h"
-#include "cpp-apx/file_info.h"
+#include "cpp-apx/file_manager.h"
 
 namespace apx
 {
-   class NodeInstance
+   class NodeInstance : public FileNotificationHandler
    {
    public:
       NodeInstance(){}
@@ -74,9 +74,10 @@ namespace apx
       std::uint8_t const* get_definition_data() const;
       void create_data_element_list(std::vector<std::unique_ptr<DataElement>>& data_element_list);
       void create_computation_lists(std::vector<std::unique_ptr<ComputationList>>& computation_lists);
-      error_t fill_definition_file_info(rmf::FileInfo& file_info);
-      void fill_provide_port_data_file_info(rmf::FileInfo& file_info);
-
+      error_t attach_to_file_manager(FileManager* file_manager);
+      error_t file_open_notify(File* file) override;
+      error_t file_close_notify(File* file) override;
+      error_t file_write_notify(File* file, std::uint32_t offset, std::uint8_t const* data, std::size_t size) override;
 
    protected:
       std::string m_name;
@@ -95,5 +96,9 @@ namespace apx
       std::unique_ptr<NodeData> m_node_data{ nullptr };
 
       apx::error_t calc_init_data_size(PortInstance **port_list, std::size_t num_ports, std::size_t & total_size);
+      error_t fill_definition_file_info(rmf::FileInfo& file_info);
+      void fill_provide_port_data_file_info(rmf::FileInfo& file_info);
+      error_t send_definition_data_to_file_manager(FileManager* file_manager, rmf::FileInfo const* file_info);
+      error_t send_provide_port_data_to_file_manager(FileManager* file_manager, rmf::FileInfo const* file_info);
    };
 }

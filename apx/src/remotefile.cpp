@@ -32,27 +32,27 @@ namespace rmf
       return (address < HIGH_ADDR_MIN) ? sizeof(std::uint16_t) : sizeof(std::uint32_t);
    }
 
-   std::size_t address_encode(std::uint8_t* begin, std::uint8_t* end, std::uint32_t address, bool more_bit)
+   std::size_t address_encode(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address, bool more_bit)
    {
-      if ((begin == nullptr) || (end == nullptr) || (begin >= end) || (address > HIGH_ADDR_MAX))
+      if ((buf == nullptr) || (buf_size == 0) || (address > HIGH_ADDR_MAX))
       {
          return 0; //Invalid argument
       }
       std::size_t encoding_size = needed_encoding_size(address);
-      if (begin + encoding_size <= end)
+      if (encoding_size <= buf_size)
       {
          if (encoding_size == sizeof(std::uint16_t))
          {
             std::uint16_t value = more_bit ? MORE_BIT_LOW_ADDR : 0u;
             value |= static_cast<std::uint16_t>(address);
-            apx::packBE<std::uint16_t>(begin, value);
+            apx::packBE<std::uint16_t>(buf, value);
          }
          else
          {
             assert(encoding_size == sizeof(std::uint32_t));
             std::uint32_t value = more_bit ? (HIGH_ADDR_BIT | MORE_BIT_HIGH_ADDR) : HIGH_ADDR_BIT;
             value |= address;
-            apx::packBE<std::uint32_t>(begin, value);
+            apx::packBE<std::uint32_t>(buf, value);
          }
       }
       else
@@ -65,9 +65,9 @@ namespace rmf
    std::size_t address_decode(std::uint8_t const* begin, std::uint8_t const* end, std::uint32_t& address, bool& more_bit)
    {
       std::size_t retval{ 0 };
-      if ((begin == nullptr) || (end == nullptr) || (begin >= end) || (address > HIGH_ADDR_MAX))
+      if ((begin == nullptr) || (end == nullptr) || (begin >= end) )
       {
-         return 0; //Invalid argument
+         return 0u; //Invalid argument
       }
       std::uint8_t const first_byte = *begin;
       more_bit = (first_byte & U8_MORE_BIT) ? true : false;
@@ -94,7 +94,7 @@ namespace rmf
 
    apx::error_t encode_open_file_cmd(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address)
    {
-      std::size_t const required_size = rmf::FILE_OPEN_CMD_SIZE;
+      std::size_t const required_size = rmf::CMD_TYPE_SIZE + rmf::FILE_OPEN_CMD_SIZE;
       if (address > HIGH_ADDR_MAX)
       {
          return APX_INVALID_ADDRESS_ERROR;

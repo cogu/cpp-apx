@@ -69,7 +69,7 @@ namespace apx
       }
       std::size_t const header1_size = numheader::encode16(header.data(), header.data() + header.size(), static_cast<std::uint16_t>(payload_size));
       assert(header1_size > 0);
-      std::size_t const header2_size = rmf::address_encode(header.data() + header1_size, header.data() + header.size(), write_address, more_bit);
+      std::size_t const header2_size = rmf::address_encode(header.data() + header1_size, header.size(), write_address, more_bit);
       assert(header2_size == address_size);
       std::size_t const bytes_to_send = header1_size + payload_size;
       std::size_t const buffer_available = m_transmit_buffer.size() - m_pending_bytes;
@@ -92,18 +92,18 @@ namespace apx
       {
          return APX_FILE_NOT_FOUND_ERROR;
       }
-      std::array<std::uint8_t, numheader::SHORT_SIZE + rmf::HIGH_ADDR_SIZE + rmf::FILE_OPEN_CMD_SIZE> buffer;
-      buffer[0] = static_cast<std::uint8_t>(buffer.size() - numheader::SHORT_SIZE);
-      if (rmf::address_encode(&buffer[1], &buffer[1]+rmf::HIGH_ADDR_SIZE, rmf::CMD_AREA_START_ADDRESS, false) != rmf::HIGH_ADDR_SIZE)
+      std::array<std::uint8_t, rmf::HIGH_ADDR_SIZE + rmf::CMD_TYPE_SIZE + rmf::FILE_OPEN_CMD_SIZE> buffer;
+      if (rmf::address_encode(buffer.data(), rmf::HIGH_ADDR_SIZE, rmf::CMD_AREA_START_ADDRESS, false) != rmf::HIGH_ADDR_SIZE)
       {
          return APX_INTERNAL_ERROR;
       }
-      if (rmf::encode_open_file_cmd(&buffer[5], rmf::FILE_OPEN_CMD_SIZE, file->get_address_without_flags()) != rmf::FILE_OPEN_CMD_SIZE)
+      std::size_t const cmd_size = rmf::CMD_TYPE_SIZE + rmf::FILE_OPEN_CMD_SIZE;
+      auto result = rmf::encode_open_file_cmd(buffer.data() + rmf::HIGH_ADDR_SIZE, cmd_size, file->get_address_without_flags());
+      if (result != APX_NO_ERROR)
       {
-         return APX_INTERNAL_ERROR;
+         return result;
       }
-
-      return APX_NO_ERROR;
+      return m_file_manager.message_received(buffer.data(), buffer.size());
    }
 
 

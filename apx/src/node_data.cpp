@@ -30,6 +30,7 @@ namespace apx
 
    apx::error_t NodeData::create_definition_data(std::uint8_t const* init_data, std::size_t data_size)
    {
+      std::scoped_lock lock{ m_mutex };
       if ( (init_data != nullptr) && (init_data > 0u) ) //init_data is not optional
       {
          m_definition_data.reset(new std::uint8_t[data_size]);
@@ -42,6 +43,7 @@ namespace apx
 
    apx::error_t NodeData::create_provide_port_data(std::size_t num_ports, std::uint8_t const* init_data, std::size_t data_size)
    {
+      std::scoped_lock lock{ m_mutex };
       if ( data_size > 0u ) //init_data is optional
       {
          m_provide_port_data.reset(new std::uint8_t[data_size]);
@@ -62,6 +64,7 @@ namespace apx
 
    apx::error_t NodeData::create_require_port_data(std::size_t num_ports, std::uint8_t const* init_data, std::size_t data_size)
    {
+      std::scoped_lock lock{ m_mutex };
       if (data_size > 0u)  //init_data is optional
       {
          m_require_port_data.reset(new std::uint8_t[data_size]);
@@ -82,6 +85,7 @@ namespace apx
 
    apx::error_t NodeData::write_provide_port_data(std::size_t offset, std::uint8_t const* src, std::size_t size)
    {
+      std::scoped_lock lock{ m_mutex };
       if ((offset + size) > m_provide_port_data_size)
       {
          return APX_INVALID_ARGUMENT_ERROR;
@@ -90,8 +94,9 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   apx::error_t NodeData::read_provide_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size) const
+   apx::error_t NodeData::read_provide_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size)
    {
+      std::scoped_lock lock{ m_mutex };
       if ((offset + size) > m_provide_port_data_size)
       {
          return APX_INVALID_ARGUMENT_ERROR;
@@ -102,6 +107,7 @@ namespace apx
 
    apx::error_t NodeData::write_require_port_data(std::size_t offset, std::uint8_t const* src, std::size_t size)
    {
+      std::scoped_lock lock{ m_mutex };
       if ((offset + size) > m_require_port_data_size)
       {
          return APX_INVALID_ARGUMENT_ERROR;
@@ -110,8 +116,9 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   apx::error_t NodeData::read_require_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size) const
+   apx::error_t NodeData::read_require_port_data(std::size_t offset, std::uint8_t* dest, std::size_t size)
    {
+      std::scoped_lock lock{ m_mutex };
       if ((offset + size) > m_require_port_data_size)
       {
          return APX_INVALID_ARGUMENT_ERROR;
@@ -120,5 +127,18 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-
+   std::uint8_t* NodeData::take_provide_port_data_snapshot()
+   {
+      std::scoped_lock lock{ m_mutex };
+      if (m_provide_port_data.get() != nullptr)
+      {
+         auto* snapshot = new std::uint8_t[m_provide_port_data_size];
+         if (snapshot != nullptr)
+         {
+            std::memcpy(snapshot, m_provide_port_data.get(), m_provide_port_data_size);
+            return snapshot;
+         }
+      }
+      return nullptr;
+   }
 }
