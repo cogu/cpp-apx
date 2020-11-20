@@ -41,7 +41,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\compiler.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\computation.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client_connection.h" />
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\connection_interface.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\transmit_handler.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_element.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_signature.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_type.h" />
@@ -73,6 +73,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\sha256.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\signature_parser.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\mock_client_connection.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\socket_client_connection.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\types.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vm.h" />
@@ -80,6 +81,14 @@
     <ClInclude Include="..\..\..\..\apx\test\sample_nodes.h" />
     <ClInclude Include="..\..\..\..\bstr\include\bstr\bstr.hpp" />
     <ClInclude Include="..\..\..\..\dtl\include\dtl\dtl.hpp" />
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_adapter.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_adt.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_server.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\osmacro.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\osutil.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\testsocket.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\testsocket_spy.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +191,9 @@
     <ClCompile Include="..\..\..\..\apx\src\mock_client_connection.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\socket_client_connection.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\vm.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -214,8 +226,30 @@
     <ClCompile Include="..\..\..\..\apx\test\test_remotefile.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_serializer.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_signature_parser.cpp" />
+    <ClCompile Include="..\..\..\..\apx\test\test_socket_client_connection.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_vm.cpp" />
     <ClCompile Include="..\..\..\..\dtl\src\dtl.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\msocket.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_adapter.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_adt.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_server.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\osutil.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\testsocket.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\testsocket_spy.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="pch.cpp">
@@ -258,7 +292,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\..\apx\include;$(SolutionDir)..\..\..\dtl\include;$(SolutionDir)..\..\..\bstr\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\..\msocket\inc;$(SolutionDir)..\..\..\apx\include;$(SolutionDir)..\..\..\dtl\include;$(SolutionDir)..\..\..\bstr\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>

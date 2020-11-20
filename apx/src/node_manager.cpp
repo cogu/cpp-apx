@@ -48,6 +48,16 @@ namespace apx
       return APX_NO_ERROR;
    }
 
+   std::vector<apx::NodeInstance*> NodeManager::get_nodes()
+   {
+       std::vector<apx::NodeInstance*> nodes;
+       for (auto& it : m_instance_map)
+       {
+          nodes.push_back(it.second.get());
+       }
+       return nodes;
+   }
+
    void NodeManager::reset()
    {
       //m_effective_element_map.clear();

@@ -44,6 +44,7 @@ namespace apx
       apx::error_t build_node(char const* definition_text);
       apx::NodeInstance* get_last_attached() { return m_last_attached; }
       std::size_t size() { return m_instance_map.size(); }
+      std::vector<apx::NodeInstance*> get_nodes();
    protected:
       apx::Parser m_parser;
       apx::Compiler m_compiler;

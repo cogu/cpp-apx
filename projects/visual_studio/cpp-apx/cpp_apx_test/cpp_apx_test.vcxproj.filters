@@ -192,6 +192,33 @@
     <ClCompile Include="..\..\..\..\apx\test\test_file_manager_shared.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\msocket.c">
+      <Filter>msocket\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_adapter.cpp">
+      <Filter>msocket\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_adt.c">
+      <Filter>msocket\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_server.c">
+      <Filter>msocket\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\osutil.c">
+      <Filter>msocket\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\testsocket.c">
+      <Filter>msocket\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\msocket\src\testsocket_spy.c">
+      <Filter>msocket\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\socket_client_connection.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_socket_client_connection.cpp">
+      <Filter>apx\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -306,9 +333,6 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\mock_client_connection.h">
       <Filter>apx\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\connection_interface.h">
-      <Filter>apx\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\command.h">
       <Filter>apx\include</Filter>
     </ClInclude>
@@ -325,6 +349,36 @@
       <Filter>apx\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_map.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket.h">
+      <Filter>msocket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_adapter.h">
+      <Filter>msocket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_adt.h">
+      <Filter>msocket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_server.h">
+      <Filter>msocket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\msocket\inc\osmacro.h">
+      <Filter>msocket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\msocket\inc\osutil.h">
+      <Filter>msocket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\msocket\inc\testsocket.h">
+      <Filter>msocket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\msocket\inc\testsocket_spy.h">
+      <Filter>msocket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\socket_client_connection.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\transmit_handler.h">
       <Filter>apx\include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -355,6 +409,15 @@
     </Filter>
     <Filter Include="bstr\include">
       <UniqueIdentifier>{8a46e31a-1da8-4067-9c08-95f0f6959bfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="msocket">
+      <UniqueIdentifier>{8123baa0-c25b-457b-be7b-f9138776c7d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="msocket\include">
+      <UniqueIdentifier>{d934744f-5b5d-4932-8f76-a33a78dea3c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="msocket\src">
+      <UniqueIdentifier>{564c2933-a27a-4ed4-9005-b79b947c2c89}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

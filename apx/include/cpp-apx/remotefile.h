@@ -78,6 +78,7 @@ namespace rmf
    std::size_t needed_encoding_size(std::uint32_t address);
    std::size_t address_encode(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address, bool more_bit);
    std::size_t address_decode(std::uint8_t const* begin, std::uint8_t const* end, std::uint32_t& address, bool& more_bit);
-   apx::error_t encode_open_file_cmd(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address);
-
+   std::size_t encode_open_file_cmd(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address);
+   std::size_t encode_acknowledge_cmd(std::uint8_t* buf, std::size_t buf_size);
+   std::size_t decode_cmd_type(std::uint8_t const* begin, std::uint8_t const* end, std::uint32_t& cmd_type);
 }

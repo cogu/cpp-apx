@@ -92,20 +92,37 @@ namespace rmf
       return retval;
    }
 
-   apx::error_t encode_open_file_cmd(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address)
+   std::size_t encode_open_file_cmd(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address)
    {
       std::size_t const required_size = rmf::CMD_TYPE_SIZE + rmf::FILE_OPEN_CMD_SIZE;
-      if (address > HIGH_ADDR_MAX)
+      if ( (address > HIGH_ADDR_MAX) || (required_size > buf_size) )
       {
-         return APX_INVALID_ADDRESS_ERROR;
-      }
-      if (required_size > buf_size)
-      {
-         return APX_BUFFER_TOO_SMALL_ERROR;
+         return 0;
       }
       std::uint8_t* p{ buf };
       apx::packLE<std::uint32_t>(p, rmf::CMD_OPEN_FILE_MSG); p += sizeof(std::uint32_t);
       apx::packLE<std::uint32_t>(p, address); p += sizeof(std::uint32_t);
-      return APX_NO_ERROR;
+      return required_size;
+   }
+
+   std::size_t encode_acknowledge_cmd(std::uint8_t* buf, std::size_t buf_size)
+   {
+      std::size_t const required_size = CMD_TYPE_SIZE;
+      if (required_size > buf_size)
+      {
+         return 0u;
+      }
+      apx::packLE<std::uint32_t>(buf, rmf::CMD_ACK_MSG);
+      return required_size;
+   }
+
+   std::size_t decode_cmd_type(std::uint8_t const* begin, std::uint8_t const* end, std::uint32_t& cmd_type)
+   {
+      if (begin + CMD_TYPE_SIZE <= end)
+      {
+         cmd_type = apx::unpackLE<std::uint32_t>(begin);
+         return CMD_TYPE_SIZE;
+      }
+      return 0u;
    }
 }

@@ -26,7 +26,7 @@
 #include <mutex>
 #include <vector>
 #include "cpp-apx/file_map.h"
-#include "cpp-apx/connection_interface.h"
+#include "cpp-apx/transmit_handler.h"
 
 namespace apx
 {
@@ -34,7 +34,7 @@ namespace apx
    {
    public:
       FileManagerShared() :m_local_file_map{ false }, m_remote_file_map{ true }, m_parent_connection{ nullptr }, m_is_connected{ false }{}
-      FileManagerShared(ConnectionInterface* parent_connection) :m_local_file_map{ false }, m_remote_file_map{ true },
+      FileManagerShared(TransmitHandler* parent_connection) :m_local_file_map{ false }, m_remote_file_map{ true },
          m_parent_connection{ parent_connection }, m_is_connected{ false }{}
 
       File* create_local_file(rmf::FileInfo const& file_info);
@@ -48,13 +48,13 @@ namespace apx
       void disconnected();
       bool is_connected();
       void copy_local_file_info(std::vector<rmf::FileInfo*>& dest);
-      ConnectionInterface* connection() const { return m_parent_connection; }
+      TransmitHandler* connection() const { return m_parent_connection; }
 
    protected:
       FileMap m_local_file_map;
       FileMap m_remote_file_map;
       std::mutex m_mutex;
-      ConnectionInterface* m_parent_connection;
+      TransmitHandler* m_parent_connection;
       bool m_is_connected;
    };
 }
