@@ -41,6 +41,7 @@ namespace apx
       void transmit_begin() override;
       void transmit_end() override;
       error_t transmit_data_message(std::uint32_t write_address, bool more_bit, std::uint8_t const* msg_data, std::int32_t msg_size, std::int32_t& bytes_available) override;
+      error_t transmit_direct_message(std::uint8_t const* msg_data, std::int32_t msg_size, std::int32_t& bytes_available) override;
 
       //Log API
       std::size_t log_length() { return m_transmit_log.size(); }

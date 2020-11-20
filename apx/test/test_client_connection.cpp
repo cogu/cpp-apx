@@ -104,4 +104,34 @@ namespace apx_test
       EXPECT_EQ(address, DEFINITION_ADDRESS_START);
       EXPECT_FALSE(more_bit);
    }
+
+   TEST(ClientConnection, ProvidePortFileIsSentWhenOpenRequested)
+   {
+      char const* apx_text = "APX/1.2\n"
+         "N\"TestNode1\"\n"
+         "P\"ProvidePort1\"C(0,3):=3\n"
+         "P\"ProvidePort2\"C(0,7):=7\n";
+      MockClientConnection mock_connection;
+      EXPECT_EQ(mock_connection.build_node(apx_text), APX_NO_ERROR);
+      EXPECT_EQ(mock_connection.log_length(), 0u);
+      mock_connection.greeting_header_accepted();
+      mock_connection.run();
+      EXPECT_EQ(mock_connection.log_length(), 1u);
+      auto const& buffer1 = mock_connection.get_log_packet(0);
+      EXPECT_EQ(buffer1.size(), 67u * 2u); //This should be the FileInfo messages
+      mock_connection.clear_log();
+      EXPECT_EQ(mock_connection.request_open_local_file("TestNode1.out"), APX_NO_ERROR);
+      mock_connection.run();
+      EXPECT_EQ(mock_connection.log_length(), 1u);
+      auto const& buffer2 = mock_connection.get_log_packet(0);
+      EXPECT_EQ(buffer2.size(), numheader::SHORT_SIZE + rmf::LOW_ADDR_SIZE + sizeof(std::uint8_t)*2);
+      EXPECT_EQ(buffer2[0], 4u);
+      std::uint32_t address{ rmf::INVALID_ADDRESS };
+      bool more_bit{ false };
+      EXPECT_EQ(rmf::address_decode(&buffer2[1], &buffer2[1] + rmf::HIGH_ADDR_SIZE, address, more_bit), rmf::LOW_ADDR_SIZE);
+      EXPECT_EQ(address, PORT_DATA_ADDRESS_START);
+      EXPECT_FALSE(more_bit);
+      EXPECT_EQ(buffer2[3], 0x03u);
+      EXPECT_EQ(buffer2[4], 0x07u);
+   }
 }

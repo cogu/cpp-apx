@@ -34,7 +34,7 @@ namespace apx
    {
    public:
       FileManager() = delete;
-      FileManager(ConnectionInterface* parent_connection) : m_shared(parent_connection),
+      FileManager(TransmitHandler* parent_connection) : m_shared(parent_connection),
          m_worker{ m_shared }{}
       void start();
       void stop();

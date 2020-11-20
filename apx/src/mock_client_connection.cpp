@@ -60,25 +60,49 @@ namespace apx
 
    error_t MockClientConnection::transmit_data_message(std::uint32_t write_address, bool more_bit, std::uint8_t const* msg_data, std::int32_t msg_size, std::int32_t& bytes_available)
    {
-      std::array<std::uint8_t, numheader::LONG16_SIZE + rmf::HIGH_ADDR_SIZE> header;
+      std::array<std::uint8_t, numheader::LONG32_SIZE + rmf::HIGH_ADDR_SIZE> header;
       std::size_t const address_size = rmf::needed_encoding_size(write_address);
       std::size_t const payload_size = address_size + msg_size;
       if (payload_size > transmit_max_bytes_avaiable())
       {
          return APX_MSG_TOO_LARGE_ERROR;
       }
-      std::size_t const header1_size = numheader::encode16(header.data(), header.data() + header.size(), static_cast<std::uint16_t>(payload_size));
+      std::size_t const header1_size = numheader::encode32(header.data(), header.data() + header.size(), static_cast<std::uint16_t>(payload_size));
       assert(header1_size > 0);
       std::size_t const header2_size = rmf::address_encode(header.data() + header1_size, header.size(), write_address, more_bit);
       assert(header2_size == address_size);
-      std::size_t const bytes_to_send = header1_size + payload_size;
+      std::size_t const bytes_to_send = header1_size + header2_size + payload_size;
       std::size_t const buffer_available = m_transmit_buffer.size() - m_pending_bytes;
       if (bytes_to_send > buffer_available)
       {
          send_packet();
+         assert(m_pending_bytes == 0u);
       }
       std::memcpy(m_transmit_buffer.data() + m_pending_bytes, header.data(), header1_size + header2_size);
       m_pending_bytes += (header1_size + header2_size);
+      std::memcpy(m_transmit_buffer.data() + m_pending_bytes, msg_data, msg_size);
+      m_pending_bytes += msg_size;
+      bytes_available = static_cast<std::int32_t>(m_transmit_buffer.size() - m_pending_bytes);
+      return APX_NO_ERROR;
+   }
+
+   error_t MockClientConnection::transmit_direct_message(std::uint8_t const* msg_data, std::int32_t msg_size, std::int32_t& bytes_available)
+   {
+      std::array<std::uint8_t, numheader::LONG32_SIZE> header;
+      if (msg_size > transmit_max_bytes_avaiable())
+      {
+         return APX_MSG_TOO_LARGE_ERROR;
+      }
+      std::size_t const header_size = numheader::encode32(header.data(), header.data() + header.size(), static_cast<std::uint16_t>(msg_size));
+      std::size_t const bytes_to_send = header_size + msg_size;
+      std::size_t const buffer_available = m_transmit_buffer.size() - m_pending_bytes;
+      if (bytes_to_send > buffer_available)
+      {
+         send_packet();
+         assert(m_pending_bytes == 0u);
+      }
+      std::memcpy(m_transmit_buffer.data() + m_pending_bytes, header.data(), header_size);
+      m_pending_bytes += header_size;
       std::memcpy(m_transmit_buffer.data() + m_pending_bytes, msg_data, msg_size);
       m_pending_bytes += msg_size;
       bytes_available = static_cast<std::int32_t>(m_transmit_buffer.size() - m_pending_bytes);
@@ -99,9 +123,9 @@ namespace apx
       }
       std::size_t const cmd_size = rmf::CMD_TYPE_SIZE + rmf::FILE_OPEN_CMD_SIZE;
       auto result = rmf::encode_open_file_cmd(buffer.data() + rmf::HIGH_ADDR_SIZE, cmd_size, file->get_address_without_flags());
-      if (result != APX_NO_ERROR)
+      if (result == 0)
       {
-         return result;
+         return APX_INTERNAL_ERROR;
       }
       return m_file_manager.message_received(buffer.data(), buffer.size());
    }

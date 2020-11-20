@@ -1,5 +1,5 @@
 /*****************************************************************************
-* \file      connection_interface.h
+* \file      transmit_handler.h
 * \author    Conny Gustafsson
 * \date      2020-11-11
 * \brief     Connection interface class
@@ -25,22 +25,18 @@
 
 #include "cpp-apx/types.h"
 #include "cpp-apx/error.h"
- 
+
 namespace apx
 {
-   class ConnectionInterface
+   class TransmitHandler
    {
    public:
-      //Connection methods
-      virtual void connected() = 0;
-      virtual void disconnected() = 0;
-
       //Transmit methods
       virtual std::int32_t transmit_max_bytes_avaiable() const = 0;
       virtual std::int32_t transmit_current_bytes_avaiable() const = 0;
       virtual void transmit_begin() = 0;
       virtual void transmit_end() = 0;
       virtual error_t transmit_data_message(std::uint32_t write_address, bool more_bit, std::uint8_t const* data, std::int32_t size, std::int32_t& bytes_available) = 0;
-
+      virtual error_t transmit_direct_message(std::uint8_t const* data, std::int32_t size, std::int32_t& bytes_available) = 0;
    };
 }
