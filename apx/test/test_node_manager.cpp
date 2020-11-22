@@ -386,4 +386,26 @@ namespace apx_test
       std::memcpy(actual.data(), require_port_data, actual.size());
       EXPECT_EQ(actual, expected);
    }
+
+   TEST(NodeManager, FindNodeByName)
+   {
+      const char* apx_text1 =
+         "APX/1.2\n"
+         "N\"TestNode1\"\n"
+         "P\"ProvdePortSignal1\"C(0,3):=3\n";
+      const char* apx_text2 =
+         "APX/1.2\n"
+         "N\"TestNode2\"\n"
+         "R\"RequirePortSignal1\"C(0,3):=3\n";
+      apx::NodeManager manager;
+      EXPECT_EQ(manager.build_node(apx_text1), APX_NO_ERROR);
+      EXPECT_EQ(manager.build_node(apx_text2), APX_NO_ERROR);
+      EXPECT_EQ(manager.size(), 2u);
+      auto* node_instance = manager.find("TestNode1");
+      ASSERT_TRUE(node_instance);
+      ASSERT_EQ(node_instance->get_name(), "TestNode1"s);
+      node_instance = manager.find("TestNode2");
+      ASSERT_TRUE(node_instance);
+      ASSERT_EQ(node_instance->get_name(), "TestNode2"s);
+   }
 }

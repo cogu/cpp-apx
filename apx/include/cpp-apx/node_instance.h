@@ -78,6 +78,11 @@ namespace apx
       error_t file_open_notify(File* file) override;
       error_t file_close_notify(File* file) override;
       error_t file_write_notify(File* file, std::uint32_t offset, std::uint8_t const* data, std::size_t size) override;
+      PortDataState get_require_port_data_state() const { return m_require_port_data_state; }
+      PortDataState get_provide_port_data_state() const{ return m_provide_port_data_state; }
+      void set_require_port_data_state(PortDataState state) { m_require_port_data_state = state; }
+      void Set_provide_port_data_state(PortDataState state) { m_provide_port_data_state = state; }
+
 
    protected:
       std::string m_name;
@@ -100,5 +105,7 @@ namespace apx
       void fill_provide_port_data_file_info(rmf::FileInfo& file_info);
       error_t send_definition_data_to_file_manager(FileManager* file_manager, rmf::FileInfo const* file_info);
       error_t send_provide_port_data_to_file_manager(FileManager* file_manager, rmf::FileInfo const* file_info);
+      PortDataState m_require_port_data_state{ PortDataState::Disconnected };
+      PortDataState m_provide_port_data_state{ PortDataState::Disconnected };
    };
 }

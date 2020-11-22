@@ -23,12 +23,12 @@
 ******************************************************************************/
 #pragma once
 #include "cpp-apx/file_manager.h"
-#include "cpp-apx/transmit_handler.h"
+#include "cpp-apx/connection_interface.h"
 #include "cpp-apx/node_manager.h"
 
 namespace apx
 {
-   class ClientConnection : public TransmitHandler
+   class ClientConnection : public ConnectionInterface
    {
    public:
       ClientConnection() :m_file_manager{ this }, m_node_manager{ nullptr }{}
@@ -39,8 +39,12 @@ namespace apx
       void attach_node_manager(NodeManager* node_manager);
       NodeManager* get_node_manager() const { return m_node_manager; }
       error_t build_node(char const* definition_text);
+      error_t remote_file_published_notification(File* file) override;
 #ifdef UNIT_TEST
       virtual void run();
+#else
+      void start();
+      void stop();
 #endif
    protected:
       error_t attach_node_instance(NodeInstance* node_instance);
@@ -49,6 +53,8 @@ namespace apx
       std::uint8_t const* parse_message(std::uint8_t const* begin, std::uint8_t const* end, apx::error_t& error_code);
       void set_data_reception_error(apx::error_t error_code);
       bool is_greeting_accepted(std::uint8_t const* msg_data, std::size_t msg_size, apx::error_t& error_code);
+      error_t process_new_require_port_data_file(File* file);
+
       bool m_is_greeting_accepted{ false };
       FileManager m_file_manager;
       NodeManager* m_node_manager;

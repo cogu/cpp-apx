@@ -30,9 +30,15 @@ namespace apx
 {
    void FileManager::start()
    {
+#ifndef UNIT_TEST
+      m_worker.start();
+#endif
    }
    void FileManager::stop()
    {
+#ifndef UNIT_TEST
+      m_worker.stop();
+#endif
    }
    void FileManager::connected()
    {
@@ -112,6 +118,12 @@ namespace apx
       return APX_NO_ERROR;
    }
 
+   error_t FileManager::send_open_file_request(std::uint32_t address)
+   {
+      m_worker.prepare_send_open_file_request(address);
+      return APX_NO_ERROR;
+   }
+
 #ifdef UNIT_TEST
    bool FileManager::run()
    {
@@ -152,9 +164,20 @@ namespace apx
       auto const cmd_type = apx::unpackLE<std::uint32_t>(data);
       std::size_t const cmd_size = size - sizeof(std::uint32_t);
       auto const* next = data + sizeof(std::uint32_t);
+      rmf::FileInfo file_info;
+      std::size_t decoded_size;
       switch (cmd_type)
       {
       case rmf::CMD_PUBLISH_FILE_MSG:
+         decoded_size = rmf::decode_publish_file_cmd(data, size, file_info);
+         if (decoded_size > 0u)
+         {
+            retval = process_remote_file_published(file_info);
+         }
+         else
+         {
+            retval = APX_INVALID_MSG_ERROR;
+         }
          break;
       case rmf::CMD_REVOKE_FILE_MSG:
          break;
@@ -188,7 +211,10 @@ namespace apx
 
    error_t FileManager::process_file_write_message(std::uint32_t address, std::uint8_t const* data, std::size_t size)
    {
-      return error_t();
+      (void)address;
+      (void)data;
+      (void)size;
+      return APX_NOT_IMPLEMENTED_ERROR;
    }
 
    error_t FileManager::process_open_file_request(std::uint32_t start_address)
@@ -205,6 +231,17 @@ namespace apx
 
    error_t FileManager::process_close_file_request(std::uint32_t start_address)
    {
+      (void)start_address;
       return APX_NOT_IMPLEMENTED_ERROR;
+   }
+
+   error_t FileManager::process_remote_file_published(rmf::FileInfo const& file_info)
+   {
+      auto *file = m_shared.create_remote_file(file_info);
+      if (file == nullptr)
+      {
+         return APX_FILE_CREATE_ERROR;
+      }
+      return m_shared.connection()->remote_file_published_notification(file);
    }
 }

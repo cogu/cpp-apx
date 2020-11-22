@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\attribute_parser.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client_connection.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\command.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\compiler.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\computation.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_element.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_signature.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_type.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\decoder.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\deserializer.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\error.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_cache.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_client.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_info.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager_receiver.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager_shared.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager_worker.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_map.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\mock_client_connection.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_data.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_instance.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\node_manager.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\numheader.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\pack.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\parser.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\program.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\remotefile.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\serializer.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\sha256.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\signature_parser.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\socket_client_connection.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\transmit_handler.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\types.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vm.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vmdefs.h" />
+    <ClInclude Include="..\..\..\..\bstr\include\bstr\bstr.hpp" />
+    <ClInclude Include="..\..\..\..\dtl\include\dtl\dtl.hpp" />
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_adapter.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_adt.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\msocket_server.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\osmacro.h" />
+    <ClInclude Include="..\..\..\..\msocket\inc\osutil.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\apx\src\attribute_parser.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\client.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\client_connection.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\command.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\compiler.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\computation.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\data_element.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\data_signature.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\data_type.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\decoder.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\deserializer.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file_cache.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file_client.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file_info.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file_manager.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file_manager_receiver.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file_manager_shared.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file_manager_worker.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\file_map.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\mock_client_connection.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\node.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\node_data.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\node_instance.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\node_manager.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\numheader.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\parser.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\port.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\port_instance.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\program.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\remotefile.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\serializer.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\sha256.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\signature_parser.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\socket_client_connection.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\vm.cpp" />
+    <ClCompile Include="..\..\..\..\dtl\src\dtl.cpp" />
+    <ClCompile Include="..\..\..\..\msocket\src\msocket.c" />
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_adapter.cpp" />
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_adt.c" />
+    <ClCompile Include="..\..\..\..\msocket\src\msocket_server.c" />
+    <ClCompile Include="..\..\..\..\msocket\src\osutil.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{cbfe1d73-ac9d-4aff-b70c-7e5df43d90b0}</ProjectGuid>
+    <RootNamespace>cppapx</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>APX_DEBUG_ENABLE;WIN32_LEAN_AND_MEAN;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\..\msocket\inc;$(SolutionDir)..\..\..\apx\include;$(SolutionDir)..\..\..\dtl\include;$(SolutionDir)..\..\..\bstr\include;$(ProjectDir);</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

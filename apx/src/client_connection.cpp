@@ -55,6 +55,15 @@ namespace apx
       return retval;
    }
 
+   error_t ClientConnection::remote_file_published_notification(File* file)
+   {
+      if (file->get_apx_file_type() == FileType::RequirePortData)
+      {
+         return process_new_require_port_data_file(file);
+      }
+      return APX_NO_ERROR;
+   }
+
    error_t ClientConnection::attach_node_instance(NodeInstance* node_instance)
    {
       return node_instance->attach_to_file_manager(&m_file_manager);
@@ -179,10 +188,33 @@ namespace apx
       return false;
    }
 
+   error_t  ClientConnection::process_new_require_port_data_file(File* file)
+   {
+      auto base_name = file->get_file_info().base_name();
+      auto* node_instance = m_node_manager->find(base_name);
+      if (node_instance != nullptr)
+      {
+         assert(node_instance->get_require_port_data_state() == PortDataState::WaitingForFileInfo);
+         file->set_notification_handler(node_instance);
+         node_instance->Set_provide_port_data_state(PortDataState::WaitingForFileData);
+         return m_file_manager.send_open_file_request(file->get_address_without_flags());
+      }
+      return APX_NO_ERROR; //Ignore this file since it doesn't match anything in our node manager
+   }
+
 #ifdef UNIT_TEST
    void ClientConnection::run()
    {
       m_file_manager.run();
+   }
+#else
+   void ClientConnection::start()
+   {
+      m_file_manager.start();
+   }
+   void ClientConnection::stop()
+   {
+      m_file_manager.stop();
    }
 #endif
 

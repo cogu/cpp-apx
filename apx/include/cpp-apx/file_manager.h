@@ -34,7 +34,7 @@ namespace apx
    {
    public:
       FileManager() = delete;
-      FileManager(TransmitHandler* parent_connection) : m_shared(parent_connection),
+      FileManager(ConnectionInterface* parent_connection) : m_shared(parent_connection),
          m_worker{ m_shared }{}
       void start();
       void stop();
@@ -46,6 +46,7 @@ namespace apx
       error_t message_received(uint8_t const* msg_data, std::size_t msg_len);
       error_t send_local_const_data(std::uint32_t address, std::uint8_t const* data, std::size_t size);
       error_t send_local_data(std::uint32_t address, std::uint8_t* data, std::size_t size);
+      error_t send_open_file_request(std::uint32_t address);
 
 #ifdef UNIT_TEST
       bool run();
@@ -58,6 +59,7 @@ namespace apx
       error_t process_file_write_message(std::uint32_t address, std::uint8_t const* data, std::size_t size);
       error_t process_open_file_request(std::uint32_t start_address);
       error_t process_close_file_request(std::uint32_t start_address);
+      error_t process_remote_file_published(rmf::FileInfo const& file_info);
 
       FileManagerReceiver m_receiver;
       FileManagerShared m_shared;

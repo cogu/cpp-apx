@@ -51,6 +51,7 @@ namespace apx
       //Mock API
       FileManager& get_file_manager(){ return m_file_manager; }
       error_t request_open_local_file(char const* file_name);
+      error_t publish_remote_file(std::uint32_t address, char const* file_name, std::size_t file_size);
 #ifdef UNIT_TEST
       void run();
 #endif
