@@ -130,6 +130,23 @@ namespace apx
       return m_file_manager.message_received(buffer.data(), buffer.size());
    }
 
+   error_t MockClientConnection::publish_remote_file(std::uint32_t address, char const* file_name, std::size_t file_size)
+   {
+      rmf::FileInfo file_info{ file_name, static_cast<std::uint32_t>(file_size), address };
+      std::array<std::uint8_t, rmf::HIGH_ADDR_SIZE + rmf::CMD_TYPE_SIZE + rmf::FILE_INFO_HEADER_SIZE + rmf::FILE_NAME_MAX_SIZE> buffer;
+      if (rmf::address_encode(buffer.data(), rmf::HIGH_ADDR_SIZE, rmf::CMD_AREA_START_ADDRESS, false) != rmf::HIGH_ADDR_SIZE)
+      {
+         return APX_INTERNAL_ERROR;
+      }
+      std::size_t const max_cmd_size = buffer.size() - rmf::HIGH_ADDR_SIZE;
+      std::size_t const cmd_size = rmf::encode_publish_file_cmd(buffer.data() + rmf::HIGH_ADDR_SIZE, max_cmd_size, &file_info);
+      if (cmd_size == 0)
+      {
+         return APX_INTERNAL_ERROR;
+      }
+      return m_file_manager.message_received(buffer.data(), rmf::HIGH_ADDR_SIZE + cmd_size);
+   }
+
 
 #ifdef UNIT_TEST
    void MockClientConnection::run()

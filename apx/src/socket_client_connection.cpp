@@ -51,12 +51,22 @@ namespace apx
       }
    }
 #else
-   error_t SocketClientConnection::connect_tcp(std::string& const address, std::uint16_t port)
+   error_t SocketClientConnection::connect_tcp(char const* address, std::uint16_t port)
    {
+      auto result = msocket_connect(m_socket, address, port);
+      if (result < 0)
+      {
+         return APX_CONNECTION_ERROR;
+      }
       return APX_NO_ERROR;
    }
-# ifdef _WIN32
-   error_t SocketClientConnection::connect_unix(std::string& const path)
+
+   error_t SocketClientConnection::connect_tcp(std::string const& address, std::uint16_t port)
+   {
+      return connect_tcp(address.data(), port);
+   }
+# ifndef _WIN32
+   error_t SocketClientConnection::connect_unix(std::string const& path)
    {
       return APX_NO_ERROR;
    }
@@ -171,6 +181,9 @@ namespace apx
    {
       if (m_socket != nullptr)
       {
+#ifdef APX_DEBUG_ENABLE
+         std::cout << "Sending " << m_pending_bytes << " bytes" << std::endl;
+#endif
          SOCKET_SEND(m_socket, m_transmit_buffer.data(), static_cast<std::uint32_t>(m_pending_bytes));
       }
    }

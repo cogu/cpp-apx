@@ -37,7 +37,6 @@ namespace rmf
       Dynamic32,
       Device,
       Stream,
-      CompressedFixed
    };
 
    enum class DigestType { None, SHA1, SHA256 };
@@ -75,6 +74,17 @@ namespace rmf
    constexpr std::size_t FILE_OPEN_CMD_SIZE = sizeof(std::uint32_t);
    constexpr std::size_t FILE_CLOSE_CMD_SIZE = sizeof(std::uint32_t);
    constexpr std::size_t CMD_TYPE_SIZE = sizeof(std::uint32_t);
+
+   constexpr std::uint16_t FILE_TYPE_FIXED     = 0u;
+   constexpr std::uint16_t FILE_TYPE_DYNAMIC8  = 1u;
+   constexpr std::uint16_t FILE_TYPE_DYNAMIC16 = 2u;
+   constexpr std::uint16_t FILE_TYPE_DYNAMIC32 = 3u;
+   constexpr std::uint16_t FILE_TYPE_DEVICE    = 4u;
+   constexpr std::uint16_t FILE_TYPE_STREAM    = 5u;
+   constexpr std::uint16_t DIGEST_TYPE_NONE    = 0u;
+   constexpr std::uint16_t DIGEST_TYPE_SHA1    = 1u;
+   constexpr std::uint16_t DIGEST_TYPE_SHA256  = 2u;
+
    std::size_t needed_encoding_size(std::uint32_t address);
    std::size_t address_encode(std::uint8_t* buf, std::size_t buf_size, std::uint32_t address, bool more_bit);
    std::size_t address_decode(std::uint8_t const* begin, std::uint8_t const* end, std::uint32_t& address, bool& more_bit);

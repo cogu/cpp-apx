@@ -41,7 +41,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\compiler.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\computation.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client_connection.h" />
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\transmit_handler.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\connection_interface.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_element.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_signature.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\data_type.h" />

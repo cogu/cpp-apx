@@ -8,10 +8,10 @@
 #include "msocket.h"
 #endif
 
-#ifdef _MSCVER
-# define ACQUIRES_LOCK(lock) _Acquires_lock_()
-# define RELEASES_LOCK(lock) _Releases_lock_()
-# define REQUIRES_LOCK_HELD(lock) _Requires_lock_held_()
+#ifdef _MSC_VER
+# define ACQUIRES_LOCK(lock) _Acquires_lock_(lock)
+# define RELEASES_LOCK(lock) _Releases_lock_(lock)
+# define REQUIRES_LOCK_HELD(lock) _Requires_lock_held_(lock)
 #else
 # define ACQUIRES_LOCK(lock)
 # define RELEASES_LOCK(lock)
@@ -35,14 +35,15 @@ namespace apx
       error_t connect();
       void run() override;
 #else
-      error_t connect_tcp(std::string& const address, std::uint16_t port);
-# ifdef _WIN32
-      error_t connect_unix(std::string& const path);
+      error_t connect_tcp(char const* address, std::uint16_t port);
+      error_t connect_tcp(std::string const& address, std::uint16_t port);
+# ifndef _WIN32
+      error_t connect_unix(std::string const& path);
 # endif
 #endif
 
-      //msocket::ClientHandler API
-      void socket_connected(const std::string& address, std::uint16_t port) override;
+      //msocket::Handler API
+      void socket_connected(const std::string & address, std::uint16_t port) override;
       void socket_disconnected() override;
       int socket_data_received(const std::uint8_t* data, std::size_t data_size, std::size_t& parse_len) override;
 

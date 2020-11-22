@@ -254,6 +254,7 @@ namespace apx
       rmf::FileInfo file_info;
       if (has_provide_port_data())
       {
+         Set_provide_port_data_state(PortDataState::WaitingForFileOpenRequest);
          fill_provide_port_data_file_info(file_info);
          auto* provide_port_data_file = file_manager->create_local_file(file_info);
          if (provide_port_data_file == nullptr)
@@ -261,6 +262,10 @@ namespace apx
             return APX_FILE_CREATE_ERROR;
          }
          provide_port_data_file->set_notification_handler(this);
+      }
+      if (has_require_port_data())
+      {
+         set_require_port_data_state(PortDataState::WaitingForFileInfo);
       }
       auto result = fill_definition_file_info(file_info);
       if (result != APX_NO_ERROR)

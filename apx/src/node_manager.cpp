@@ -48,6 +48,22 @@ namespace apx
       return APX_NO_ERROR;
    }
 
+   apx::error_t NodeManager::build_node(std::string const& definition_text)
+   {
+      apx::error_t result = m_parser.parse(definition_text);
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      auto node{ m_parser.take_last_node() };
+      result = create_node_instance(node.get(), reinterpret_cast<std::uint8_t const*>(definition_text.data()), definition_text.size());
+      if (result != APX_NO_ERROR)
+      {
+         return result;
+      }
+      return APX_NO_ERROR;
+   }
+
    std::vector<apx::NodeInstance*> NodeManager::get_nodes()
    {
        std::vector<apx::NodeInstance*> nodes;
@@ -56,6 +72,26 @@ namespace apx
           nodes.push_back(it.second.get());
        }
        return nodes;
+   }
+
+   apx::NodeInstance* NodeManager::find(char const* name)
+   {
+      auto it = m_instance_map.find(name);
+      if (it != m_instance_map.end())
+      {
+         return it->second.get();
+      }
+      return nullptr;
+   }
+
+   apx::NodeInstance* NodeManager::find(std::string const& name)
+   {
+      auto it = m_instance_map.find(name);
+      if (it != m_instance_map.end())
+      {
+         return it->second.get();
+      }
+      return nullptr;
    }
 
    void NodeManager::reset()

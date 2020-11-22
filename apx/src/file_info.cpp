@@ -25,6 +25,7 @@
 #include <cassert>
 #include "cpp-apx/file_info.h"
 #include "cpp-apx/pack.h"
+#include "bstr/bstr.hpp"
 
 namespace rmf
 {
@@ -104,13 +105,13 @@ namespace rmf
       return std::string();
    }
 
-   apx::error_t encode_publish_file_cmd(std::uint8_t* buf, std::size_t buf_size, rmf::FileInfo const* file, std::size_t& cmd_size)
+   std::size_t encode_publish_file_cmd(std::uint8_t* buf, std::size_t buf_size, rmf::FileInfo const* file)
    {
       std::size_t const name_size = file->name.length();
       std::size_t const required_size = rmf::FILE_INFO_HEADER_SIZE + name_size + 1u ; //Add 1 for null-terminator
       if (required_size > buf_size)
       {
-         return APX_BUFFER_TOO_SMALL_ERROR;
+         return 0u;
       }
       std::uint8_t* p{ buf };
       apx::packLE<std::uint32_t>(p, rmf::CMD_PUBLISH_FILE_MSG); p += sizeof(std::uint32_t);
@@ -135,7 +136,101 @@ namespace rmf
       assert((p + name_size + 1) == buf + required_size);
       std::memcpy(p, reinterpret_cast<std::uint8_t const*>(file->name.data()), name_size); p += name_size;
       *p = 0u;
-      cmd_size = required_size;
-      return APX_NO_ERROR;
+      return required_size;
+   }
+
+   std::size_t decode_publish_file_cmd(std::uint8_t const* buf, std::size_t buf_size, FileInfo& file_info)
+   {
+      std::uint8_t const* next{ buf };
+      std::uint8_t const* end{ buf + buf_size };
+      if ((next + FILE_INFO_HEADER_SIZE) < end)
+      {
+         std::uint32_t const cmd_type = apx::unpackLE<std::uint32_t>(next); next += sizeof(std::uint32_t);
+         if (cmd_type != CMD_PUBLISH_FILE_MSG)
+         {
+            //Invalid command type
+            return 0u;
+         }
+         file_info.address = apx::unpackLE<std::uint32_t>(next); next += sizeof(std::uint32_t);
+         file_info.size = apx::unpackLE<std::uint32_t>(next); next += sizeof(std::uint32_t);
+         std::uint16_t value = apx::unpackLE<std::uint16_t>(next); next += sizeof(std::uint16_t);
+         if (!rmf::value_to_file_type(value, file_info.rmf_file_type))
+         {
+            return 0u;
+         }
+         value = apx::unpackLE<std::uint16_t>(next); next += sizeof(std::uint16_t);
+         if (!rmf::value_to_digest_type(value, file_info.digest_type))
+         {
+            return 0u;
+         }
+         switch (file_info.digest_type)
+         {
+         case DigestType::None:
+            std::memset(file_info.digest_data.data(), 0, SHA256_SIZE);
+            break;
+         case DigestType::SHA1:
+            std::memcpy(file_info.digest_data.data(), next, SHA1_SIZE);
+            std::memset(file_info.digest_data.data() + SHA1_SIZE, 0, SHA256_SIZE - SHA1_SIZE);
+            break;
+         case DigestType::SHA256:
+            std::memcpy(file_info.digest_data.data(), next, SHA256_SIZE);
+            break;
+         }
+         next += SHA256_SIZE;
+         std::uint8_t const* result = bstr::while_predicate<std::uint8_t>(next, end, [](auto c) -> bool { return c != 0; });
+         if ((result > next) && (result < end) )
+         {
+            file_info.name.assign(next, result);
+         }
+         return (result - buf);
+      }
+      return 0u;
+   }
+
+   bool value_to_file_type(std::uint16_t value, FileType& file_type)
+   {
+      switch (value)
+      {
+      case FILE_TYPE_FIXED:
+         file_type = FileType::Fixed;
+         break;
+      case FILE_TYPE_DYNAMIC8:
+         file_type = FileType::Dynamic8;
+         break;
+      case FILE_TYPE_DYNAMIC16:
+         file_type = FileType::Dynamic16;
+         break;
+      case FILE_TYPE_DYNAMIC32:
+         file_type = FileType::Dynamic32;
+         break;
+      case FILE_TYPE_DEVICE:
+         file_type = FileType::Device;
+         break;
+      case FILE_TYPE_STREAM:
+         file_type = FileType::Stream;
+         break;
+      default:
+         return false;
+      }
+      return true;
+   }
+
+   bool value_to_digest_type(std::uint16_t value, DigestType& digest_type)
+   {
+      switch (value)
+      {
+      case DIGEST_TYPE_NONE:
+         digest_type = DigestType::None;
+         break;
+      case DIGEST_TYPE_SHA1:
+         digest_type = DigestType::SHA1;
+         break;
+      case DIGEST_TYPE_SHA256:
+         digest_type = DigestType::SHA256;
+         break;
+      default:
+         return false;
+      }
+      return true;
    }
 }

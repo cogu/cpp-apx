@@ -86,6 +86,22 @@ namespace apx
    enum class ArrayType : unsigned char { None, UInt8, UInt16, UInt32 };
    enum class Mode : unsigned char { Client, Server };
 
+#define APX_REQUIRE_PORT_DATA_STATE_INIT                           ((apx_requirePortDataState_t) 0u)
+#define APX_REQUIRE_PORT_DATA_STATE_WAITING_FILE_INFO              ((apx_requirePortDataState_t) 1u) //used in client mode
+#define APX_REQUIRE_PORT_DATA_STATE_WAITING_FOR_FILE_OPEN_REQUEST  ((apx_requirePortDataState_t) 2u) //used in server mode
+#define APX_REQUIRE_PORT_DATA_STATE_WAITING_FOR_FILE_DATA          ((apx_requirePortDataState_t) 3u) //used in client mode
+#define APX_REQUIRE_PORT_DATA_STATE_CONNECTED                      ((apx_requirePortDataState_t) 4u)
+#define APX_REQUIRE_PORT_DATA_STATE_DISCONNECTED                   ((apx_requirePortDataState_t) 5u)
+
+   enum class PortDataState : unsigned char {
+      Disconnected,
+      WaitingForFileInfo,             //Used by file subscriber
+      WaitingForFileOpenRequest,      //Used by file publisher
+      WaitingForFileData,
+      Connected,
+   };
+
+
    using type_id_t = std::uint32_t;
    using port_id_t = std::uint32_t;
    using element_id_t = std::uint32_t;

@@ -25,10 +25,11 @@
 
 #include "cpp-apx/types.h"
 #include "cpp-apx/error.h"
+#include "cpp-apx/file.h"
 
 namespace apx
 {
-   class TransmitHandler
+   class ConnectionInterface
    {
    public:
       //Transmit methods
@@ -38,5 +39,8 @@ namespace apx
       virtual void transmit_end() = 0;
       virtual error_t transmit_data_message(std::uint32_t write_address, bool more_bit, std::uint8_t const* data, std::int32_t size, std::int32_t& bytes_available) = 0;
       virtual error_t transmit_direct_message(std::uint8_t const* data, std::int32_t size, std::int32_t& bytes_available) = 0;
+
+      // Notification callbacks
+      virtual error_t remote_file_published_notification(File* file) = 0;
    };
 }

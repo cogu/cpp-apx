@@ -26,6 +26,7 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+#include <thread>
 #include "cpp-apx/types.h"
 #include "cpp-apx/error.h"
 #include "cpp-apx/file_info.h"
@@ -42,21 +43,29 @@ namespace apx
       void prepare_publish_local_file(rmf::FileInfo* file_info);
       void prepare_send_local_const_data(std::uint32_t address, std::uint8_t const* data, std::uint32_t size);
       void prepare_send_local_data(std::uint32_t address, std::uint8_t* data, std::uint32_t size);
+      void prepare_send_open_file_request(std::uint32_t address);
+
 #ifdef UNIT_TEST
       bool run();
       std::size_t num_pending_commands() const { return m_queue.size(); }
+#else
+      void start();
+      void stop();
 #endif
 
    protected:
       std::queue<apx::Command> m_queue;
       std::condition_variable m_cond;
       std::mutex m_mutex;
+      std::thread m_worker_thread;
       FileManagerShared& m_shared;
 
       bool process_single_command(apx::Command const& cmd);
       error_t run_publish_local_file(rmf::FileInfo* file);
       error_t run_send_local_const_data(std::uint32_t address, std::uint8_t const* data, std::uint32_t size);
       error_t run_send_local_data(std::uint32_t address, std::uint8_t* data, std::uint32_t size);
+      error_t run_open_remote_file(std::uint32_t address);
+      void worker_main();
 
    };
 }

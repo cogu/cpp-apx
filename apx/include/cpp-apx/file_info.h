@@ -26,7 +26,6 @@
 #include <string>
 #include <array>
 #include "cpp-apx/remotefile.h"
-#include "cpp-apx/error.h"
 
 namespace rmf
 {
@@ -57,5 +56,8 @@ namespace rmf
       std::string name;
    };
 
-   apx::error_t encode_publish_file_cmd(std::uint8_t* buf, std::size_t buf_size, rmf::FileInfo const* file, std::size_t &cmd_size);
+   std::size_t encode_publish_file_cmd(std::uint8_t* buf, std::size_t buf_size, FileInfo const* file);
+   std::size_t decode_publish_file_cmd(std::uint8_t const* buf, std::size_t buf_size, FileInfo &file_info);
+   bool value_to_file_type(std::uint16_t value, FileType& file_type);
+   bool value_to_digest_type(std::uint16_t value, DigestType& digest_type);
 }

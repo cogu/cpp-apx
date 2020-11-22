@@ -812,6 +812,7 @@ namespace apx
       }
       if (m_state != nullptr) delete m_state;
    }
+
    apx::ValueTable* AttributeParser::create_value_table_from_state(ValueTableState& vts)
    {
       auto vt = std::make_unique<apx::ValueTable>();
