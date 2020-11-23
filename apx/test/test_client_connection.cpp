@@ -105,7 +105,7 @@ namespace apx_test
       EXPECT_FALSE(more_bit);
    }
 
-   TEST(ClientConnection, ProvidePortFileIsSentWhenOpenRequested)
+   TEST(ClientConnection, ProvidePortFileIsSentWhenFileOpenRequested)
    {
       char const* apx_text = "APX/1.2\n"
          "N\"TestNode1\"\n"
@@ -150,7 +150,7 @@ namespace apx_test
       auto const& buffer1 = mock_connection.get_log_packet(0);
       EXPECT_EQ(buffer1.size(), 67u); //This should be the FileInfo message
       mock_connection.clear_log();
-      EXPECT_EQ(mock_connection.publish_remote_file(0u, "TestNode1.in", 2u), APX_NO_ERROR);
+      EXPECT_EQ(mock_connection.publish_remote_file(PORT_DATA_ADDRESS_START, "TestNode1.in", 2u), APX_NO_ERROR);
       mock_connection.run();
       EXPECT_EQ(mock_connection.log_length(), 1u);
       auto const& buffer2 = mock_connection.get_log_packet(0);
@@ -164,5 +164,35 @@ namespace apx_test
       EXPECT_EQ(rmf::decode_cmd_type(&buffer2[5], &buffer2[5] + sizeof(std::uint32_t), cmd_type), sizeof(std::uint32_t));
       std::uint32_t const file_address = apx::unpackLE<std::uint32_t>(&buffer2[9]);
       EXPECT_EQ(file_address, PORT_DATA_ADDRESS_START);
+   }
+   TEST(ClientConnection, NodeDataIsUpdatedWhenRequirePortIsWritten)
+   {
+      char const* apx_text = "APX/1.2\n"
+         "N\"TestNode1\"\n"
+         "R\"RequirePort1\"C(0,3):=3\n"
+         "R\"RequirePort2\"C(0,7):=7\n";
+      MockClientConnection mock_connection;
+      EXPECT_EQ(mock_connection.build_node(apx_text), APX_NO_ERROR);
+      EXPECT_EQ(mock_connection.log_length(), 0u);
+      mock_connection.greeting_header_accepted();
+      mock_connection.run();
+      EXPECT_EQ(mock_connection.log_length(), 1u);
+      auto const& buffer1 = mock_connection.get_log_packet(0);
+      EXPECT_EQ(buffer1.size(), 67u); //This should be the FileInfo message
+      mock_connection.clear_log();
+      EXPECT_EQ(mock_connection.publish_remote_file(PORT_DATA_ADDRESS_START, "TestNode1.in", 2u), APX_NO_ERROR);
+      mock_connection.run();
+      EXPECT_EQ(mock_connection.log_length(), 1u); //This should be the file open request
+      auto* node_instance = mock_connection.find_node("TestNode1");
+      ASSERT_TRUE(node_instance);
+      EXPECT_EQ(node_instance->get_require_port_data_state(), PortDataState::WaitingForFileData);
+      mock_connection.clear_log();
+      std::array<std::uint8_t, 2u> remote_buffer{ 1u ,0u };
+      EXPECT_EQ(mock_connection.write_remote_data(PORT_DATA_ADDRESS_START, remote_buffer.data(), remote_buffer.size()), APX_NO_ERROR);
+      EXPECT_EQ(node_instance->get_require_port_data_state(), PortDataState::Synchronized);
+      auto* node_data = node_instance->get_node_data();
+      auto const* require_port_data = node_data->get_require_port_data();
+      EXPECT_EQ(require_port_data[0], 1u);
+      EXPECT_EQ(require_port_data[1], 0u);
    }
 }

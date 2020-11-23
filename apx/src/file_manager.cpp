@@ -211,10 +211,24 @@ namespace apx
 
    error_t FileManager::process_file_write_message(std::uint32_t address, std::uint8_t const* data, std::size_t size)
    {
-      (void)address;
-      (void)data;
-      (void)size;
-      return APX_NOT_IMPLEMENTED_ERROR;
+      auto* file = m_shared.find_file_by_address(address | rmf::HIGH_ADDR_BIT);
+      if (file == nullptr)
+      {
+         return APX_INVALID_WRITE_ERROR;
+      }
+      if (!file->is_open())
+      {
+         //Ignore writes on closed files
+         return APX_NO_ERROR;
+      }
+      if (m_shared.connection() == nullptr)
+      {
+         return APX_NULL_PTR_ERROR;
+      }
+      std::uint32_t const start_address = file->get_address_without_flags();
+      assert(start_address <= address);
+      std::uint32_t const offset = address - start_address;
+      return m_shared.connection()->remote_file_write_notification(file, offset, data, size);
    }
 
    error_t FileManager::process_open_file_request(std::uint32_t start_address)

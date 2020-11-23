@@ -64,6 +64,21 @@ namespace apx
       return APX_NO_ERROR;
    }
 
+   error_t ClientConnection::remote_file_write_notification(File* file, std::uint32_t offset, std::uint8_t const* data, std::size_t size)
+   {
+      auto retval = file->write_notify(offset, data, size);
+      if (retval == APX_NO_ERROR)
+      {
+         if (file->get_apx_file_type() == FileType::RequirePortData)
+         {
+            //TODO: Notify parent client about file change
+         }
+         //TODO: Notify other event listeners
+      }
+
+      return retval;
+   }
+
    error_t ClientConnection::attach_node_instance(NodeInstance* node_instance)
    {
       return node_instance->attach_to_file_manager(&m_file_manager);
@@ -196,7 +211,8 @@ namespace apx
       {
          assert(node_instance->get_require_port_data_state() == PortDataState::WaitingForFileInfo);
          file->set_notification_handler(node_instance);
-         node_instance->Set_provide_port_data_state(PortDataState::WaitingForFileData);
+         node_instance->set_require_port_data_state(PortDataState::WaitingForFileData);
+         file->open();
          return m_file_manager.send_open_file_request(file->get_address_without_flags());
       }
       return APX_NO_ERROR; //Ignore this file since it doesn't match anything in our node manager

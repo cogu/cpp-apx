@@ -82,6 +82,7 @@ namespace apx
       void close() { m_is_file_open = false; }
       void open_notify();
       void close_notify();
+      error_t write_notify(std::uint32_t offset, std::uint8_t const* data, std::size_t size);
       void set_file_manager(FileManager* file_manager) { m_file_manager = file_manager; }
       FileManager* get_file_manager() { return m_file_manager; }
       void set_notification_handler(FileNotificationHandler* handler) { m_notification_handler = handler; }

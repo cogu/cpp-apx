@@ -101,4 +101,13 @@ namespace apx
          m_notification_handler->file_close_notify(this);
       }
    }
+
+   error_t File::write_notify(std::uint32_t offset, std::uint8_t const* data, std::size_t size)
+   {
+      if (m_notification_handler != nullptr)
+      {
+         return m_notification_handler->file_write_notify(this, offset, data, size);
+      }
+      return APX_NO_ERROR;
+   }
 }

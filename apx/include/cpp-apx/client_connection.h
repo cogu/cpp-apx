@@ -40,6 +40,7 @@ namespace apx
       NodeManager* get_node_manager() const { return m_node_manager; }
       error_t build_node(char const* definition_text);
       error_t remote_file_published_notification(File* file) override;
+      error_t remote_file_write_notification(File* file, std::uint32_t offset, std::uint8_t const* data, std::size_t size);
 #ifdef UNIT_TEST
       virtual void run();
 #else
