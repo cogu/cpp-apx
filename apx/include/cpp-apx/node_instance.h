@@ -81,7 +81,7 @@ namespace apx
       PortDataState get_require_port_data_state() const { return m_require_port_data_state; }
       PortDataState get_provide_port_data_state() const{ return m_provide_port_data_state; }
       void set_require_port_data_state(PortDataState state) { m_require_port_data_state = state; }
-      void Set_provide_port_data_state(PortDataState state) { m_provide_port_data_state = state; }
+      void set_provide_port_data_state(PortDataState state) { m_provide_port_data_state = state; }
 
 
    protected:
@@ -99,13 +99,14 @@ namespace apx
       std::size_t m_provide_port_init_data_size{ 0u };
       std::size_t m_require_port_init_data_size{ 0u };
       std::unique_ptr<NodeData> m_node_data{ nullptr };
+      PortDataState m_require_port_data_state{ PortDataState::Init };
+      PortDataState m_provide_port_data_state{ PortDataState::Init };
 
       apx::error_t calc_init_data_size(PortInstance **port_list, std::size_t num_ports, std::size_t & total_size);
       error_t fill_definition_file_info(rmf::FileInfo& file_info);
       void fill_provide_port_data_file_info(rmf::FileInfo& file_info);
       error_t send_definition_data_to_file_manager(FileManager* file_manager, rmf::FileInfo const* file_info);
       error_t send_provide_port_data_to_file_manager(FileManager* file_manager, rmf::FileInfo const* file_info);
-      PortDataState m_require_port_data_state{ PortDataState::Disconnected };
-      PortDataState m_provide_port_data_state{ PortDataState::Disconnected };
+      error_t process_remote_write_require_port_data(std::uint32_t offset, std::uint8_t const* data, std::size_t size);
    };
 }

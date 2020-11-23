@@ -49,9 +49,13 @@ namespace apx
       void clear_log() { m_transmit_log.clear(); };
 
       //Mock API
-      FileManager& get_file_manager(){ return m_file_manager; }
+      FileManager* get_file_manager(){ return &m_file_manager; }
       error_t request_open_local_file(char const* file_name);
       error_t publish_remote_file(std::uint32_t address, char const* file_name, std::size_t file_size);
+      error_t write_remote_data(std::uint32_t address, std::uint8_t const* data, std::size_t size);
+      apx::NodeInstance* find_node(char const* name) { return m_node_manager.find(name); }
+      apx::NodeInstance* find_node(std::string const& name) { return m_node_manager.find(name); }
+
 #ifdef UNIT_TEST
       void run();
 #endif

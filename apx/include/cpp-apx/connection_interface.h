@@ -42,5 +42,6 @@ namespace apx
 
       // Notification callbacks
       virtual error_t remote_file_published_notification(File* file) = 0;
+      virtual error_t remote_file_write_notification(File* file, std::uint32_t offset, std::uint8_t const* data, std::size_t size) = 0;
    };
 }

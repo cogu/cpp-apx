@@ -56,7 +56,7 @@ namespace apx
    void FileManagerWorker::prepare_send_local_data(std::uint32_t address, std::uint8_t* data, std::uint32_t size)
    {
       std::scoped_lock lock{ m_mutex };
-      Command cmd{ CmdType::SendLocalConstData, address, size, reinterpret_cast<void*>(const_cast<std::uint8_t*>(data)), nullptr };
+      Command cmd{ CmdType::SendLocalData, address, size, reinterpret_cast<void*>(const_cast<std::uint8_t*>(data)), nullptr };
       m_queue.push(cmd);
 #ifndef UNIT_TEST
       m_cond.notify_one();

@@ -147,6 +147,20 @@ namespace apx
       return m_file_manager.message_received(buffer.data(), rmf::HIGH_ADDR_SIZE + cmd_size);
    }
 
+   error_t MockClientConnection::write_remote_data(std::uint32_t address, std::uint8_t const* payload_data, std::size_t payload_size)
+   {
+      std::array<std::uint8_t, rmf::HIGH_ADDR_SIZE> header;
+      auto header_size = rmf::address_encode(header.data(), header.size(), address, false);
+      if (header_size == 0u)
+      {
+         return APX_INTERNAL_ERROR;
+      }
+      apx::ByteArray msg(header_size + payload_size);
+      std::memcpy(msg.data(), header.data(), header_size);
+      std::memcpy(msg.data() + header_size, payload_data, payload_size);
+      return m_file_manager.message_received(msg.data(), msg.size());
+   }
+
 
 #ifdef UNIT_TEST
    void MockClientConnection::run()

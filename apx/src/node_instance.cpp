@@ -254,7 +254,7 @@ namespace apx
       rmf::FileInfo file_info;
       if (has_provide_port_data())
       {
-         Set_provide_port_data_state(PortDataState::WaitingForFileOpenRequest);
+         set_provide_port_data_state(PortDataState::WaitingForFileOpenRequest);
          fill_provide_port_data_file_info(file_info);
          auto* provide_port_data_file = file_manager->create_local_file(file_info);
          if (provide_port_data_file == nullptr)
@@ -305,12 +305,20 @@ namespace apx
 
    error_t NodeInstance::file_close_notify(File* file)
    {
+      (void)file;
       return APX_NO_ERROR;
    }
 
    error_t NodeInstance::file_write_notify(File* file, std::uint32_t offset, std::uint8_t const* data, std::size_t size)
    {
-      return APX_NO_ERROR;
+      error_t retval = APX_NO_ERROR;
+      switch (file->get_apx_file_type())
+      {
+      case FileType::RequirePortData:
+         retval = process_remote_write_require_port_data(offset, data, size);
+         break;
+      }
+      return retval;
    }
 
    apx::error_t NodeInstance::calc_init_data_size(PortInstance** port_list, std::size_t num_ports, std::size_t& total_size)
@@ -366,5 +374,13 @@ namespace apx
       return file_manager->send_local_data(file_info->address_without_flags(), snapshot, provide_port_data_size);
    }
 
+   error_t NodeInstance::process_remote_write_require_port_data(std::uint32_t offset, std::uint8_t const* data, std::size_t size)
+   {
+      if (m_require_port_data_state == PortDataState::WaitingForFileData)
+      {
+         m_require_port_data_state = PortDataState::Synchronized;
+      }
+      return m_node_data->write_require_port_data(offset, data, size);
+   }
 }
 

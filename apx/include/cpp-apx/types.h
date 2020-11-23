@@ -94,11 +94,11 @@ namespace apx
 #define APX_REQUIRE_PORT_DATA_STATE_DISCONNECTED                   ((apx_requirePortDataState_t) 5u)
 
    enum class PortDataState : unsigned char {
-      Disconnected,
+      Init,
       WaitingForFileInfo,             //Used by file subscriber
       WaitingForFileOpenRequest,      //Used by file publisher
       WaitingForFileData,
-      Connected,
+      Synchronized,
    };
 
 
