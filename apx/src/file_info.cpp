@@ -29,7 +29,11 @@
 
 namespace rmf
 {
-   FileInfo::FileInfo(char const* _name, std::uint32_t _size, std::uint32_t _address):
+    FileInfo::FileInfo()
+    {
+       std::memset(digest_data.data(), 0, digest_data.size());
+    }
+    FileInfo::FileInfo(char const* _name, std::uint32_t _size, std::uint32_t _address):
       address{ _address }, size{ _size }, name{ _name }
    {
       std::memset(digest_data.data(), 0, digest_data.size());

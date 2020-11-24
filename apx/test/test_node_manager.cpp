@@ -365,9 +365,9 @@ namespace apx_test
       apx::NodeManager manager;
       EXPECT_EQ(manager.build_node(apx_text), APX_NO_ERROR);
       auto* node = manager.get_last_attached();
-      EXPECT_NE(node, nullptr);
+      ASSERT_TRUE(node);
       auto const* node_data = node->get_const_node_data();
-      EXPECT_NE(node_data, nullptr);
+      ASSERT_TRUE(node_data);
       EXPECT_EQ(node_data->num_provide_ports(), 1u);
       EXPECT_EQ(node_data->num_require_ports(), 1u);
       EXPECT_EQ(node_data->provide_port_data_size(), expected_size);
@@ -407,5 +407,33 @@ namespace apx_test
       node_instance = manager.find("TestNode2");
       ASSERT_TRUE(node_instance);
       ASSERT_EQ(node_instance->get_name(), "TestNode2"s);
+   }
+
+   TEST(NodeManager, CreateRequirePortByteMap)
+   {
+      const char* apx_text =
+         "APX/1.2\n"
+         "N\"TestNode\"\n"
+         "R\"ComplexPort\"{\"Left\"L\"Right\"L}\n"
+         "R\"U8Port\"C\n"
+         "R\"U16Port\"S\n"
+         "R\"NamePort\"A[21]\n";
+      apx::NodeManager manager;
+      EXPECT_EQ(manager.build_node(apx_text), APX_NO_ERROR);
+      std::array<apx::port_id_t, 32> expected_map{
+         0, 0, 0, 0, 0, 0, 0, 0,
+         1,
+         2, 2,
+         3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
+      };
+      auto* node_instance = manager.get_last_attached();
+      ASSERT_TRUE(node_instance);
+      auto const* port_map = node_instance->get_require_port_map();
+      ASSERT_TRUE(port_map);
+      for (std::size_t offset = 0; offset < expected_map.size(); offset++)
+      {
+         EXPECT_EQ(port_map->lookup(offset), expected_map[offset]);
+      }
    }
 }

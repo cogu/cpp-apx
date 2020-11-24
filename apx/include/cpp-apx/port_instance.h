@@ -62,6 +62,7 @@ namespace apx
       std::size_t get_computation_length() const;
       Computation const* get_computation(std::size_t index) const;
       computation_id_t get_computation_id() const;
+      port_id_t get_port_id() const { return m_port_id; }
    protected:
 
       //Members that requires serialization

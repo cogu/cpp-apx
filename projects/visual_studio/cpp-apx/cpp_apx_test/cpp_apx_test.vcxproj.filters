@@ -219,6 +219,9 @@
     <ClCompile Include="..\..\..\..\apx\test\test_socket_client_connection.cpp">
       <Filter>apx\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\byte_port_map.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -379,6 +382,12 @@
       <Filter>apx\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\connection_interface.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\byte_port_map.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_ref.h">
       <Filter>apx\include</Filter>
     </ClInclude>
   </ItemGroup>

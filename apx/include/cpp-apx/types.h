@@ -101,12 +101,11 @@ namespace apx
       Synchronized,
    };
 
-
+   using ByteArray = std::vector<std::uint8_t>;
    using type_id_t = std::uint32_t;
    using port_id_t = std::uint32_t;
    using element_id_t = std::uint32_t;
    using computation_id_t = std::uint32_t;
-   using ByteArray = std::vector<std::uint8_t>;
    constexpr type_id_t INVALID_TYPE_ID = static_cast<type_id_t>(-1);
    constexpr port_id_t INVALID_PORT_ID = static_cast<port_id_t>(-1);
    constexpr element_id_t INVALID_ELEMENT_ID = static_cast<element_id_t>(-1);
