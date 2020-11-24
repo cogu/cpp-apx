@@ -37,6 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\attribute_parser.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\byte_port_map.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\command.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\compiler.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\computation.h" />
@@ -67,6 +68,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_ref.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\program.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\remotefile.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\serializer.h" />
@@ -93,6 +95,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\apx\src\attribute_parser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\byte_port_map.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\client_connection.cpp">

@@ -24,7 +24,7 @@
 
 #include <cassert>
 #include <cstring>
-#include "cpp-apx\node_manager.h"
+#include "cpp-apx/node_manager.h"
 #include <iostream> //DEBUG ONLY
 
 namespace apx
@@ -126,6 +126,11 @@ namespace apx
       {
          return result;
       }
+      if (node_instance->has_require_port_data())
+      {
+         node_instance->create_require_port_byte_map();
+      }
+      node_instance->create_port_refs();
       attach_node(node_instance_ptr.release());
       return APX_NO_ERROR;
    }

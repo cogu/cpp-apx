@@ -72,6 +72,15 @@ namespace apx
       {
          delete[] m_require_port_init_data;
       }
+      if (m_provide_port_refs != nullptr)
+      {
+         delete[] m_provide_port_refs;
+      }
+      if (m_require_port_refs != nullptr)
+      {
+         delete[] m_require_port_refs;
+      }
+
    }
 
    void NodeInstance::alloc_port_instance_memory(std::size_t num_provide_ports, std::size_t num_require_ports)
@@ -245,6 +254,35 @@ namespace apx
             {
                m_computation_lists[i] = computation_lists[i].release();
             }
+         }
+      }
+   }
+
+   void NodeInstance::create_require_port_byte_map()
+   {
+      m_require_port_byte_map.reset(new BytePortMap(m_require_port_init_data_size,
+         const_cast<const apx::PortInstance**>(m_require_ports), m_num_require_ports));
+   }
+
+   void NodeInstance::create_port_refs()
+   {
+      if (m_num_provide_ports > 0)
+      {
+         m_provide_port_refs = new PortRef[m_num_provide_ports];
+         for (std::size_t i = 0u; i < m_num_provide_ports; i++)
+         {
+            m_provide_port_refs[i].node_instance = this;
+            m_provide_port_refs[i].port_instance = m_provide_ports[i];
+         }
+      }
+
+      if (m_num_require_ports > 0)
+      {
+         m_require_port_refs = new PortRef[m_num_require_ports];
+         for (std::size_t i = 0u; i < m_num_require_ports; i++)
+         {
+            m_require_port_refs[i].node_instance = this;
+            m_require_port_refs[i].port_instance = m_require_ports[i];
          }
       }
    }
