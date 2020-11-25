@@ -29,11 +29,15 @@ namespace apx
    {
    public:
       SocketClientConnection(SOCKET_TYPE* socket);
+      SocketClientConnection(SOCKET_TYPE* socket, Client* parent_client);
       ~SocketClientConnection();
       //connection API
 #ifdef UNIT_TEST
       error_t connect();
       void run() override;
+      void receive_accepted_cmd();
+      void receive_file_info_cmd(std::uint32_t address, char const* file_name, std::size_t file_size);
+      void receive_data_messsage(std::uint32_t address, std::uint8_t const* data, std::size_t size);
 #else
       error_t connect_tcp(char const* address, std::uint16_t port);
       error_t connect_tcp(std::string const& address, std::uint16_t port);

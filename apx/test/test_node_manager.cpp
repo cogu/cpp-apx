@@ -294,8 +294,8 @@ namespace apx_test
       auto port = node->get_provide_port(0u);
       EXPECT_NE(port, nullptr);
 
-      EXPECT_EQ(port->get_computation_length(), 3u);
-      EXPECT_EQ(port->get_computation_id(), 0u);
+      EXPECT_EQ(port->get_computation_list_length(), 3u);
+      EXPECT_EQ(port->get_computation_list_id(), 0u);
       auto const* computation = port->get_computation(0u);
       auto const* scaling = dynamic_cast<apx::RationalScaling const*>(computation);
       EXPECT_NE(scaling, nullptr);

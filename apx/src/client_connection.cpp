@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include "cpp-apx/client_connection.h"
+#include "cpp-apx/client.h"
 #include "cpp-apx/numheader.h"
 
 namespace apx
@@ -16,11 +17,18 @@ namespace apx
    {
       m_is_greeting_accepted = false;
       send_greeting_header();
+      if (m_parent_client != nullptr)
+      {
+         m_parent_client->on_connection_connected(this);
+      }
    }
 
    void ClientConnection::disconnected()
    {
-
+      if (m_parent_client != nullptr)
+      {
+         m_parent_client->on_connection_disconnected(this);
+      }
    }
 
    void ClientConnection::attach_node_manager(NodeManager* node_manager)
@@ -28,6 +36,7 @@ namespace apx
       if (node_manager != nullptr)
       {
          m_node_manager = node_manager;
+         node_manager->set_connection(this);
          for (auto& node_instance : node_manager->get_nodes())
          {
             attach_node_instance(node_instance);
@@ -77,6 +86,25 @@ namespace apx
       }
 
       return retval;
+   }
+
+   void ClientConnection::require_port_data_written(NodeInstance* node_instance, std::size_t offset, std::size_t size)
+   {
+      if (m_parent_client != nullptr)
+      {
+         std::size_t end_offset = offset + size;
+         while (offset < end_offset)
+         {
+            port_id_t port_id = node_instance->lookup_require_port_id(offset);
+            if (port_id >= node_instance->get_num_require_ports())
+            {
+               break;
+            }
+            PortInstance* port_instance = node_instance->get_require_port(port_id);
+            offset += port_instance->data_size();
+            m_parent_client->on_require_port_written(port_instance);
+         }
+      }
    }
 
    error_t ClientConnection::attach_node_instance(NodeInstance* node_instance)

@@ -255,7 +255,7 @@ namespace apx
       stream->put(bin::START_OF_PORT_INSTANCES);
       for (std::size_t port_id = 0u; port_id < num_ports; port_id++)
       {
-         auto const* port_instance = node_instance->get_provide_port(port_id);
+         auto const* port_instance = node_instance->get_provide_port(static_cast<port_id_t>(port_id));
          if (port_instance == nullptr)
          {
             return APX_NULL_PTR_ERROR;
@@ -284,7 +284,7 @@ namespace apx
       stream->put(bin::START_OF_PORT_INSTANCES);
       for (std::size_t port_id = 0u; port_id < num_ports; port_id++)
       {
-         auto const* port_instance = node_instance->get_require_port(port_id);
+         auto const* port_instance = node_instance->get_require_port(static_cast<port_id_t>(port_id));
          if (port_instance == nullptr)
          {
             return APX_NULL_PTR_ERROR;
@@ -301,14 +301,14 @@ namespace apx
 
    apx::error_t FileCache::serialize_port_instance(std::basic_ostream<char>* stream, PortInstance const* port_instance)
    {
-      write_string_with_null_terminator(stream, port_instance->get_name());
-      auto retval = write_integer_to_stream(stream, port_instance->get_data_element_id());
+      write_string_with_null_terminator(stream, port_instance->name());
+      auto retval = write_integer_to_stream(stream, port_instance->data_element_id());
       if (retval == APX_NO_ERROR)
       {
          //TODO: Optional computation reference
-         if (port_instance->get_port_type() == PortType::ProvidePort)
+         if (port_instance->port_type() == PortType::ProvidePort)
          {
-            auto program = port_instance->get_pack_program();
+            auto program = port_instance->pack_program();
             std::size_t program_size = program.size() - vm::INITIAL_HEADER_SIZE;
             stream->put(bin::START_OF_PACK_PROGRAM);
             retval = write_integer_to_stream(stream, program_size);
@@ -319,7 +319,7 @@ namespace apx
          }
          else
          {
-            auto program = port_instance->get_unpack_program();
+            auto program = port_instance->unpack_program();
             std::size_t program_size = program.size() - vm::INITIAL_HEADER_SIZE;
             stream->put(bin::START_OF_UNPACK_PROGRAM);
             retval = write_integer_to_stream(stream, program_size);

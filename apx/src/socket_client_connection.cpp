@@ -6,8 +6,10 @@
 #include "cpp-apx/remotefile.h"
 #include "cpp-apx/numheader.h"
 #include "cpp-apx/socket_client_connection.h"
+#include "cpp-apx/client.h"
 
 #ifdef UNIT_TEST
+#include <array>
 #define SOCKET_DELETE testsocket_delete
 #define SOCKET_SET_HANDLER(x, y) msocket::set_client_handler(x,y)
 #define SOCKET_START_IO(x)
@@ -21,7 +23,17 @@
 
 namespace apx
 {
-   SocketClientConnection::SocketClientConnection(SOCKET_TYPE* socket):m_socket(socket)
+   SocketClientConnection::SocketClientConnection(SOCKET_TYPE* socket):
+      ClientConnection { nullptr }, m_socket(socket)
+   {
+      if (m_socket != nullptr)
+      {
+         SOCKET_SET_HANDLER(m_socket, this);
+      }
+   }
+
+   SocketClientConnection::SocketClientConnection(SOCKET_TYPE* socket, Client* parent_client):
+      ClientConnection{ parent_client }, m_socket(socket)
    {
       if (m_socket != nullptr)
       {
@@ -41,6 +53,7 @@ namespace apx
       testsocket_onConnect(m_socket);
       return APX_NO_ERROR;
    }
+
    void SocketClientConnection::run()
    {
       testsocket_run(m_socket);
@@ -49,6 +62,45 @@ namespace apx
          ClientConnection::run();
          testsocket_run(m_socket);
       }
+   }
+   void SocketClientConnection::receive_accepted_cmd()
+   {
+      std::array<std::uint8_t, numheader::SHORT_SIZE + rmf::HIGH_ADDR_SIZE + rmf::CMD_TYPE_SIZE> msg;
+      msg[0] = static_cast<std::uint8_t>(msg.size()) - 1u;
+      rmf::address_encode(msg.data() + 1, msg.size(), rmf::CMD_AREA_START_ADDRESS, false);
+      rmf::encode_acknowledge_cmd(msg.data() + 1 + rmf::HIGH_ADDR_SIZE, rmf::CMD_TYPE_SIZE);
+      testsocket_serverSend(m_socket, msg.data(), static_cast<std::uint32_t>(msg.size()));
+   }
+
+   void SocketClientConnection::receive_file_info_cmd(std::uint32_t address, char const* file_name, std::size_t file_size)
+   {
+      rmf::FileInfo file_info{ file_name, static_cast<std::uint32_t>(file_size), address };
+      std::array<std::uint8_t, numheader::SHORT_SIZE + rmf::HIGH_ADDR_SIZE + rmf::CMD_TYPE_SIZE + rmf::FILE_INFO_HEADER_SIZE + rmf::FILE_NAME_MAX_SIZE> msg;
+      if (rmf::address_encode(msg.data() + 1, rmf::HIGH_ADDR_SIZE, rmf::CMD_AREA_START_ADDRESS, false) != rmf::HIGH_ADDR_SIZE)
+      {
+         return;
+      }
+      std::size_t const max_cmd_size = msg.size() - (1+rmf::HIGH_ADDR_SIZE);
+      std::size_t const cmd_size = rmf::encode_publish_file_cmd(msg.data() + 1 + rmf::HIGH_ADDR_SIZE, max_cmd_size, &file_info);
+      if (cmd_size == 0)
+      {
+         return;
+      }
+      msg[0] = rmf::HIGH_ADDR_SIZE + static_cast<std::uint8_t>(cmd_size);
+      testsocket_serverSend(m_socket, msg.data(), 1 + rmf::HIGH_ADDR_SIZE + static_cast<std::uint32_t>(cmd_size));
+   }
+
+   void SocketClientConnection::receive_data_messsage(std::uint32_t address, std::uint8_t const* data, std::size_t data_size)
+   {
+      std::size_t const needed_address_size{ rmf::needed_encoding_size(address) };
+      std::size_t const needed_numheader_size = needed_address_size + data_size > numheader::SHORT_MAX ? numheader::LONG32_SIZE : numheader::SHORT_SIZE;
+      apx::ByteArray msg(needed_numheader_size + needed_address_size + data_size);
+      assert(msg.size() == needed_numheader_size + needed_address_size + data_size);
+      numheader::encode32(msg.data(), msg.data() + needed_numheader_size, static_cast<std::uint32_t>(needed_address_size + data_size));
+      std::size_t header_size = rmf::address_encode(msg.data() + needed_numheader_size, needed_address_size, address, false);
+      assert(header_size == needed_address_size);
+      std::memcpy(msg.data() + needed_numheader_size + needed_address_size, data, data_size);
+      testsocket_serverSend(m_socket, msg.data(), static_cast<std::uint32_t>(msg.size()));
    }
 #else
    error_t SocketClientConnection::connect_tcp(char const* address, std::uint16_t port)

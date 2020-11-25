@@ -28,10 +28,13 @@
 
 namespace apx
 {
+   class Client;
+
    class ClientConnection : public ConnectionInterface
    {
    public:
       ClientConnection() :m_file_manager{ this }, m_node_manager{ nullptr }{}
+      ClientConnection(Client* parent_client) : m_parent_client{ parent_client }, m_file_manager{ this }, m_node_manager{ nullptr }{}
       virtual ~ClientConnection() {}
       void greeting_header_accepted();
       void connected();
@@ -41,6 +44,7 @@ namespace apx
       error_t build_node(char const* definition_text);
       error_t remote_file_published_notification(File* file) override;
       error_t remote_file_write_notification(File* file, std::uint32_t offset, std::uint8_t const* data, std::size_t size);
+      void require_port_data_written(NodeInstance* node_instance, std::size_t offset, std::size_t size);
 #ifdef UNIT_TEST
       virtual void run();
 #else
@@ -59,6 +63,7 @@ namespace apx
       bool m_is_greeting_accepted{ false };
       FileManager m_file_manager;
       NodeManager* m_node_manager;
+      Client* m_parent_client{ nullptr };
 
    };
 }

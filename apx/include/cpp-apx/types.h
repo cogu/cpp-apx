@@ -86,13 +86,6 @@ namespace apx
    enum class ArrayType : unsigned char { None, UInt8, UInt16, UInt32 };
    enum class Mode : unsigned char { Client, Server };
 
-#define APX_REQUIRE_PORT_DATA_STATE_INIT                           ((apx_requirePortDataState_t) 0u)
-#define APX_REQUIRE_PORT_DATA_STATE_WAITING_FILE_INFO              ((apx_requirePortDataState_t) 1u) //used in client mode
-#define APX_REQUIRE_PORT_DATA_STATE_WAITING_FOR_FILE_OPEN_REQUEST  ((apx_requirePortDataState_t) 2u) //used in server mode
-#define APX_REQUIRE_PORT_DATA_STATE_WAITING_FOR_FILE_DATA          ((apx_requirePortDataState_t) 3u) //used in client mode
-#define APX_REQUIRE_PORT_DATA_STATE_CONNECTED                      ((apx_requirePortDataState_t) 4u)
-#define APX_REQUIRE_PORT_DATA_STATE_DISCONNECTED                   ((apx_requirePortDataState_t) 5u)
-
    enum class PortDataState : unsigned char {
       Init,
       WaitingForFileInfo,             //Used by file subscriber
@@ -127,4 +120,5 @@ namespace apx
 
    constexpr std::size_t SMALL_DATA_SIZE = sizeof(std::uint32_t);
    constexpr std::size_t MAX_FILE_SIZE = 0x4000000; //64MB
+   constexpr std::size_t MAX_STACK_BUFFER_SIZE = 256u;
 }

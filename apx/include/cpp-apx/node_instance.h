@@ -35,10 +35,11 @@
 #include "cpp-apx/computation.h"
 #include "cpp-apx/file_manager.h"
 #include "cpp-apx/byte_port_map.h"
-#include "cpp-apx/port_ref.h"
 
 namespace apx
 {
+   class NodeManager;
+
    class NodeInstance : public FileNotificationHandler
    {
    public:
@@ -62,8 +63,8 @@ namespace apx
       std::uint8_t const* get_require_port_init_data() const { return m_require_port_init_data; }
       apx::error_t create_port_init_data_memory(std::uint8_t*& provide_port_data, std::size_t& provide_port_data_size,
          std::uint8_t*& require_port_data, std::size_t& require_port_data_size);
-      PortInstance* get_provide_port(std::size_t port_id) const;
-      PortInstance* get_require_port(std::size_t port_id) const;
+      PortInstance* get_provide_port(port_id_t port_id) const;
+      PortInstance* get_require_port(port_id_t port_id) const;
       DataElement const* get_data_element(element_id_t id) const;
       ComputationList const* get_computation_list(computation_id_t id) const;
       apx::error_t create_node_data(std::uint8_t const* definition_data, std::size_t definition_size);
@@ -77,7 +78,6 @@ namespace apx
       void create_data_element_list(std::vector<std::unique_ptr<DataElement>>& data_element_list);
       void create_computation_lists(std::vector<std::unique_ptr<ComputationList>>& computation_lists);
       void create_require_port_byte_map();
-      void create_port_refs();
       error_t attach_to_file_manager(FileManager* file_manager);
       error_t file_open_notify(File* file) override;
       error_t file_close_notify(File* file) override;
@@ -87,6 +87,12 @@ namespace apx
       void set_require_port_data_state(PortDataState state) { m_require_port_data_state = state; }
       void set_provide_port_data_state(PortDataState state) { m_provide_port_data_state = state; }
       BytePortMap const* get_require_port_map() { return const_cast<const BytePortMap*>(m_require_port_byte_map.get()); }
+      void set_node_manager(NodeManager* node_manager) { m_node_manager = node_manager; }
+      NodeManager* get_node_manager() const { return m_node_manager; }
+      port_id_t lookup_require_port_id(std::size_t byte_offset);
+      PortInstance* find(char const* name);
+      PortInstance* find(std::string const& name);
+
 
    protected:
       std::string m_name;
@@ -97,8 +103,6 @@ namespace apx
       PortInstance** m_provide_ports{ nullptr };
       PortInstance** m_require_ports{ nullptr };
       DataElement** m_data_elements{ nullptr };
-      PortRef* m_provide_port_refs{ nullptr };
-      PortRef* m_require_port_refs{ nullptr };
       ComputationList** m_computation_lists{ nullptr };
       std::uint8_t* m_provide_port_init_data{ nullptr };
       std::uint8_t* m_require_port_init_data{ nullptr };
@@ -108,7 +112,7 @@ namespace apx
       std::unique_ptr<BytePortMap> m_require_port_byte_map{ nullptr }; //Used by APX clients
       PortDataState m_require_port_data_state{ PortDataState::Init };
       PortDataState m_provide_port_data_state{ PortDataState::Init };
-
+      NodeManager* m_node_manager{ nullptr };
 
       apx::error_t calc_init_data_size(PortInstance **port_list, std::size_t num_ports, std::size_t & total_size);
       error_t fill_definition_file_info(rmf::FileInfo& file_info);

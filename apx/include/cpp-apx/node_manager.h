@@ -38,6 +38,7 @@
 
 namespace apx
 {
+   class ClientConnection;
    class NodeManager
    {
    public:
@@ -48,11 +49,15 @@ namespace apx
       std::vector<apx::NodeInstance*> get_nodes();
       apx::NodeInstance* find(char const* name);
       apx::NodeInstance* find(std::string const& name);
+      void set_connection(ClientConnection* connection) { m_parent_connection = connection; }
+      ClientConnection* get_connection() const { return m_parent_connection; }
+      void require_port_data_written(NodeInstance* node_instance, std::uint32_t offset, std::size_t size);
    protected:
       apx::Parser m_parser;
       apx::Compiler m_compiler;
       std::unordered_map<std::string, std::unique_ptr<apx::NodeInstance>> m_instance_map;
       apx::NodeInstance* m_last_attached{ nullptr };
+      ClientConnection* m_parent_connection{ nullptr };
       using DataElementMap = std::map<std::string, DataElement const*>;
       using ComputationListMap = std::map<std::string, ComputationList const*>;
       using DataElementList = std::vector<std::unique_ptr<apx::DataElement>>;

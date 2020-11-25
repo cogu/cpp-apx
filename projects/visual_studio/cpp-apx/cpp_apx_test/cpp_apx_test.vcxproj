@@ -38,6 +38,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\attribute_parser.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\byte_port_map.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\command.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\compiler.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\computation.h" />
@@ -49,6 +50,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\decoder.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\deserializer.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\error.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\event_listener.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_manager_receiver.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\file_info.h" />
@@ -68,7 +70,6 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_instance.h" />
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\port_ref.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\program.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\remotefile.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\serializer.h" />
@@ -80,6 +81,7 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vm.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vmdefs.h" />
+    <ClInclude Include="..\..\..\..\apx\test\client_spy.h" />
     <ClInclude Include="..\..\..\..\apx\test\sample_nodes.h" />
     <ClInclude Include="..\..\..\..\bstr\include\bstr\bstr.hpp" />
     <ClInclude Include="..\..\..\..\dtl\include\dtl\dtl.hpp" />
@@ -98,6 +100,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\byte_port_map.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\client.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\client_connection.cpp">
@@ -202,6 +207,10 @@
     <ClCompile Include="..\..\..\..\apx\src\vm.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\client_spy.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\test\test_client.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_client_connection.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_computation.cpp" />
     <ClCompile Include="..\..\..\..\apx\test\test_data_signature.cpp" />

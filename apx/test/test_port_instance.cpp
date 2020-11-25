@@ -30,11 +30,11 @@ namespace apx_test
       apx::error_t result{ APX_NO_ERROR };
       auto pack_program = compiler.compile_port(port, apx::ProgramType::Pack, result);
       ASSERT_EQ(result, APX_NO_ERROR);
-      apx::PortInstance port_instance( apx::PortType::ProvidePort, 0, "U8Signal"s, pack_program.release(), nullptr );
+      apx::PortInstance port_instance(nullptr, apx::PortType::ProvidePort, 0, "U8Signal"s, pack_program.release(), nullptr );
       std::uint32_t data_size{ 0 };
       ASSERT_EQ(port_instance.derive_properties(0u, data_size), APX_NO_ERROR);
       ASSERT_EQ(data_size, sizeof(std::uint8_t));
-      ASSERT_EQ(data_size, port_instance.get_data_size());
+      ASSERT_EQ(data_size, port_instance.data_size());
    }
 
    TEST(PortInstance, DerivePropertiesOnProvidePortUint16)
@@ -56,11 +56,11 @@ namespace apx_test
       apx::error_t result{ APX_NO_ERROR };
       auto pack_program = compiler.compile_port(port, apx::ProgramType::Pack, result);
       ASSERT_EQ(result, APX_NO_ERROR);
-      apx::PortInstance port_instance(apx::PortType::ProvidePort, 0, "U16Signal"s, pack_program.release(), nullptr);
+      apx::PortInstance port_instance(nullptr, apx::PortType::ProvidePort, 0, "U16Signal"s, pack_program.release(), nullptr);
       std::uint32_t data_size{ 0 };
       ASSERT_EQ(port_instance.derive_properties(0u, data_size), APX_NO_ERROR);
       ASSERT_EQ(data_size, sizeof(std::uint16_t));
-      ASSERT_EQ(data_size, port_instance.get_data_size());
+      ASSERT_EQ(data_size, port_instance.data_size());
    }
 
    TEST(PortInstance, DerivePropertiesOnProvidePortUint32)
@@ -82,11 +82,11 @@ namespace apx_test
       apx::error_t result{ APX_NO_ERROR };
       auto pack_program = compiler.compile_port(port, apx::ProgramType::Pack, result);
       ASSERT_EQ(result, APX_NO_ERROR);
-      apx::PortInstance port_instance(apx::PortType::ProvidePort, 0, "U32Signal"s, pack_program.release(), nullptr);
+      apx::PortInstance port_instance(nullptr, apx::PortType::ProvidePort, 0, "U32Signal"s, pack_program.release(), nullptr);
       std::uint32_t data_size{ 0 };
       ASSERT_EQ(port_instance.derive_properties(0u, data_size), APX_NO_ERROR);
       ASSERT_EQ(data_size, sizeof(std::uint32_t));
-      ASSERT_EQ(data_size, port_instance.get_data_size());
+      ASSERT_EQ(data_size, port_instance.data_size());
    }
 
    TEST(PortInstance, DerivePropertiesOnQueuedProvidePortWithUint8DataAndUint8QueueSize)
@@ -107,12 +107,12 @@ namespace apx_test
       apx::error_t result{ APX_NO_ERROR };
       auto pack_program = compiler.compile_port(port, apx::ProgramType::Pack, result);
       ASSERT_EQ(result, APX_NO_ERROR);
-      apx::PortInstance port_instance(apx::PortType::ProvidePort, 0, "U8Signal"s, pack_program.release(), nullptr);
+      apx::PortInstance port_instance(nullptr, apx::PortType::ProvidePort, 0, "U8Signal"s, pack_program.release(), nullptr);
       std::uint32_t data_size{ 0 };
       ASSERT_EQ(port_instance.derive_properties(0u, data_size), APX_NO_ERROR);
       ASSERT_EQ(data_size, sizeof(std::uint8_t)+sizeof(std::uint8_t)*10u );
-      ASSERT_EQ(data_size, port_instance.get_data_size());
-      ASSERT_EQ(port_instance.get_queue_length(), 10u);
-      ASSERT_EQ(port_instance.get_element_size(), sizeof(std::uint8_t));
+      ASSERT_EQ(data_size, port_instance.data_size());
+      ASSERT_EQ(port_instance.queue_length(), 10u);
+      ASSERT_EQ(port_instance.element_size(), sizeof(std::uint8_t));
    }
 }

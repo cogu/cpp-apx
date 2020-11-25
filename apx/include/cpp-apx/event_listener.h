@@ -1,8 +1,8 @@
 /*****************************************************************************
-* \file      port_ref.h
+* \file      event_listener.h
 * \author    Conny Gustafsson
 * \date      2020-11-24
-* \brief     Port reference struct
+* \brief     Event listener definitions
 *
 * Copyright (c) 2020 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,16 +23,15 @@
 ******************************************************************************/
 #pragma once
 
-#include "cpp-apx/port_instance.h"
-
+#include "cpp-apx/client_connection.h"
 
 namespace apx
 {
-   class NodeInstance;
-   struct PortRef
+   class ClientEventListener
    {
-      NodeInstance* node_instance;
-      PortInstance* port_instance;
+   public:
+      virtual void connected1(ClientConnection* connection) = 0;
+      virtual void disconnected1(ClientConnection* connection) = 0;
+      virtual void require_port_written1 (PortInstance* port_instance) = 0;
    };
 }
-

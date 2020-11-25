@@ -38,7 +38,7 @@ namespace apx
          for (port_id_t port_id = 0u; port_id < static_cast<port_id_t>(num_ports); port_id++)
          {
             PortInstance const* port_instance = port_instance_list[port_id];
-            auto data_size = port_instance->get_data_size();
+            auto data_size = port_instance->data_size();
             for (std::size_t i = 0; i < data_size; i++)
             {
                if (offset >= m_map_len)
