@@ -25,6 +25,7 @@
 #include <cassert>
 #include <cstring>
 #include "cpp-apx/node_instance.h"
+#include "cpp-apx/node_manager.h"
 #include "cpp-apx/sha256.h"
 
 namespace apx
@@ -72,14 +73,6 @@ namespace apx
       {
          delete[] m_require_port_init_data;
       }
-      if (m_provide_port_refs != nullptr)
-      {
-         delete[] m_provide_port_refs;
-      }
-      if (m_require_port_refs != nullptr)
-      {
-         delete[] m_require_port_refs;
-      }
 
    }
 
@@ -100,7 +93,7 @@ namespace apx
    {
       if (port_id < m_num_provide_ports)
       {
-         m_provide_ports[port_id] = new PortInstance(PortType::ProvidePort, port_id, name, pack_program.release(), nullptr);
+         m_provide_ports[port_id] = new PortInstance(this, PortType::ProvidePort, port_id, name, pack_program.release(), nullptr);
          return m_provide_ports[port_id]->derive_properties(data_offset, data_size);
       }
       return APX_INVALID_ARGUMENT_ERROR;
@@ -110,7 +103,7 @@ namespace apx
    {
       if (port_id < m_num_require_ports)
       {
-         m_require_ports[port_id] = new PortInstance(PortType::RequirePort, port_id, name, pack_program.release(), unpack_program.release());
+         m_require_ports[port_id] = new PortInstance(this, PortType::RequirePort, port_id, name, pack_program.release(), unpack_program.release());
          return m_require_ports[port_id]->derive_properties(data_offset, data_size);
       }
       return APX_INVALID_ARGUMENT_ERROR;
@@ -151,7 +144,7 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-   PortInstance* NodeInstance::get_provide_port(std::size_t port_id) const
+   PortInstance* NodeInstance::get_provide_port(port_id_t port_id) const
    {
       if (port_id < m_num_provide_ports)
       {
@@ -160,7 +153,7 @@ namespace apx
       return nullptr;
    }
 
-   PortInstance* NodeInstance::get_require_port(std::size_t port_id) const
+   PortInstance* NodeInstance::get_require_port(port_id_t port_id) const
    {
       if (port_id < m_num_require_ports)
       {
@@ -264,29 +257,6 @@ namespace apx
          const_cast<const apx::PortInstance**>(m_require_ports), m_num_require_ports));
    }
 
-   void NodeInstance::create_port_refs()
-   {
-      if (m_num_provide_ports > 0)
-      {
-         m_provide_port_refs = new PortRef[m_num_provide_ports];
-         for (std::size_t i = 0u; i < m_num_provide_ports; i++)
-         {
-            m_provide_port_refs[i].node_instance = this;
-            m_provide_port_refs[i].port_instance = m_provide_ports[i];
-         }
-      }
-
-      if (m_num_require_ports > 0)
-      {
-         m_require_port_refs = new PortRef[m_num_require_ports];
-         for (std::size_t i = 0u; i < m_num_require_ports; i++)
-         {
-            m_require_port_refs[i].node_instance = this;
-            m_require_port_refs[i].port_instance = m_require_ports[i];
-         }
-      }
-   }
-
    error_t NodeInstance::attach_to_file_manager(FileManager* file_manager)
    {
       rmf::FileInfo file_info;
@@ -359,6 +329,69 @@ namespace apx
       return retval;
    }
 
+   port_id_t NodeInstance::lookup_require_port_id(std::size_t byte_offset)
+   {
+      if (m_require_port_byte_map != nullptr)
+      {
+         return m_require_port_byte_map->lookup(byte_offset);
+      }
+      return INVALID_PORT_ID;
+   }
+
+   PortInstance* NodeInstance::find(char const* name)
+   {
+      if (m_num_provide_ports > 0)
+      {
+         for (std::size_t i = 0; i < m_num_provide_ports; i++)
+         {
+            auto* port_instance = m_provide_ports[i];
+            if (port_instance->name() == name)
+            {
+               return port_instance;
+            }
+         }
+      }
+      if (m_num_require_ports > 0)
+      {
+         for (std::size_t i = 0; i < m_num_require_ports; i++)
+         {
+            auto* port_instance = m_require_ports[i];
+            if (port_instance->name() == name)
+            {
+               return port_instance;
+            }
+         }
+      }
+      return nullptr;
+   }
+
+   PortInstance* NodeInstance::find(std::string const& name)
+   {
+      if (m_num_provide_ports > 0)
+      {
+         for (std::size_t i = 0; i < m_num_provide_ports; i++)
+         {
+            auto* port_instance = m_provide_ports[i];
+            if (port_instance->name() == name)
+            {
+               return port_instance;
+            }
+         }
+      }
+      if (m_num_require_ports > 0)
+      {
+         for (std::size_t i = 0; i < m_num_require_ports; i++)
+         {
+            auto* port_instance = m_require_ports[i];
+            if (port_instance->name() == name)
+            {
+               return port_instance;
+            }
+         }
+      }
+      return nullptr;
+   }
+
    apx::error_t NodeInstance::calc_init_data_size(PortInstance** port_list, std::size_t num_ports, std::size_t& total_size)
    {
       if ( (port_list == nullptr) || (num_ports == 0) )
@@ -370,7 +403,7 @@ namespace apx
       {
          auto port_instance = port_list[port_id];
          assert(port_instance != nullptr);
-         auto data_size = port_instance->get_data_size();
+         auto data_size = port_instance->data_size();
          assert(data_size > 0u);
          total_size += data_size;
       }
@@ -418,7 +451,12 @@ namespace apx
       {
          m_require_port_data_state = PortDataState::Synchronized;
       }
-      return m_node_data->write_require_port_data(offset, data, size);
+      auto retval = m_node_data->write_require_port_data(offset, data, size);
+      if ( (retval == APX_NO_ERROR) && (m_node_manager != nullptr) )
+      {
+         m_node_manager->require_port_data_written(this, offset, size);
+      }
+      return retval;
    }
 }
 

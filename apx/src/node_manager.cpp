@@ -25,7 +25,7 @@
 #include <cassert>
 #include <cstring>
 #include "cpp-apx/node_manager.h"
-#include <iostream> //DEBUG ONLY
+#include "cpp-apx/client_connection.h"
 
 namespace apx
 {
@@ -94,6 +94,14 @@ namespace apx
       return nullptr;
    }
 
+   void NodeManager::require_port_data_written(NodeInstance* node_instance, std::uint32_t offset, std::size_t size)
+   {
+      if (m_parent_connection != nullptr)
+      {
+         m_parent_connection->require_port_data_written(node_instance, offset, size);
+      }
+   }
+
    void NodeManager::reset()
    {
       //m_effective_element_map.clear();
@@ -130,7 +138,6 @@ namespace apx
       {
          node_instance->create_require_port_byte_map();
       }
-      node_instance->create_port_refs();
       attach_node(node_instance_ptr.release());
       return APX_NO_ERROR;
    }
@@ -138,6 +145,7 @@ namespace apx
    void NodeManager::attach_node(apx::NodeInstance* node_instance)
    {
       m_instance_map.insert(std::make_pair(node_instance->get_name(), std::unique_ptr<apx::NodeInstance>(node_instance)));
+      node_instance->set_node_manager(this);
       m_last_attached = node_instance;
    }
 
@@ -243,7 +251,7 @@ namespace apx
          {
             return APX_NULL_PTR_ERROR;
          }
-         auto data_size = port_instance->get_data_size();
+         auto data_size = port_instance->data_size();
          assert(data_size > 0u);
          auto const* proper_init_value = parsed_port->proper_init_value.get();
          if (proper_init_value != nullptr)
@@ -265,7 +273,7 @@ namespace apx
          {
             return APX_NULL_PTR_ERROR;
          }
-         auto data_size = port_instance->get_data_size();
+         auto data_size = port_instance->data_size();
          assert(data_size > 0u);
          auto const* proper_init_value = parsed_port->proper_init_value.get();
          if (proper_init_value != nullptr)
@@ -286,7 +294,7 @@ namespace apx
       assert(port_instance != nullptr);
       assert(value != nullptr);
       assert(data != nullptr);
-      vm::Program const& pack_program = port_instance->get_pack_program();
+      vm::Program const& pack_program = port_instance->pack_program();
       auto result = vm.select_program(pack_program);
       if (result != APX_NO_ERROR)
       {

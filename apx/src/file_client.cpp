@@ -169,7 +169,7 @@ namespace apx
       {
          return APX_INVALID_ARGUMENT_ERROR;
       }
-      auto const data_size = port->get_data_size();
+      auto const data_size = port->data_size();
       if (m_buffer.size() < data_size)
       {
          m_buffer.resize(data_size);
@@ -178,7 +178,7 @@ namespace apx
       retval = m_vm.set_write_buffer(m_buffer.data(), data_size);
       if (retval == APX_NO_ERROR)
       {
-         retval = m_vm.select_program(port->get_pack_program());
+         retval = m_vm.select_program(port->pack_program());
       }
       if (retval == APX_NO_ERROR)
       {
@@ -187,7 +187,7 @@ namespace apx
       if (retval == APX_NO_ERROR)
       {
          auto node_data = m_node->get_node_data();
-         retval = node_data->write_provide_port_data(port->get_data_offset(), m_buffer.data(), data_size);
+         retval = node_data->write_provide_port_data(port->data_offset(), m_buffer.data(), data_size);
       }
       return retval;
    }
@@ -203,21 +203,21 @@ namespace apx
       {
          return APX_INVALID_ARGUMENT_ERROR;
       }
-      auto const data_size = port->get_data_size();
+      auto const data_size = port->data_size();
       if (m_buffer.size() < data_size)
       {
          m_buffer.resize(data_size);
       }
       apx::error_t retval = APX_NO_ERROR;
       auto node_data = m_node->get_node_data();
-      retval = node_data->read_require_port_data(port->get_data_offset(), m_buffer.data(), data_size);
+      retval = node_data->read_require_port_data(port->data_offset(), m_buffer.data(), data_size);
       if (retval == APX_NO_ERROR)
       {
          retval = m_vm.set_read_buffer(m_buffer.data(), data_size);
       }
       if (retval == APX_NO_ERROR)
       {
-         retval = m_vm.select_program(port->get_unpack_program());
+         retval = m_vm.select_program(port->unpack_program());
       }
       if (retval == APX_NO_ERROR)
       {

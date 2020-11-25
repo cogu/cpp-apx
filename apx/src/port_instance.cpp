@@ -40,7 +40,7 @@ namespace apx
       return APX_NO_ERROR;
    }
 
-    element_id_t PortInstance::get_data_element_id() const
+    element_id_t PortInstance::data_element_id() const
     {
        if (m_effective_data_element != nullptr)
        {
@@ -49,7 +49,7 @@ namespace apx
        return INVALID_ELEMENT_ID;
     }
 
-    std::size_t PortInstance::get_computation_length() const
+    std::size_t PortInstance::get_computation_list_length() const
     {
        if (m_computation_list != nullptr)
        {
@@ -68,7 +68,7 @@ namespace apx
 
     }
 
-    computation_id_t PortInstance::get_computation_id() const
+    computation_id_t PortInstance::get_computation_list_id() const
     {
        if (m_computation_list != nullptr)
        {
