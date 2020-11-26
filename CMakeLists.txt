@@ -33,7 +33,9 @@ endif()
 # Libs
 add_subdirectory(bstr ${CMAKE_CURRENT_BINARY_DIR}/bstr)
 add_subdirectory(dtl ${CMAKE_CURRENT_BINARY_DIR}/dtl)
+add_subdirectory(msocket ${CMAKE_CURRENT_BINARY_DIR}/msocket)
 add_subdirectory(apx ${CMAKE_CURRENT_BINARY_DIR}/apx)
+
 
 # Applications
 add_subdirectory(app/apx_file_demo)
@@ -50,14 +52,16 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(GoogleTest)
     include("cmake/test_help.cmake")
     set (CPP_APX_TESTS
+        apx/test/client_spy.cpp
+        apx/test/client_spy.h
         apx/test/test_attribute_parser.cpp
         apx/test/test_client_connection.cpp
+        apx/test/test_client.cpp
         apx/test/test_compiler.cpp
         apx/test/test_computation.cpp
         apx/test/test_data_element.cpp
         apx/test/test_data_signature.cpp
         apx/test/test_decoder.cpp
-        apx/test/test_deserializer.cpp
         apx/test/test_file.cpp
         apx/test/test_file_cache.cpp
         apx/test/test_file_client.cpp
@@ -75,8 +79,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         apx/test/test_port_instance.cpp
         apx/test/test_program.cpp
         apx/test/test_remotefile.cpp
-        apx/test/test_serializer.cpp
         apx/test/test_signature_parser.cpp
+        apx/test/test_socket_client_connection.cpp
         apx/test/test_vm.cpp
     )
     if (QT_API)
@@ -84,7 +88,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         set(APX_LIBS cpp_apx_common cpp_apx_dtl cpp_apx_qt Qt5::Core)
         package_add_test_with_libraries(apx_test "${CPP_APX_TESTS}" "${APX_LIBS}")
     else()
-        list(APPEND CPP_APX_TESTS apx/test/test_serializer.cpp)
+        list(APPEND CPP_APX_TESTS apx/test/test_serializer.cpp apx/test/test_deserializer.cpp)
         set(APX_LIBS cpp_apx_common cpp_apx_dtl)
         package_add_test_with_libraries(apx_test "${CPP_APX_TESTS}" "${APX_LIBS}")
     endif()
