@@ -4,8 +4,8 @@ This is the new [APX](https://cogu.github.io/apx/) for C++ implementation.
 
 ## Implementation Status
 
-This repo is in early stages of development and mostly contains a set of classes with unit tests.
-The Visual Studio 2019 solution is used for development while the CMake build is used for production.
+This is an alpha-stage project and currently has limited functionality.
+Run-time tests and feature improvements are currently ongoing.
 
 ## Building with CMake
 
@@ -14,45 +14,23 @@ Unit tests should also build and run in Cygwin but it's not recomended to use as
 
 At least C++17 is required by your compiler, C++20 is recommended (this is the current pre-set in CMake files).
 
-### Running unit tests (Linux with GCC)
+### Running unit tests
 
 **Configure:**
 
-```sh
+```bash
 cmake -S . -B build -DUNIT_TEST=ON
 ```
 
 **Build:**
 
-```sh
+```bash
 cmake --build build
 ```
 
 **Run test cases:**
 
-```cmd
-cd build && ctest
-```
-
-### Running unit tests (Windows with Visual Studio 2019)
-
-Launch "x64 Native Tools Command Prompt for Visual Studio 2019" in start menu.
-
-**Configure:**
-
-```cmd
-cmake -S . -B build -DUNIT_TEST=ON
-```
-
-**Build:**
-
-```cmd
-cmake --build build
-```
-
-**Run test cases:**
-
-```cmd
+```bash
 cd build
 ctest
 ```
