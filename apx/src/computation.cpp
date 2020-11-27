@@ -21,7 +21,9 @@
 * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *
 ******************************************************************************/
-#include <charconv>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <array>
 #include <cassert>
 #include "cpp-apx/computation.h"
@@ -113,16 +115,12 @@ namespace apx
 
    std::string RationalScaling::to_string()
    {
-      std::array<char, 12> tmp;
-      auto [ptr, ec] = std::to_chars(tmp.data(), tmp.data() + tmp.size(), offset);
-      if (ec != std::errc())
-      {
-         return std::string();
-      }
+      std::ostringstream ss;
+      ss << std::setprecision(8) << std::noshowpoint << offset;
       std::string retval{ "RS(" };
       retval.append(limit_to_string());
       retval.push_back(',');
-      retval.append(tmp.data(), ptr);
+      retval.append(ss.str());
       retval.push_back(',');
       retval.append(std::to_string(numerator));
       retval.push_back(',');

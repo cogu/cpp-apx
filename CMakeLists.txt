@@ -41,7 +41,7 @@ add_subdirectory(apx ${CMAKE_CURRENT_BINARY_DIR}/apx)
 add_subdirectory(app/apx_file_demo)
 
 ### Unit Tests
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND UNIT_TEST)
     if(MSVC)
         set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
     endif()

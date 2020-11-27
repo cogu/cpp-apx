@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <cstring>
 #include <array>
 #include "cpp-apx/file_manager_receiver.h"
 

@@ -2,6 +2,7 @@
 #include <cassert>
 #include <algorithm>
 #include <typeinfo>
+#include <climits>
 #include "dtl/dtl.hpp"
 
 namespace dtl
