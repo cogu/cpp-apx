@@ -12,7 +12,15 @@ Run-time tests and feature improvements are currently ongoing.
 CMake build has been tested for Windows (with Visual Studio) as well as Linux (with GCC).
 Unit tests should also build and run in Cygwin but it's not recomended to use as production environment (due to issues with Cygwin socket support).
 
-At least C++17 is required by your compiler, C++20 is recommended (this is the current pre-set in CMake files).
+Your compiler needs to support at least C++17 in order to build.
+
+### Tested build environments
+
+| Supported | Architcture | OS      | Compiler           |
+|-----------|-------------|---------|--------------------|
+| No        | Any         | Linux   | GCC < 9.x          |
+| Yes       | Intel x64   | Linux   | GCC 9.3            |
+| Yes       | Intel x64   | Windows | Visual Studio 2019 |
 
 ### Running unit tests
 
