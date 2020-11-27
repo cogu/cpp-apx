@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(cpp_apx LANGUAGES CXX VERSION 0.0.2)
+project(cpp_apx LANGUAGES CXX VERSION 0.1.0)
 
 option(QT_API "Build against QT APIs?" OFF)
 
