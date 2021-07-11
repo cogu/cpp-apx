@@ -633,6 +633,11 @@ namespace apx
             }
             break;
          }
+         if (result == nullptr)
+         {
+            set_error(APX_PARSE_ERROR, next);
+            return result;
+         }
       }
       return next;
    }
@@ -837,7 +842,7 @@ namespace apx
          auto_upper_limit = true;
       }
       int32_t i32_index = vt->lower_limit.i32;
-      uint32_t u32_index = vt->lower_limit.i32;
+      uint32_t u32_index = vt->lower_limit.u32;
       for (auto it = vts.values.begin(); it != vts.values.end(); it++)
       {
          vt->values.push_back(*it);

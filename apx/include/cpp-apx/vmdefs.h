@@ -31,14 +31,14 @@ namespace apx
    namespace vm
    {
       /*
-      * APX PROGRAM HEADER (Varies between 6 and 13 bytes)
+      * APX VM 2.0 PROGRAM HEADER (Varies between 6 and 14 bytes)
       * bytes 0-1: Magic numbers 'V','M'
       * Byte 2: VM_MAJOR_VERSION
       * Byte 3: VM_MINOR_VERSION
       * Byte 4 (bits 4-7): program flags
       * Byte 4 (bit 3): pack or unpack program (0-1)
       * Byte 4 (bits 0-2): data size variant (VARIANT_U8, VARIANT_U16, VARIANT_U32)
-      * Bytes 5-(N-1): DataSize (Maximum data size required by this program) (variable-size encoded integer)
+      * Bytes 5..(N-1): DataSize (Maximum data size required by this program) (variable-size encoded integer)
       *            - If Byte 5 (bits 0-2) has value VARIANT_U8 this is encoded as uint8.
       *            - If Byte 5 (bits 0-2) has value VARIANT_U16 this is encoded as uint16le (little endian).
       *            - If Byte 5 (bits 0-2) has value VARIANT_U32 this is encoded as uint32le.
@@ -46,7 +46,7 @@ namespace apx
       * The header continues with an encoded DATA_SIZE instruction where variant must be value 2 or above.
       * Since length of previous header field varies we call the first byte after the encoded integer "Byte N".
       * Byte N: DATA_SIZE instruction header
-      * Bytes (N+1)-(N+4): ElementSize (variable-size encoded integer)
+      * Bytes (N+1)..(N+4): ElementSize (variable-size encoded integer)
       *
       * When HEADER_FLAG_QUEUED_DATA is set the queue size can be calculated from using the DataSize and ElementSize numbers.
       * The DataSize value has been previously incremented by the value 1, 2 or 4. Which of these it is can be determined from variant in the DATA_SIZE instruction.
@@ -73,7 +73,7 @@ namespace apx
       constexpr std::uint8_t HEADER_FLAG_QUEUED_DATA = 0x20; //When this is active, the very next instruction must be OPCODE_DATA_SIZE.
 
 
-      /* APX INSTRUCTION
+      /* APX VM 2.0 Instruction Format
 
       +-------------+----------------+---------------+
       | 1 FLag bit  | 4 variant bits | 3 opcode bits |

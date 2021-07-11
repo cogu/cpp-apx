@@ -7,7 +7,6 @@ apx::error_t apx::DataType::derive_data_element(apx::DataElement*& data_element,
    std::uint16_t reference_follow_count = 0u;
    apx::TypeCode type_code;
    data_element = get_data_element();
-   parent = nullptr;
    do
    {
       type_code = data_element->get_type_code();
@@ -42,7 +41,6 @@ apx::error_t apx::DataType::derive_data_element(apx::DataElement const*& data_el
    std::uint16_t reference_follow_count = 0u;
    apx::TypeCode type_code;
    data_element = get_data_element();
-   parent = nullptr;
 
    do
    {

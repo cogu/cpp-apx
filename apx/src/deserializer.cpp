@@ -126,7 +126,6 @@ namespace apx
             break;
          }
          return APX_NO_ERROR;
-
       }
 
       apx::error_t Deserializer::State::read_scalar_value(dtl::Scalar const* sv_arg, TypeCode type_code_arg)

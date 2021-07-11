@@ -1270,12 +1270,12 @@ namespace apx_test
 
    TEST(Serializer, PackUInt8QueuedElement)
    {
-      //DATA SIGNATURE: C:Q[10]
+      //DATA SIGNATURE: C:Q[5]
       std::array<std::uint8_t, UINT8_SIZE + UINT8_SIZE * 5> buf;
       std::memset(buf.data(), 0, buf.size());
       Serializer serializer;
       ASSERT_EQ(serializer.set_write_buffer(buf.data(), buf.size()), APX_NO_ERROR);
-      ASSERT_EQ(serializer.queued_write_begin(UINT8_SIZE, 10, true), APX_NO_ERROR);
+      ASSERT_EQ(serializer.queued_write_begin(UINT8_SIZE, 5, true), APX_NO_ERROR);
       auto sv = dtl::make_sv<std::uint32_t>(7);
       ASSERT_EQ(serializer.set_value(sv), APX_NO_ERROR);
       ASSERT_EQ(serializer.pack_uint8(0, apx::SizeType::UInt8), APX_NO_ERROR);
@@ -1287,7 +1287,7 @@ namespace apx_test
 
    TEST(Serializer, PackMultipleUInt8QueuedElements)
    {
-      //DATA SIGNATURE: C:Q[10]
+      //DATA SIGNATURE: C:Q[5]
       std::array<std::uint8_t, UINT8_SIZE + UINT8_SIZE * 5> buf;
       std::memset(buf.data(), 0, buf.size());
       Serializer serializer;

@@ -52,6 +52,7 @@ namespace apx
       TypeRefName, // TYPE NAME (string)
       TypeRefPtr   // Pointer to element
    };
+
    enum class TokenClass : unsigned char {
       None,
       DataElement,         //APX IDL v1.3
@@ -92,6 +93,7 @@ namespace apx
       WaitingForFileOpenRequest,      //Used by file publisher
       WaitingForFileData,
       Synchronized,
+      Disconnected,
    };
 
    using ByteArray = std::vector<std::uint8_t>;

@@ -369,15 +369,19 @@ namespace apx
       }
       for (std::size_t i = 0u; i < num_children; i++)
       {
-         DataElement* child_element = get_child_at(i);
-         apx::error_t result = derive_data_element(child_element, nullptr);
+         DataElement* child_element;
+         DataElement* derived_element;
+         child_element = derived_element = get_child_at(i);
+         assert(child_element != nullptr);
+         apx::error_t result = derive_data_element(derived_element, nullptr);
          if (result != APX_NO_ERROR)
          {
             return result;
          }
+         assert(derived_element != nullptr);
          dtl::DynamicValue const parsed_dv = parsed_av->at(i);
          dtl::DynamicValue derived_dv;
-         result = child_element->derive_proper_init_value(parsed_dv, derived_dv);
+         result = derived_element->derive_proper_init_value(parsed_dv, derived_dv);
          if (result != APX_NO_ERROR)
          {
             return result;

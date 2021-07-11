@@ -314,8 +314,8 @@ namespace apx
       auto const num_require_ports = static_cast<port_id_t>(node->get_num_require_ports());
       DataElementList data_element_list;
       DataElementMap data_element_map;
-      ComputationListOfLists computation_list;
-      ComputationListMap computation_map;
+      //ComputationListOfLists computation_list;
+      //ComputationListMap computation_map;
       for (port_id_t port_id = 0u; port_id < num_provide_ports; port_id++)
       {
          auto parsed_port = node->get_provide_port(port_id);
@@ -385,8 +385,8 @@ namespace apx
    {
       auto const num_provide_ports = static_cast<port_id_t>(node->get_num_provide_ports());
       auto const num_require_ports = static_cast<port_id_t>(node->get_num_require_ports());
-      DataElementList data_element_list;
-      DataElementMap data_element_map;
+      //DataElementList data_element_list;
+      //DataElementMap data_element_map;
       ComputationListOfLists computation_lists;
       ComputationListMap computation_map;
       for (port_id_t port_id = 0u; port_id < num_provide_ports; port_id++)

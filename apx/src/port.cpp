@@ -105,6 +105,7 @@ namespace apx
          auto data_type = data_element->get_typeref_ptr();
          if (data_type != nullptr)
          {
+            parent = data_element;
             retval = data_type->derive_data_element(data_element, &parent);
             assert(data_element != nullptr);
          }
@@ -126,6 +127,7 @@ namespace apx
          auto data_type = data_element->get_typeref_ptr();
          if (data_type != nullptr)
          {
+            parent = data_element;
             retval = data_type->derive_data_element(data_element, &parent);
             assert(data_element != nullptr);
          }

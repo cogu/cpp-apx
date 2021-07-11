@@ -209,6 +209,10 @@ namespace apx
             if (is_array)
             {
                elem_size *= array_length;
+               if (is_dynamic_array)
+               {
+                  elem_size += static_cast<uint32_t>(vm::size_type_to_size(vm::size_to_size_type(array_length)));
+               }
             }
          }
          else

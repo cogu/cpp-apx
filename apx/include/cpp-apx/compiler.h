@@ -31,7 +31,6 @@ namespace apx
       apx::error_t compile_record_select_instruction(apx::DataElement const* data_element, bool is_last_field);
       apx::error_t compile_array_next_instruction();
 
-      //std::stack<std::uint32_t> m_offset_stack;
       std::unique_ptr<apx::vm::Program> m_program;
       apx::error_t m_last_error{ APX_NO_ERROR };
       bool m_is_dynamic = false;

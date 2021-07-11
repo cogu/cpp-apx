@@ -45,11 +45,7 @@ namespace apx
       void reset();
       void reserve(std::size_t size);
       FileManagerReceptionResult write(std::uint32_t address, std::uint8_t const* data, std::size_t size, bool more_bit);
-      //bool get_msg(std::uint32_t& start_address, std::uint8_t const*& msg_data, std::size_t& msg_size);
       std::size_t buffer_size() const { return m_receive_buffer.size(); }
-/*      std::size_t msg_size() const { return m_buf_pos; }
-      std::uint8_t const* data() const { return m_receive_buffer.data(); }
-      std::uint32_t address() const { return m_start_address; }*/
    protected:
 
       void start_new_reception(FileManagerReceptionResult& result, std::uint32_t address, std::uint8_t const* data, std::size_t size, bool more_bit);
