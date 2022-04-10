@@ -147,9 +147,6 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\socket_client_connection.h">
       <Filter>apx\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\transmit_handler.h">
-      <Filter>apx\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h">
       <Filter>apx\include</Filter>
     </ClInclude>
@@ -187,6 +184,9 @@
       <Filter>msocket\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client.h">
+      <Filter>apx\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\byte_port_map.h">
       <Filter>apx\include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -315,6 +315,9 @@
       <Filter>msocket\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\client.cpp">
+      <Filter>apx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\apx\src\byte_port_map.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
   </ItemGroup>

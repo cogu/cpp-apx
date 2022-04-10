@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\attribute_parser.h" />
+    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\byte_port_map.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\client_connection.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\command.h" />
@@ -57,7 +58,6 @@
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\sha256.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\signature_parser.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\socket_client_connection.h" />
-    <ClInclude Include="..\..\..\..\apx\include\cpp-apx\transmit_handler.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\types.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\type_attribute.h" />
     <ClInclude Include="..\..\..\..\apx\include\cpp-apx\vm.h" />
@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\apx\src\attribute_parser.cpp" />
+    <ClCompile Include="..\..\..\..\apx\src\byte_port_map.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\client.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\client_connection.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\command.cpp" />
@@ -217,7 +218,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>APX_DEBUG_ENABLE;WIN32_LEAN_AND_MEAN;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>

@@ -152,9 +152,6 @@
     <ClCompile Include="..\..\..\..\apx\src\port.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\apx\src\port_attribute.cpp">
-      <Filter>apx\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\port_instance.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
@@ -165,9 +162,6 @@
       <Filter>apx\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\signature_parser.cpp">
-      <Filter>apx\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\apx\src\type_attribute.cpp">
       <Filter>apx\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\apx\src\vm.cpp">

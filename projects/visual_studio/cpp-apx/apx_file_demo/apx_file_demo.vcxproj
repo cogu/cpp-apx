@@ -62,12 +62,10 @@
     <ClCompile Include="..\..\..\..\apx\src\node_manager.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\parser.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\port.cpp" />
-    <ClCompile Include="..\..\..\..\apx\src\port_attribute.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\port_instance.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\program.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\serializer.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\signature_parser.cpp" />
-    <ClCompile Include="..\..\..\..\apx\src\type_attribute.cpp" />
     <ClCompile Include="..\..\..\..\apx\src\vm.cpp" />
     <ClCompile Include="..\..\..\..\dtl\src\dtl.cpp" />
   </ItemGroup>

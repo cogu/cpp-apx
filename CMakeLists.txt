@@ -39,6 +39,9 @@ add_subdirectory(apx ${CMAKE_CURRENT_BINARY_DIR}/apx)
 
 # Applications
 add_subdirectory(app/apx_file_demo)
+if (NOT UNIT_TEST)
+add_subdirectory(app/apx_test_client)
+endif()
 
 ### Unit Tests
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND UNIT_TEST)
