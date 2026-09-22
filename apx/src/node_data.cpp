@@ -31,7 +31,7 @@ namespace apx
    apx::error_t NodeData::create_definition_data(std::uint8_t const* init_data, std::size_t data_size)
    {
       std::scoped_lock lock{ m_mutex };
-      if ( (init_data != nullptr) && (init_data > 0u) ) //init_data is not optional
+      if ( (init_data != nullptr) && (data_size > 0u) ) //init_data is not optional
       {
          m_definition_data.reset(new std::uint8_t[data_size]);
          m_definition_data_size = data_size;
